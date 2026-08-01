@@ -17,6 +17,11 @@ Last updated: July 31, 2026
 - Zod validation for public Supabase environment variables
 - Initial Supabase migration for profiles, personal workspaces, memberships,
   work schedules, signup provisioning, and RLS
+- Local Supabase stack verified on Docker Desktop
+- Foundation migration and privacy-safe seed replayed successfully from a clean
+  local database
+- Generated TypeScript database contract connected to the browser and server
+  Supabase clients
 - Vitest, Testing Library, and Playwright configuration with initial tests
 - Prettier, ESLint, TypeScript, build, and GitHub Actions quality checks
 - Baseline security headers and non-indexable product metadata
@@ -53,14 +58,12 @@ enhancement and cannot block local planning.
 
 ## Next foundation increment
 
-1. Start the local Supabase stack and replay the foundation migration.
-2. Generate TypeScript database types from the migrated local schema.
-3. Add English sign-in and first-time setup screens.
-4. Add Next.js session refresh through the current `proxy.ts` convention.
-5. Protect workspace routes and test authorization/RLS behavior.
-6. Replace synthetic profile/work schedule values with authenticated data.
-7. Establish a hosted development Supabase project only after local behavior is
+1. Add English sign-in and first-time setup screens.
+2. Add Next.js session refresh through the current `proxy.ts` convention.
+3. Protect workspace routes and test authorization/RLS behavior.
+4. Replace synthetic profile/work schedule values with authenticated data.
+5. Establish a hosted development Supabase project only after local behavior is
    reproducible.
 
-This increment requires Docker for local Supabase. It does not require Google
-Calendar credentials.
+Docker Desktop and the local Supabase stack are now operational. This increment
+does not require Google Calendar credentials.

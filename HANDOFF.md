@@ -78,6 +78,8 @@ calendar.
 - First Today implementation with synthetic ticket, Task, Reminder, and Meeting data
 - Supabase SSR boundaries, environment validation, local config, initial workspace
   migration, signup provisioning, and RLS
+- Docker-backed local Supabase stack, clean migration replay, and generated
+  TypeScript database types wired into both Supabase clients
 - Formatting, linting, type checking, unit tests, browser tests, build checks, and CI
 - Security-fixed dependency overrides with a clean npm audit
 
@@ -93,10 +95,9 @@ Google Calendar credentials, and deployment configuration are not connected.
 
 ### Next step
 
-Continue Phase 3 from `docs/13-technical-foundation.md`: run and verify the
-local Supabase migration, generate database types, then implement sign-in,
-first-time setup, session refresh, and protected workspace routes. Google
-Calendar credentials are not needed for this increment.
+Continue Phase 3 from `docs/13-technical-foundation.md`: implement sign-in,
+first-time setup, session refresh, protected workspace routes, and RLS tests.
+Google Calendar credentials are not needed for this increment.
 
 ## Confirmed product decisions
 

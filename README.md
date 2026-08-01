@@ -42,6 +42,17 @@ authentication work begins, copy `.env.example` to `.env.local` and replace the
 placeholder values with local or hosted project values. Never commit
 `.env.local`.
 
+Run the local database and reproduce its schema with:
+
+```bash
+npm run db:start
+npm run db:reset
+npm run db:types
+```
+
+`db:types` regenerates the checked-in TypeScript database contract after a
+schema migration changes.
+
 ## Verification commands
 
 ```bash
