@@ -5,9 +5,15 @@ Last updated: August 1, 2026
 
 ## Outcome
 
-North Haven is prepared for a private Vercel deployment backed by a separate
-hosted Supabase project. Local development remains available and the owner's
+North Haven now has a separate hosted Supabase project and is prepared for a
+private Vercel deployment. Local development remains available and the owner's
 existing Netlify deployment is not changed.
+
+`North Haven Development` was created in the Tokki organization on the Free
+plan in East US (North Virginia). The repository is linked through the Supabase
+CLI, all 19 reviewed migrations were applied successfully, and a subsequent
+remote dry run reports that the database is up to date. No demo seed or customer
+data was applied.
 
 The repository pins Node.js 24 for local development, GitHub Actions, and
 Vercel. GitHub Actions now proves the authenticated workflow against a clean
@@ -34,16 +40,16 @@ not seed `supabase/demo/insights_demo.sql` into the hosted project.
 
 ## Supabase project
 
-Create a hosted project in a personal or Tokki Supabase organization:
+The hosted project uses:
 
+- Organization: `Tokki`
 - Project name: `North Haven Development`
-- Region: choose the region closest to the Vercel function region and the owner
-  in Guatemala; keep both services in the same broad geography when possible
-- Plan: Free is sufficient for the private acceptance environment
+- Region: East US (North Virginia)
+- Plan: Free
 - Database password: generated and stored in a password manager, never in Git
   or chat
 
-After signing the CLI in locally, link this repository and apply migrations:
+The project was linked and migrated using:
 
 ```bash
 npx supabase login

@@ -179,22 +179,26 @@ calendar.
 - Hosted-test cleanup that removes its generated workspace and auth user
 - Auth-user teardown that removes a sole-owner personal workspace atomically
   without changing North Haven's recoverable in-app archival behavior
+- Hosted `North Haven Development` Supabase project in the Tokki organization,
+  East US (North Virginia), linked to the repository with all 19 reviewed
+  migrations applied and no demo or customer data
 
 ### Pending or not started
 
-- Phase 7.5D hosted Supabase and Vercel acceptance run
-- Hosted Supabase and Vercel deployment configuration
+- Phase 7.5D Vercel deployment and hosted acceptance run
+- Hosted environment variables, redirects, password recovery, and production
+  Google Calendar callback validation
 - Phase 8 hardening and personal launch
 
-Application code and local real-calendar validation now exist. Production data,
-hosted authentication, production Google credentials, and deployment
-configuration are not connected.
+Application code, local real-calendar validation, and the empty hosted database
+schema now exist. Production data, hosted authentication acceptance, production
+Google credentials, and Vercel deployment configuration are not connected.
 
 ### Next step
 
-Continue Phase 7.5D by creating the hosted development Supabase project,
-applying the reviewed migrations, importing North Haven into the owner's Tokki
-Vercel team, and running the cleanup-safe hosted acceptance path. Production
+Continue Phase 7.5D by importing North Haven into the owner's Tokki Vercel team,
+configuring protected environment values and redirects, and running the
+cleanup-safe hosted acceptance path. Production
 Google Calendar consent is verified only after the stable Vercel production URL
 is registered. The exact sequence is in
 `docs/23-hosted-environment-implementation.md`. The completed reporting, Settings, and recovery
@@ -210,9 +214,9 @@ implementations are documented in
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.
 
-The hosted Supabase development environment, hosted password-recovery check,
-remaining authenticated Today schedule data, and recovery documentation remain
-open Phase 3 hardening tasks. They are required before deployment but do not
+The hosted password-recovery check, remaining authenticated Today schedule data,
+and recovery documentation remain open Phase 3 hardening tasks. They are
+required before personal launch but do not
 block Phase 7. Local Google Calendar credentials are configured in the ignored
 environment file; they must never be copied into documentation or Git.
 
