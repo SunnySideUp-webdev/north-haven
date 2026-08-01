@@ -128,6 +128,6 @@ test("creates a private workspace, completes setup, and restores the session", a
   ).toBeVisible();
   await expect(page.getByLabel("Insights period")).toHaveValue("month");
   await expect(
-    page.getByRole("heading", { level: 2, name: "Work completed" }),
+    page.getByRole("heading", { level: 2, name: "Weekly rhythm" }),
   ).toBeVisible();
 });

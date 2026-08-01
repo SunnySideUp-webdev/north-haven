@@ -124,6 +124,7 @@ describe("insight calculations", () => {
         ticketsResolved: 0,
         ticketsWorked: 1,
       },
+      workStatus: { active: 0, total: 0, waiting: 0, watching: 0 },
       workingWeekdays: [1, 2, 3, 4, 5],
     };
 

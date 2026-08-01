@@ -459,11 +459,21 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
         chosen_end_date: "2026-08-04",
         chosen_start_date: "2026-08-04",
       });
+    const { data: workStatusA, error: workStatusErrorA } = await clientA.rpc(
+      "reporting_work_status_snapshot",
+      { chosen_as_of_date: "2026-08-04" },
+    );
+    const { data: workStatusB, error: workStatusErrorB } = await clientB.rpc(
+      "reporting_work_status_snapshot",
+      { chosen_as_of_date: "2026-08-04" },
+    );
 
     expect(totalsErrorA).toBeNull();
     expect(totalsErrorB).toBeNull();
     expect(inventoryMetricsErrorA).toBeNull();
     expect(inventoryMetricsErrorB).toBeNull();
+    expect(workStatusErrorA).toBeNull();
+    expect(workStatusErrorB).toBeNull();
     expect(totalsA?.[0]).toMatchObject({
       completed_items: 1,
       planned_items: 2,
@@ -483,6 +493,18 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
       active_tickets: 0,
       waiting_tickets: 0,
       watching_tickets: 0,
+    });
+    expect(workStatusA?.[0]).toMatchObject({
+      active_work: 0,
+      total_active: 1,
+      waiting: 1,
+      watching: 0,
+    });
+    expect(workStatusB?.[0]).toMatchObject({
+      active_work: 0,
+      total_active: 0,
+      waiting: 0,
+      watching: 0,
     });
 
     const { data: connection, error: connectionError } = await admin

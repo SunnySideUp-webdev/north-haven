@@ -150,6 +150,7 @@ export async function getInsights(request: {
     totalsResult,
     previousTotalsResult,
     inventoryResult,
+    workStatusResult,
     scheduleResult,
   ] = await Promise.all([
     supabase.rpc("reporting_daily_metrics", {
@@ -168,6 +169,9 @@ export async function getInsights(request: {
       chosen_end_date: range.end,
       chosen_start_date: range.start,
     }),
+    supabase.rpc("reporting_work_status_snapshot", {
+      chosen_as_of_date: range.end,
+    }),
     supabase.from("work_schedules").select("working_weekdays").maybeSingle(),
   ]);
 
@@ -176,6 +180,7 @@ export async function getInsights(request: {
     totalsResult.error ||
     previousTotalsResult.error ||
     inventoryResult.error ||
+    workStatusResult.error ||
     scheduleResult.error
   ) {
     throw new Error("We couldn't load Insights for this period.");
@@ -204,6 +209,12 @@ export async function getInsights(request: {
     timeZone,
     today,
     totals: mapPeriodTotals(totalsResult.data?.[0]),
+    workStatus: {
+      active: number(workStatusResult.data?.[0]?.active_work ?? 0),
+      total: number(workStatusResult.data?.[0]?.total_active ?? 0),
+      waiting: number(workStatusResult.data?.[0]?.waiting ?? 0),
+      watching: number(workStatusResult.data?.[0]?.watching ?? 0),
+    },
     workingWeekdays: scheduleResult.data?.working_weekdays ?? [1, 2, 3, 4, 5],
   };
 }

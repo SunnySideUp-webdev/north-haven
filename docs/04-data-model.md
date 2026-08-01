@@ -267,6 +267,8 @@ Reporting data remains derived rather than copied into analytics tables:
 - `reporting_period_totals(start, end)` returns exact-period distinct totals.
 - `reporting_inventory_metrics(start, end)` reconstructs historical inventory
   and ticket-age snapshots from status events.
+- `reporting_work_status_snapshot(date)` partitions active inventory into
+  mutually exclusive Active, Watching, and Waiting segments for visualization.
 
 All three functions derive the authenticated personal workspace internally and
 limit ranges to 371 dates. Calendar, Insights, and Reports must consume these

@@ -55,6 +55,13 @@ export type PeriodTotals = {
   ticketsWorked: number;
 };
 
+export type WorkStatusSnapshot = {
+  active: number;
+  total: number;
+  waiting: number;
+  watching: number;
+};
+
 export type InsightsView = {
   daily: DailyMetric[];
   end: string;
@@ -67,5 +74,6 @@ export type InsightsView = {
   timeZone: string;
   today: string;
   totals: PeriodTotals;
+  workStatus: WorkStatusSnapshot;
   workingWeekdays: number[];
 };

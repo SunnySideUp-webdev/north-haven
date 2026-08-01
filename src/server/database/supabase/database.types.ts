@@ -1225,6 +1225,15 @@ export type Database = {
           tickets_worked: number;
         }[];
       };
+      reporting_work_status_snapshot: {
+        Args: { chosen_as_of_date: string };
+        Returns: {
+          active_work: number;
+          total_active: number;
+          waiting: number;
+          watching: number;
+        }[];
+      };
       resolve_end_of_day_follow_up: {
         Args: {
           chosen_decision: Database["public"]["Enums"]["follow_up_decision"];

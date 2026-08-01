@@ -169,6 +169,101 @@ function ComparisonBars({
   );
 }
 
+function StackedActivityBars({ buckets }: { buckets: InsightBucket[] }) {
+  const max = Math.max(
+    0,
+    ...buckets.map((bucket) => bucket.worked + bucket.resolved),
+  );
+  if (!max) {
+    return (
+      <NoChart>
+        Ticket activity will appear here after work is recorded for this period.
+      </NoChart>
+    );
+  }
+
+  return (
+    <>
+      <div className="mt-6 flex items-center justify-end gap-5 text-xs">
+        <span className="text-muted flex items-center gap-2">
+          <span className="bg-lavender-300 h-3 w-3 rounded-sm" /> Worked
+        </span>
+        <span className="text-muted flex items-center gap-2">
+          <span className="bg-blush-200 h-3 w-3 rounded-sm" /> Resolved
+        </span>
+      </div>
+      <div className="border-border relative mt-5 h-52 overflow-x-auto border-b">
+        <div
+          className="pointer-events-none absolute inset-0 flex flex-col justify-between pb-7"
+          aria-hidden="true"
+        >
+          <span className="border-border border-t" />
+          <span className="border-border border-t" />
+          <span className="border-border border-t" />
+          <span className="border-border border-t" />
+        </div>
+        <div
+          className="relative flex h-full w-full items-end gap-7 px-3"
+          style={{ minWidth: `${Math.max(540, buckets.length * 92)}px` }}
+        >
+          {buckets.map((bucket) => {
+            const total = bucket.worked + bucket.resolved;
+            return (
+              <div
+                key={bucket.start}
+                className="flex h-full min-w-16 flex-1 flex-col items-center justify-end"
+              >
+                <div
+                  className="flex w-11 flex-col justify-end overflow-hidden rounded-t-sm"
+                  style={{
+                    height: `${Math.max(total ? 5 : 0, (total / max) * 78)}%`,
+                  }}
+                  aria-hidden="true"
+                >
+                  <div
+                    className="bg-lavender-300"
+                    style={{
+                      height: `${total ? (bucket.worked / total) * 100 : 0}%`,
+                    }}
+                  />
+                  <div
+                    className="bg-blush-200"
+                    style={{
+                      height: `${total ? (bucket.resolved / total) * 100 : 0}%`,
+                    }}
+                  />
+                </div>
+                <span className="text-quiet mt-3 pb-2 text-center text-[11px]">
+                  {bucket.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <table className="sr-only">
+        <caption>Worked and resolved ticket activity</caption>
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>Worked</th>
+            <th>Resolved</th>
+          </tr>
+        </thead>
+        <tbody>
+          {buckets.map((bucket) => (
+            <tr key={bucket.start}>
+              <th>{bucket.label}</th>
+              <td>{bucket.worked}</td>
+              <td>{bucket.resolved}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  );
+}
+
 function ActiveTrend({ buckets }: { buckets: InsightBucket[] }) {
   const max = Math.max(0, ...buckets.map((bucket) => bucket.active));
   if (!max)
@@ -233,6 +328,62 @@ function ActiveTrend({ buckets }: { buckets: InsightBucket[] }) {
         </tbody>
       </table>
     </>
+  );
+}
+
+function WorkStatusDonut({ status }: { status: InsightsView["workStatus"] }) {
+  if (!status.total) {
+    return (
+      <NoChart>
+        Work status will appear when active tickets exist for this date.
+      </NoChart>
+    );
+  }
+
+  const activeEnd = (status.active / status.total) * 100;
+  const watchingEnd = activeEnd + (status.watching / status.total) * 100;
+  const background = `conic-gradient(
+    var(--nh-lavender-300) 0% ${activeEnd}%,
+    var(--nh-blush-200) ${activeEnd}% ${watchingEnd}%,
+    var(--nh-waiting-surface) ${watchingEnd}% 100%
+  )`;
+
+  return (
+    <div className="mt-6 grid grid-cols-[230px_1fr] items-center gap-7">
+      <div
+        role="img"
+        aria-label={`Work status: ${status.total} active tickets total; ${status.active} active, ${status.watching} watching, ${status.waiting} waiting.`}
+        className="relative h-[230px] w-[230px] rounded-full"
+        style={{ background }}
+      >
+        <div className="bg-paper absolute inset-[38px] flex flex-col items-center justify-center rounded-full">
+          <strong className="text-ink text-[36px] leading-none tracking-[-0.05em]">
+            {status.total}
+          </strong>
+          <span className="text-muted mt-2 text-xs">active tickets</span>
+        </div>
+      </div>
+      <dl className="space-y-5">
+        {[
+          { color: "bg-lavender-300", label: "Active", value: status.active },
+          { color: "bg-blush-200", label: "Watching", value: status.watching },
+          {
+            color: "bg-waiting-surface",
+            label: "Waiting",
+            value: status.waiting,
+          },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="grid grid-cols-[14px_1fr_auto] items-center gap-3"
+          >
+            <span className={`${item.color} h-3.5 w-3.5 rounded-sm`} />
+            <dt className="text-muted text-sm">{item.label}</dt>
+            <dd className="text-ink text-sm font-bold">{item.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 
@@ -586,27 +737,59 @@ export function InsightsDashboard({ insights }: { insights: InsightsView }) {
         </p>
       </section>
 
+      <section className="border-border bg-paper shadow-surface mt-6 rounded-xl border p-7">
+        <div className="divide-border grid grid-cols-[minmax(0,1.18fr)_minmax(430px,0.82fr)] divide-x">
+          <div className="pr-8">
+            <ChartHeading
+              id="weekly-rhythm-title"
+              title="Weekly rhythm"
+              description="Tickets worked and resolved across the selected period"
+            />
+            <StackedActivityBars buckets={buckets} />
+          </div>
+          <div className="pl-8">
+            <ChartHeading
+              id="work-status-title"
+              title="Work status"
+              description="Active inventory at the end of this period"
+            />
+            <WorkStatusDonut status={insights.workStatus} />
+            <p className="bg-lavender-50 text-muted mt-6 rounded-lg p-4 text-sm leading-6">
+              <strong className="text-ink block">A steady pattern</strong>
+              <span className="mt-1 block">
+                {activityTop && activityTop.worked
+                  ? `${activityTop.label} had the most worked activity; `
+                  : "No ticket work was recorded; "}
+                {insights.workStatus.waiting === 1
+                  ? "1 ticket is waiting for a response."
+                  : `${insights.workStatus.waiting} tickets are waiting for a response.`}
+              </span>
+            </p>
+          </div>
+        </div>
+      </section>
+
       <div className="mt-6 grid grid-cols-2 gap-6">
         <section
-          aria-labelledby="work-completed-title"
+          aria-labelledby="flow-title"
           className="border-border bg-paper shadow-surface rounded-xl border p-7"
         >
           <ChartHeading
-            id="work-completed-title"
-            title="Work completed"
-            description="Ticket activity and resolution rhythm"
+            id="flow-title"
+            title="Received versus resolved"
+            description="New ticket demand compared with resolution events"
           />
           <ComparisonBars
             buckets={buckets}
-            first="worked"
-            firstLabel="Worked"
+            first="received"
+            firstLabel="Received"
             second="resolved"
             secondLabel="Resolved"
           />
-          <p className="bg-lavender-50 text-muted mt-6 rounded-lg p-4 text-sm leading-6">
-            {activityTop && activityTop.worked
-              ? `${activityTop.label} had the most worked ticket activity: ${plural(activityTop.worked, "ticket")}.`
-              : "No ticket work was recorded in this period."}
+          <p className="bg-blush-50 text-muted mt-6 rounded-lg p-4 text-sm leading-6">
+            {plural(summary.totalReceived, "ticket")} received and{" "}
+            {plural(insights.totals.ticketsResolved, "resolution")} recorded in
+            this period.
           </p>
         </section>
 
@@ -628,29 +811,6 @@ export function InsightsDashboard({ insights }: { insights: InsightsView }) {
                 ? `increased by ${activeEnd - activeStart}`
                 : `decreased by ${activeStart - activeEnd}`}{" "}
             across this period.
-          </p>
-        </section>
-
-        <section
-          aria-labelledby="flow-title"
-          className="border-border bg-paper shadow-surface rounded-xl border p-7"
-        >
-          <ChartHeading
-            id="flow-title"
-            title="Received versus resolved"
-            description="New ticket demand compared with resolution events"
-          />
-          <ComparisonBars
-            buckets={buckets}
-            first="received"
-            firstLabel="Received"
-            second="resolved"
-            secondLabel="Resolved"
-          />
-          <p className="bg-blush-50 text-muted mt-6 rounded-lg p-4 text-sm leading-6">
-            {plural(summary.totalReceived, "ticket")} received and{" "}
-            {plural(insights.totals.ticketsResolved, "resolution")} recorded in
-            this period.
           </p>
         </section>
 
@@ -679,7 +839,7 @@ export function InsightsDashboard({ insights }: { insights: InsightsView }) {
 
         <section
           aria-labelledby="plan-title"
-          className="border-border bg-paper shadow-surface col-span-2 rounded-xl border p-7"
+          className="border-border bg-paper shadow-surface rounded-xl border p-7"
         >
           <ChartHeading
             id="plan-title"

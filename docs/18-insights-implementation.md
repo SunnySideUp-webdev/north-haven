@@ -31,6 +31,11 @@ Migration `20260801001000_reporting_meeting_instances.sql` keeps recurring
 meeting instances distinct by local date while still deduplicating the same
 event if it appears through more than one selected calendar.
 
+Migration `20260801001100_reporting_work_status.sql` adds an exact historical
+snapshot for the status donut. Its Active, Watching, and Waiting categories are
+mutually exclusive and always add up to the Active Tickets total shown in the
+center.
+
 Both functions accept ranges of at most 371 days, derive the personal workspace
 from the authenticated session, use an empty search path, and accept no
 workspace identifier from the browser. The daily Calendar projection remains
@@ -70,6 +75,8 @@ subsets of Active rather than additional inventory totals.
 - Week, Month, Quarter, and Custom range controls use dates only in the URL.
 - Current partial periods are labeled `Current period through today`.
 - Five primary metrics are followed by a quieter status and average band.
+- The primary analysis surface mirrors the approved high-fidelity direction:
+  stacked Worked/Resolved bars on the left and a Work Status donut on the right.
 - Work Completed, Received versus Resolved, Active Inventory, Ticket Age, and
   Plan Completion charts include visible plain-language summaries.
 - Every visual chart includes a semantic text or table alternative.
@@ -78,6 +85,17 @@ subsets of Active rather than additional inventory totals.
 - Tasks, Reminders, and confirmed Meetings remain separate from ticket totals.
 - `Export report` is visible but disabled until the final Phase 7 Report Builder
   increment is implemented, avoiding a dead or misleading route.
+
+## Local visual-review data
+
+`supabase/demo/insights_demo.sql` creates 16 synthetic tickets plus July 2026
+plans, work logs, outcomes, historical statuses, and three demo day notes. Every
+record uses the `DEMO-INSIGHT-` or `[DEMO]` marker and contains no customer
+information. Re-running the script is idempotent for these marked records.
+
+`supabase/demo/remove_insights_demo.sql` removes only those marked synthetic
+records. Neither script runs as part of normal migrations, CI, production setup,
+or `supabase db reset`.
 
 ## Verification
 

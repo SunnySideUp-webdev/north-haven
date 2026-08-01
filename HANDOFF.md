@@ -133,6 +133,8 @@ calendar.
 - Accessible Work Completed, Received vs Resolved, Active Inventory, Ticket Age,
   and Plan Completion charts with plain-language summaries
 - OOO-aware average daily work that respects configured working weekdays
+- High-fidelity-inspired Insights analysis surface with stacked activity bars
+  and a mutually exclusive Active/Watching/Waiting donut
 
 ### Pending or not started
 
@@ -161,6 +163,11 @@ remaining authenticated Today schedule data, and recovery documentation remain
 open Phase 3 hardening tasks. They are required before deployment but do not
 block Phase 7. Local Google Calendar credentials are configured in the ignored
 environment file; they must never be copied into documentation or Git.
+
+The current local personal workspace contains 16 clearly marked synthetic
+`DEMO-INSIGHT-*` tickets for July 2026 so the approved Insights graphs can be
+visually reviewed. They contain no customer information and can be removed with
+`supabase/demo/remove_insights_demo.sql` without touching real work records.
 
 ## Confirmed product decisions
 
