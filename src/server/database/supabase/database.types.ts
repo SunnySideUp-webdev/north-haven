@@ -603,6 +603,24 @@ export type Database = {
           },
         ];
       };
+      report_export_attempts: {
+        Row: {
+          id: string;
+          profile_id: string;
+          requested_at: string;
+        };
+        Insert: {
+          id?: string;
+          profile_id: string;
+          requested_at?: string;
+        };
+        Update: {
+          id?: string;
+          profile_id?: string;
+          requested_at?: string;
+        };
+        Relationships: [];
+      };
       status_events: {
         Row: {
           changed_at: string;
@@ -1111,6 +1129,7 @@ export type Database = {
         };
         Returns: undefined;
       };
+      claim_report_export_slot: { Args: never; Returns: boolean };
       complete_initial_setup: {
         Args: {
           chosen_display_name: string;

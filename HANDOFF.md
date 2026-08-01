@@ -135,10 +135,18 @@ calendar.
 - OOO-aware average daily work that respects configured working weekdays
 - High-fidelity-inspired Insights analysis surface with stacked activity bars
   and a mutually exclusive Active/Watching/Waiting donut
+- Daily, Weekly, and Monthly Report Builder entered from Insights without a new
+  primary-navigation destination
+- Live designed-PDF and accessible CSV previews with exact local date ranges
+- Server-rendered, selectable-text PDF using embedded DM Sans plus date-row and
+  period-total UTF-8 CSV
+- Privacy-safe detail controls that exclude ticket titles, day notes, and
+  follow-up reasons until explicit opt-in
+- Authenticated, same-origin, private/no-store export endpoint with a durable
+  six-per-minute PostgreSQL limit and no retained report files
 
 ### Pending or not started
 
-- Phase 7 Daily/Weekly/Monthly Report Builder and PDF/CSV exports
 - Hosted Supabase and deployment configuration
 - Phase 8 hardening and personal launch
 
@@ -148,12 +156,14 @@ configuration are not connected.
 
 ### Next step
 
-Continue Phase 7 with the approved Daily, Weekly, and Monthly Report Builder,
-then stream designed PDF and data-only CSV exports. Reports must consume the
-implemented reporting projections without recomputing metrics. The Calendar and
-Insights increments are documented in
-`docs/17-retrospective-calendar-implementation.md` and
-`docs/18-insights-implementation.md`.
+Begin Phase 8 hardening and personal launch. Priorities are hosted Supabase and
+Vercel configuration, a complete keyboard/accessibility audit, cross-browser
+desktop verification, hosted password recovery, report privacy/accessibility
+review, backup/export restoration, and removal of visual-review data before
+real daily use. The completed reporting implementation is documented in
+`docs/17-retrospective-calendar-implementation.md`,
+`docs/18-insights-implementation.md`, and
+`docs/19-report-builder-implementation.md`.
 
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.
@@ -250,7 +260,8 @@ visually reviewed. They contain no customer information and can be removed with
 - Ticket numbers, titles, notes, and follow-up content are excluded by default.
 - Detailed content requires explicit opt-in and a privacy notice.
 - Generated files are streamed on demand and are not retained by North Haven.
-- The complete reporting extension is approved for implementation.
+- The complete reporting extension is implemented and ready for personal
+  visual review.
 
 ### Privacy and security
 
@@ -309,6 +320,7 @@ The current visual specification is `docs/10-visual-system.md`.
 - `docs/16-google-calendar-implementation.md` — secure read-only Calendar implementation and live feasibility check
 - `docs/17-retrospective-calendar-implementation.md` — shared daily metrics, monthly Calendar, Day Summary, and remaining Phase 7 work
 - `docs/18-insights-implementation.md` — reporting periods, historical inventory, metric semantics, and accessible charts
+- `docs/19-report-builder-implementation.md` — Report Builder, PDF/CSV generation, privacy controls, and export security
 
 ## Design assets
 

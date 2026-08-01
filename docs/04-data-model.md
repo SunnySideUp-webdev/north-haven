@@ -298,6 +298,11 @@ Report Builder sends a validated, server-side request containing only period,
 date range, format, and inclusion flags. Generated PDF and CSV bytes are
 streamed to the authenticated user and discarded after the response.
 
+`report_export_attempts` stores only authenticated profile ID and request time
+for the durable six-per-minute generation limit. It has RLS enabled, grants no
+direct table access, stores no report configuration or content, and is mutated
+only through `claim_report_export_slot()`.
+
 ## Data integrity rules
 
 - Business tables require `workspace_id` and row-level authorization.

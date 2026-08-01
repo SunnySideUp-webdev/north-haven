@@ -21,7 +21,7 @@ function dateFromKey(value: string) {
   return new Date(`${value}T12:00:00Z`);
 }
 
-function isDateKey(value: string | undefined): value is string {
+export function isDateKey(value: string | undefined): value is string {
   if (!value || !datePattern.test(value)) return false;
   const date = dateFromKey(value);
   return !Number.isNaN(date.valueOf()) && isoDate(date) === value;

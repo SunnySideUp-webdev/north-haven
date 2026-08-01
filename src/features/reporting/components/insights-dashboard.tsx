@@ -467,21 +467,30 @@ export function InsightsPeriodControls({
     startTransition(() => router.push(url));
   }
 
+  function openReportBuilder() {
+    const period =
+      insights.period === "week"
+        ? "weekly"
+        : insights.period === "month"
+          ? "monthly"
+          : "monthly";
+    window.sessionStorage.setItem(
+      "north-haven:report-entry",
+      JSON.stringify({ anchor: insights.end, period }),
+    );
+    navigate("/insights/reports");
+  }
+
   return (
     <div className="flex items-end gap-3">
-      <div className="text-center">
-        <button
-          type="button"
-          disabled
-          aria-describedby="report-export-status"
-          className="bg-lavender-300 text-lavender-700 rounded-lg px-5 py-3 text-sm font-bold opacity-70"
-        >
-          Export report
-        </button>
-        <p id="report-export-status" className="text-quiet mt-1 text-[10px]">
-          Available next
-        </p>
-      </div>
+      <button
+        type="button"
+        disabled={pending}
+        onClick={openReportBuilder}
+        className="bg-lavender-300 text-lavender-700 hover:bg-lavender-200 rounded-lg px-5 py-3 text-sm font-bold disabled:opacity-50"
+      >
+        Export report
+      </button>
       <label className="text-muted text-xs font-bold">
         Period
         <select

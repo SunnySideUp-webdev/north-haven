@@ -4,9 +4,38 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { getMonthRange } from "@/features/reporting/date";
+import { getReport } from "@/features/reporting/queries";
+import {
+  reportConfigSchema,
+  type ReportView,
+} from "@/features/reporting/reports";
 import { requireAuthenticatedContext } from "@/server/auth/session";
 
 export type ReportingActionResult = { message?: string; ok: boolean };
+
+export type ReportPreviewActionResult = {
+  message?: string;
+  ok: boolean;
+  report?: ReportView;
+};
+
+export async function loadReportPreviewAction(
+  input: unknown,
+): Promise<ReportPreviewActionResult> {
+  const result = reportConfigSchema.safeParse(input);
+  if (!result.success) {
+    return { message: "Review the report settings.", ok: false };
+  }
+
+  try {
+    return { ok: true, report: await getReport(result.data) };
+  } catch {
+    return {
+      message: "We couldn't create this preview. Your settings are still here.",
+      ok: false,
+    };
+  }
+}
 
 export async function saveMonthNoteAction(input: {
   body: string;

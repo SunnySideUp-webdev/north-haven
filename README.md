@@ -19,9 +19,10 @@ protected Google OAuth routes.
 
 The live corporate OAuth feasibility check and refresh-token exchange passed on
 August 1, 2026. Phase 7 now includes shared reporting projections, retrospective
-Calendar and Day Summary, monthly notes, Week/Month/Quarter/Custom Insights, and
-accessible trend summaries. The Report Builder and PDF/CSV exports are next. No
-customer data, production credentials, or Google tokens are committed.
+Calendar and Day Summary, monthly notes, Week/Month/Quarter/Custom Insights,
+accessible trend summaries, and the Daily/Weekly/Monthly Report Builder with
+designed PDF and data CSV exports. Phase 8 hardening and personal launch are
+next. No customer data, production credentials, or Google tokens are committed.
 
 ## Local setup
 
@@ -116,7 +117,8 @@ design/                   Approved wireframes and high-fidelity references
 - Every exposed business table requires RLS.
 - Service-role and Google secrets stay server-only.
 - Customer content must never appear in URLs, logs, analytics, or errors.
-- Generated report files will be streamed with private/no-store behavior.
+- Generated report files are streamed with private/no-store behavior and are
+  never retained by North Haven.
 - The initial dependency audit passes with zero known vulnerabilities.
 
 Supabase JavaScript is pinned to `2.109.0` with SSR `0.12.0` because the next
@@ -144,3 +146,4 @@ Reassess these pins when the project moves to Node 22.
 - [Google Calendar implementation](docs/16-google-calendar-implementation.md)
 - [Retrospective Calendar implementation](docs/17-retrospective-calendar-implementation.md)
 - [Insights implementation](docs/18-insights-implementation.md)
+- [Report Builder implementation](docs/19-report-builder-implementation.md)

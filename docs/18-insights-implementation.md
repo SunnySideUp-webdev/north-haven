@@ -83,8 +83,9 @@ subsets of Active rather than additional inventory totals.
 - An individual chart with no eligible data explains the absence instead of
   drawing misleading zero bars.
 - Tasks, Reminders, and confirmed Meetings remain separate from ticket totals.
-- `Export report` is visible but disabled until the final Phase 7 Report Builder
-  increment is implemented, avoiding a dead or misleading route.
+- `Export report` opens the implemented Report Builder and preserves Week or
+  Month context without putting report settings in the URL. Quarter and Custom
+  ranges open the Monthly report scale because those are not report formats.
 
 ## Local visual-review data
 
@@ -111,10 +112,8 @@ or `supabase db reset`.
 - opt-in two-user integration coverage extended for both new security-definer
   reporting functions
 
-## Remaining Phase 7 work
+## Phase 7 completion
 
-1. Build the Daily, Weekly, and Monthly Report Builder from these exact
-   projections.
-2. Generate the designed, selectable-text PDF with privacy-safe content options.
-3. Stream the data-only CSV and PDF without retaining files server-side.
-4. Verify report totals against Calendar and Insights for identical periods.
+The Daily, Weekly, and Monthly Report Builder, designed PDF, data CSV, privacy
+controls, and protected streaming endpoint are implemented. See
+`docs/19-report-builder-implementation.md`.

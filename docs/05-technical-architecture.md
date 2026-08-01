@@ -177,9 +177,10 @@ Calendar failure must never block manual planning.
 - Keep ticket titles, notes, and follow-up text out of exports unless the
   request explicitly opts in.
 
-PDF libraries are selected and locked during implementation after verifying
-DM Sans embedding, chart accessibility, Vercel runtime compatibility, and
-multi-page behavior.
+The implemented PDF renderer is `@react-pdf/renderer` 4.5.1 on the Node runtime.
+It embeds repository-owned DM Sans TTF assets, supports predictable wrapping and
+fixed page-number footers, and streams its Node output through the Next.js Route
+Handler. CSV remains a dependency-free server renderer.
 
 ## Security model
 

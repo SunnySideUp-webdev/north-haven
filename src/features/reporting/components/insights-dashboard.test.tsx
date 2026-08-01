@@ -117,8 +117,11 @@ describe("Insights", () => {
     expect(push).toHaveBeenCalledWith(
       "/insights?period=week&anchor=2026-08-03",
     );
-    expect(
-      screen.getByRole("button", { name: "Export report" }),
-    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Export report" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Export report" }));
+    expect(push).toHaveBeenLastCalledWith("/insights/reports");
+    expect(window.sessionStorage.getItem("north-haven:report-entry")).toBe(
+      JSON.stringify({ anchor: "2026-08-03", period: "monthly" }),
+    );
   });
 });

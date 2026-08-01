@@ -1,7 +1,7 @@
 # Reporting and exports
 
-Status: Approved  
-Last updated: July 31, 2026
+Status: Implemented
+Last updated: August 1, 2026
 
 ## Product role
 
@@ -158,3 +158,24 @@ this before detailed ticket content is included.
 - No generated file remains in server storage after the response completes.
 - Export failure never affects underlying work data.
 - A report can be generated entirely with keyboard navigation.
+
+## Implemented architecture
+
+- `/insights/reports` is a child destination of Insights and does not appear in
+  primary navigation.
+- The entry selection is transferred through session storage; report settings,
+  titles, notes, and customer content never enter a URL.
+- Preview and export normalize the same protected daily, period-total,
+  inventory, and status projections used by Calendar and Insights.
+- Optional Ticket titles, Day Notes, and Follow-up Reasons are requested only
+  after their individual controls are enabled.
+- `@react-pdf/renderer` 4.5.1 produces server-side, selectable-text PDFs with
+  repository-owned DM Sans Regular and Bold TTF files.
+- `/api/reports/export` accepts authenticated same-origin POST requests, streams
+  PDF or CSV responses, applies private/no-store headers, and never creates a
+  report file in application storage.
+- `claim_report_export_slot()` serializes limits per authenticated profile and
+  allows at most six exports per minute without storing report content.
+
+Implementation and verification details live in
+`docs/19-report-builder-implementation.md`.

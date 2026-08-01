@@ -60,6 +60,23 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     expect(workspacesB).toHaveLength(1);
     expect(workspacesA?.[0].id).not.toBe(workspacesB?.[0].id);
 
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      const { data: allowed, error } = await clientA.rpc(
+        "claim_report_export_slot",
+      );
+      expect(error).toBeNull();
+      expect(allowed).toBe(true);
+    }
+    const { data: limited, error: limitError } = await clientA.rpc(
+      "claim_report_export_slot",
+    );
+    const { data: otherUserAllowed, error: otherUserLimitError } =
+      await clientB.rpc("claim_report_export_slot");
+    expect(limitError).toBeNull();
+    expect(limited).toBe(false);
+    expect(otherUserLimitError).toBeNull();
+    expect(otherUserAllowed).toBe(true);
+
     const { error: protectedCalendarReadError } = await clientA
       .from("calendar_connections")
       .select("id");
