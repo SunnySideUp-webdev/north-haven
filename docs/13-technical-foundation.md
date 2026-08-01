@@ -22,6 +22,15 @@ Last updated: July 31, 2026
   local database
 - Generated TypeScript database contract connected to the browser and server
   Supabase clients
+- English email/password sign-in, account creation, generic password recovery,
+  password update, and sign-out flows
+- First-time setup for display name, IANA time zone, workdays, and working hours
+- Transactional personal setup function with an explicit completion timestamp
+- Next.js 16 `proxy.ts` session refresh using verified Supabase claims
+- Protected workspace routes and guest-only authentication routes
+- Authenticated display name in the application shell
+- Local browser coverage for account creation, setup, sign-out, and sign-in
+- Two-user integration coverage proving RLS workspace isolation
 - Vitest, Testing Library, and Playwright configuration with initial tests
 - Prettier, ESLint, TypeScript, build, and GitHub Actions quality checks
 - Baseline security headers and non-indexable product metadata
@@ -49,21 +58,22 @@ accessibility, routes, and tests. It is not a mock persistence architecture.
 The next increment replaces it through feature-owned queries after
 authentication and a local Supabase session are active.
 
-Supabase clients validate their environment only when called, allowing the
-visual foundation to build without secrets. Authentication routes must not be
-enabled until local or hosted publishable credentials are configured.
+Supabase clients validate their environment only when called. Authentication
+routes are active locally and require a configured URL plus publishable key.
 
 Google Calendar variables are reserved but unused. Calendar remains an optional
 enhancement and cannot block local planning.
 
 ## Next foundation increment
 
-1. Add English sign-in and first-time setup screens.
-2. Add Next.js session refresh through the current `proxy.ts` convention.
-3. Protect workspace routes and test authorization/RLS behavior.
-4. Replace synthetic profile/work schedule values with authenticated data.
-5. Establish a hosted development Supabase project only after local behavior is
-   reproducible.
+1. Establish a hosted development Supabase project and protected environment
+   variables.
+2. Exercise email delivery and password recovery against the hosted development
+   environment.
+3. Replace the remaining synthetic Today schedule values with authenticated
+   data.
+4. Document and test backup and migration recovery procedures.
+5. Prepare the Phase 4 work-inventory business schema.
 
 Docker Desktop and the local Supabase stack are now operational. This increment
 does not require Google Calendar credentials.

@@ -1,5 +1,13 @@
 import { redirect } from "next/navigation";
 
-export default function HomePage() {
-  redirect("/today");
+import { getAuthContext } from "@/server/auth/session";
+
+export default async function HomePage() {
+  const { profile, userId } = await getAuthContext();
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
+  redirect(profile?.setup_completed_at ? "/today" : "/setup");
 }

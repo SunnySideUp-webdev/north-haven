@@ -57,5 +57,8 @@
   authorization, but must be excluded from URLs, logs, and analytics.
 - Authentication, Row Level Security, server-only credentials, backups, and
   recoverable archival are MVP requirements.
+- North Haven uses email and password for its own account flow. Passwords must
+  contain at least 12 characters; Google Calendar OAuth remains a separate,
+  optional corporate authorization.
 - Generated report files are streamed on demand and are not retained in server
   storage during the MVP.

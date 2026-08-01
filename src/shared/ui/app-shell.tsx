@@ -1,10 +1,12 @@
 import Link from "next/link";
 
+import { signOutAction } from "@/server/auth/actions";
 import { PrimaryNavigation } from "@/shared/ui/primary-navigation";
 
 export function AppShell({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  displayName,
+}: Readonly<{ children: React.ReactNode; displayName: string }>) {
   return (
     <div className="bg-canvas min-h-screen">
       <a
@@ -22,6 +24,19 @@ export function AppShell({
             North Haven
           </Link>
           <PrimaryNavigation />
+          <div className="border-border ml-7 flex items-center gap-4 border-l pl-7">
+            <span className="text-muted max-w-32 truncate text-sm font-bold">
+              {displayName}
+            </span>
+            <form action={signOutAction}>
+              <button
+                type="submit"
+                className="text-muted hover:text-ink text-sm font-bold"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
       </header>
       <main id="main-content">{children}</main>

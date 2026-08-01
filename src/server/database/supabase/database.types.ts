@@ -14,6 +14,7 @@ export type Database = {
           created_at: string;
           display_name: string;
           id: string;
+          setup_completed_at: string | null;
           time_zone: string;
           updated_at: string;
         };
@@ -21,6 +22,7 @@ export type Database = {
           created_at?: string;
           display_name?: string;
           id: string;
+          setup_completed_at?: string | null;
           time_zone?: string;
           updated_at?: string;
         };
@@ -28,6 +30,7 @@ export type Database = {
           created_at?: string;
           display_name?: string;
           id?: string;
+          setup_completed_at?: string | null;
           time_zone?: string;
           updated_at?: string;
         };
@@ -127,6 +130,16 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      complete_initial_setup: {
+        Args: {
+          chosen_display_name: string;
+          chosen_ends_at_local: string;
+          chosen_starts_at_local: string;
+          chosen_time_zone: string;
+          chosen_working_weekdays: number[];
+        };
+        Returns: undefined;
+      };
       is_workspace_member: {
         Args: { target_workspace_id: string };
         Returns: boolean;

@@ -80,12 +80,15 @@ calendar.
   migration, signup provisioning, and RLS
 - Docker-backed local Supabase stack, clean migration replay, and generated
   TypeScript database types wired into both Supabase clients
+- Email/password authentication, account creation, password recovery/update,
+  sign-out, and verified session refresh through Next.js Proxy
+- Transactional first-time workday setup and authenticated application shell
+- Local end-to-end authentication coverage and two-user RLS isolation coverage
 - Formatting, linting, type checking, unit tests, browser tests, build checks, and CI
 - Security-fixed dependency overrides with a clean npm audit
 
 ### Not started
 
-- Authentication setup
 - Google Calendar implementation
 - Deployment configuration
 - Full work-inventory business schema
@@ -95,9 +98,11 @@ Google Calendar credentials, and deployment configuration are not connected.
 
 ### Next step
 
-Continue Phase 3 from `docs/13-technical-foundation.md`: implement sign-in,
-first-time setup, session refresh, protected workspace routes, and RLS tests.
-Google Calendar credentials are not needed for this increment.
+Continue Phase 3 from `docs/13-technical-foundation.md`: establish a hosted
+development Supabase environment, validate hosted email recovery, connect the
+remaining authenticated schedule data, and document recovery procedures. Then
+prepare the Phase 4 work-inventory schema. Google Calendar credentials are not
+needed for the next increment.
 
 ## Confirmed product decisions
 

@@ -13,8 +13,8 @@ Spanish.
 
 Technical foundation is in progress. The repository now contains the Next.js
 application shell, approved visual tokens, an initial Today implementation,
-Supabase workspace migration and RLS policies, environment boundaries, tests,
-and continuous-integration checks.
+Supabase authentication, private workspace provisioning, first-time setup, RLS
+policies, environment boundaries, tests, and continuous-integration checks.
 
 The Today screen currently uses synthetic foundation data. No customer data,
 production credentials, or Google tokens are present.
@@ -35,12 +35,11 @@ npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:3000`. The root route redirects to `/today`.
+Open `http://127.0.0.1:3000`. The root route sends signed-out visitors to Sign
+in and authenticated users to Setup or Today.
 
-Supabase variables are not required for the current synthetic Today view. When
-authentication work begins, copy `.env.example` to `.env.local` and replace the
-placeholder values with local or hosted project values. Never commit
-`.env.local`.
+Copy `.env.example` to `.env.local` and replace the placeholders with local or
+hosted project values. Never commit `.env.local`.
 
 Run the local database and reproduce its schema with:
 
@@ -52,6 +51,14 @@ npm run db:types
 
 `db:types` regenerates the checked-in TypeScript database contract after a
 schema migration changes.
+
+With the local stack running, the opt-in database and browser authentication
+checks are:
+
+```bash
+npm run test:integration:local
+npm run test:e2e:local
+```
 
 ## Verification commands
 
