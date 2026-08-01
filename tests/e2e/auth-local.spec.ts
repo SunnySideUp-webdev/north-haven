@@ -66,6 +66,7 @@ test("creates a private workspace, completes setup, and restores the session", a
 
   await page.getByRole("link", { name: "Edit" }).click();
   await page.getByLabel("Tracking").selectOption("closed");
+  page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Save task" }).click();
 
   await expect(page.getByText("Task · Closed", { exact: true })).toBeVisible();
@@ -77,6 +78,7 @@ test("creates a private workspace, completes setup, and restores the session", a
   await page.getByRole("link", { name: "Prepare weekly summary" }).click();
   await page.getByRole("link", { name: "Edit" }).click();
   await page.getByLabel("Tracking").selectOption("archived");
+  page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Save task" }).click();
   await expect(
     page.getByText("Task · Archived", { exact: true }),
@@ -86,6 +88,24 @@ test("creates a private workspace, completes setup, and restores the session", a
   await page.getByRole("link", { name: "Prepare weekly summary" }).click();
   await page.getByRole("button", { name: "Restore to Active" }).click();
   await expect(page.getByText("Task · Active", { exact: true })).toBeVisible();
+
+  await page
+    .getByRole("button", { name: /Search/ })
+    .first()
+    .click();
+  await page
+    .getByPlaceholder(/Search tickets, tasks/)
+    .fill("Prepare weekly summary");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Search", exact: true })
+    .click();
+  await expect(
+    page
+      .getByRole("dialog")
+      .getByText("Prepare weekly summary", { exact: false }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
 
   await page.getByRole("link", { name: "Settings" }).click();
   await expect(
@@ -149,12 +169,10 @@ test("creates a private workspace, completes setup, and restores the session", a
     page.getByText("No follow-ups need a decision today."),
   ).toBeVisible();
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByRole("link", { name: /Review next workday plan/ }).click();
   await page
     .getByRole("button", { name: "Add Review tomorrow's requests" })
     .click();
-  await page.getByRole("button", { name: "Mark ready" }).click();
-  await page.goBack();
+  await page.getByRole("button", { name: "Mark plan ready" }).click();
   await page.getByRole("button", { name: "Finish End of Day" }).click();
   await expect(
     page.getByRole("heading", {

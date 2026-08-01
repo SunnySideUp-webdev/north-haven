@@ -8,7 +8,12 @@ import { PageHeader } from "@/shared/ui/page-header";
 
 export const metadata: Metadata = { title: "New ticket" };
 
-export default async function NewTicketPage() {
+export default async function NewTicketPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ context?: string; date?: string; nextDate?: string }>;
+}) {
+  const params = await searchParams;
   const [{ profile }, ticketTypes] = await Promise.all([
     requireAuthenticatedContext(),
     getTicketTypes(),
@@ -27,6 +32,13 @@ export default async function NewTicketPage() {
           defaultReceivedAt={todayInTimeZone(
             profile?.time_zone ?? "America/Guatemala",
           )}
+          endOfDayContext={
+            params.context === "end-of-day" &&
+            /^\d{4}-\d{2}-\d{2}$/.test(params.date ?? "") &&
+            /^\d{4}-\d{2}-\d{2}$/.test(params.nextDate ?? "")
+              ? { workDate: params.date!, nextWorkDate: params.nextDate! }
+              : undefined
+          }
         />
       </div>
     </>

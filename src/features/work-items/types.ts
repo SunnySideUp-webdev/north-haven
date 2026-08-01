@@ -9,6 +9,7 @@ export type WorkTrackingState =
 export type WorkFormState = {
   status: "idle" | "error";
   message?: string;
+  existingWorkItemId?: string;
 };
 
 export const initialWorkFormState: WorkFormState = { status: "idle" };

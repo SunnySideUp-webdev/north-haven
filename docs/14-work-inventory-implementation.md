@@ -1,7 +1,7 @@
 # Work Inventory implementation
 
-Status: Core interaction slice complete
-Last updated: July 31, 2026
+Status: Complete through Phase 7.5C
+Last updated: August 1, 2026
 
 ## Outcome
 
@@ -61,6 +61,21 @@ The final interaction increment adds:
 - global `Ctrl/Command + K` Quick Add for Ticket, Task, or Reminder
 - `/` to focus inventory search and `Ctrl/Command + Enter` to save entry forms
 - autofocus and visible shortcut guidance for keyboard-efficient capture
+
+Phase 7.5C completes the approved operational surface with:
+
+- an Active default that includes both Active and Watching work
+- session-persistent work type, priority, operational, and tracking filters
+- exact ticket-number ranking ahead of partial search matches
+- the complete operational table context: received date, age, priority,
+  operational status, tracking state, next review, backup, and last worked date
+- multi-selection with Add to Plan, Set Review Date, and recoverable Archive
+- database guards that prevent archiving work still present in an open plan
+- direct Add to Plan and Days Worked sections on Work Detail
+- confirmations for downstream closure, archival, future received dates, and
+  clearing an existing backup completion
+- duplicate capture recovery with a direct Open Existing action
+- private Global Search across number, title, type, notes, and secure link
 
 ## Security and verification
 

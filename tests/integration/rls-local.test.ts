@@ -354,6 +354,31 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     });
     expect(mondayWorkday).toBe("2026-08-03");
 
+    const { data: previousFriday } = await clientA.rpc("previous_workday", {
+      chosen_before_date: "2026-08-03",
+    });
+    expect(previousFriday).toBe("2026-07-31");
+
+    const { data: foundTicketId } = await clientA.rpc("find_ticket_by_number", {
+      chosen_ticket_number: " nh-101 ",
+    });
+    const { data: searchResultsA, error: searchErrorA } = await clientA.rpc(
+      "global_work_search",
+      { chosen_include_archived: false, chosen_query: "Request reviewed" },
+    );
+    const { data: searchResultsB, error: searchErrorB } = await clientB.rpc(
+      "global_work_search",
+      { chosen_include_archived: false, chosen_query: "Request reviewed" },
+    );
+    expect(foundTicketId).toBe(ticketId);
+    expect(searchErrorA).toBeNull();
+    expect(searchErrorB).toBeNull();
+    expect(searchResultsA?.[0]).toMatchObject({
+      id: ticketId,
+      match_reason: "Notes",
+    });
+    expect(searchResultsB).toEqual([]);
+
     const { error: nonWorkingDayError } = await clientA
       .from("non_working_days")
       .insert({
@@ -368,14 +393,37 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     expect(nonWorkingDayError).toBeNull();
     expect(tuesdayWorkday).toBe("2026-08-04");
 
-    for (const workItemId of [ticketId!, taskId!]) {
-      const { error } = await clientA.rpc("set_plan_item_selected", {
-        chosen_selected: true,
+    const { data: bulkPlanned, error: bulkPlanError } = await clientA.rpc(
+      "bulk_add_work_items_to_plan",
+      {
         chosen_work_date: "2026-08-04",
-        target_work_item_id: workItemId,
-      });
-      expect(error).toBeNull();
-    }
+        target_work_item_ids: [ticketId!, taskId!],
+      },
+    );
+    expect(bulkPlanError).toBeNull();
+    expect(bulkPlanned).toBe(2);
+
+    const { data: newFollowUpId } = await clientA.rpc("save_open_follow_up", {
+      chosen_reason: "Confirm the downstream form update.",
+      chosen_review_on: "2026-08-10",
+      chosen_waiting_on: "Forms team",
+      target_work_item_id: ticketId!,
+    });
+    const { data: reviewsUpdated, error: bulkReviewError } = await clientA.rpc(
+      "bulk_set_follow_up_review",
+      {
+        chosen_review_on: "2026-08-20",
+        target_work_item_ids: [ticketId!],
+      },
+    );
+    const { data: updatedFollowUp } = await clientA
+      .from("follow_ups")
+      .select("review_on")
+      .eq("id", newFollowUpId!)
+      .single();
+    expect(bulkReviewError).toBeNull();
+    expect(reviewsUpdated).toBe(1);
+    expect(updatedFollowUp?.review_on).toBe("2026-08-20");
 
     const { data: plan, error: planError } = await clientA
       .from("daily_plans")
@@ -692,18 +740,13 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
       "update_profile_settings",
       { chosen_display_name: "Temporary replacement" },
     );
-    const { error: archiveReminderError } = await clientA.rpc(
-      "update_reminder",
-      {
-        chosen_description: "Temporary change",
-        chosen_remind_at: "2026-08-03T14:00:00.000Z",
-        chosen_title: "Changed reminder",
-        chosen_tracking_state: "archived",
-        target_work_item_id: reminderId!,
-      },
-    );
+    const { data: archivedItems, error: archiveReminderError } =
+      await clientA.rpc("bulk_archive_work_items", {
+        target_work_item_ids: [reminderId!],
+      });
     expect(changedProfileError).toBeNull();
     expect(archiveReminderError).toBeNull();
+    expect(archivedItems).toBe(1);
 
     const { error: wrongConfirmationError } = await clientA.rpc(
       "restore_workspace_backup",

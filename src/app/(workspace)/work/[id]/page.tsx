@@ -6,10 +6,12 @@ import {
   FollowUpForm,
 } from "@/features/work-items/components/activity-forms";
 import { ArchivedRecovery } from "@/features/work-items/components/archived-recovery";
+import { AddToPlan } from "@/features/work-items/components/add-to-plan";
 import { formatDate, formatDateTime } from "@/features/work-items/date";
 import {
   getWorkItem,
   getWorkItemActivity,
+  getDefaultPlanDate,
 } from "@/features/work-items/queries";
 import { PageHeader } from "@/shared/ui/page-header";
 
@@ -39,9 +41,10 @@ export default async function WorkItemPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [item, activity] = await Promise.all([
+  const [item, activity, defaultPlanDate] = await Promise.all([
     getWorkItem(id),
     getWorkItemActivity(id),
+    getDefaultPlanDate(),
   ]);
   const openFollowUp = activity.followUps.find(
     (followUp) => followUp.state === "open",
@@ -60,12 +63,15 @@ export default async function WorkItemPage({
           item.tracking_state === "archived" ? (
             <ArchivedRecovery workItemId={id} />
           ) : (
-            <Link
-              href={`/work/${id}/edit`}
-              className="bg-lavender-700 hover:bg-lavender-500 rounded-lg px-5 py-3 text-sm font-bold text-white"
-            >
-              Edit
-            </Link>
+            <div className="flex items-center gap-3">
+              <AddToPlan defaultDate={defaultPlanDate} workItemId={id} />
+              <Link
+                href={`/work/${id}/edit`}
+                className="bg-lavender-700 hover:bg-lavender-500 rounded-lg px-5 py-3 text-sm font-bold text-white"
+              >
+                Edit
+              </Link>
+            </div>
           )
         }
       />
@@ -119,6 +125,41 @@ export default async function WorkItemPage({
                 Open ticket system ↗
               </a>
             ) : null}
+          </section>
+
+          <section className="border-border/70 bg-paper shadow-surface rounded-xl border p-8">
+            <h2 className="text-ink text-xl font-bold">Days worked</h2>
+            <p className="text-muted mt-1 text-sm">
+              A calm record of the days this item received attention.
+            </p>
+            <div className="mt-6">
+              {activity.workLogs.length ? (
+                activity.workLogs.map((log) => (
+                  <div
+                    key={log.id}
+                    className="border-border flex items-center justify-between border-t py-4 first:border-t-0"
+                  >
+                    <div>
+                      <p className="text-ink text-sm font-bold">
+                        {formatDate(log.worked_on)}
+                      </p>
+                      <p className="text-quiet mt-1 text-xs">
+                        {log.is_automatic
+                          ? "Recorded from daily plan"
+                          : "Recorded manually"}
+                      </p>
+                    </div>
+                    <span className="bg-lavender-100 text-lavender-700 rounded-full px-3 py-1 text-xs font-bold">
+                      {label(log.outcome)}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-quiet py-6 text-sm">
+                  No worked days recorded yet.
+                </p>
+              )}
+            </div>
           </section>
 
           <section className="border-border/70 bg-paper shadow-surface rounded-xl border p-8">

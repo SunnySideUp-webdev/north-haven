@@ -1127,6 +1127,7 @@ export type Database = {
           form_backup_completed_at: string | null;
           id: string | null;
           kind: Database["public"]["Enums"]["work_item_kind"] | null;
+          last_worked_on: string | null;
           next_review_on: string | null;
           operational_status:
             Database["public"]["Enums"]["ticket_operational_status"] | null;
@@ -1174,6 +1175,18 @@ export type Database = {
         };
         Returns: undefined;
       };
+      bulk_add_work_items_to_plan: {
+        Args: { chosen_work_date: string; target_work_item_ids: string[] };
+        Returns: number;
+      };
+      bulk_archive_work_items: {
+        Args: { target_work_item_ids: string[] };
+        Returns: number;
+      };
+      bulk_set_follow_up_review: {
+        Args: { chosen_review_on: string; target_work_item_ids: string[] };
+        Returns: number;
+      };
       claim_report_export_slot: { Args: never; Returns: boolean };
       complete_initial_setup: {
         Args: {
@@ -1219,9 +1232,27 @@ export type Database = {
       create_ticket_type: { Args: { chosen_name: string }; Returns: string };
       create_workspace_backup: { Args: never; Returns: Json };
       current_personal_workspace_id: { Args: never; Returns: string };
+      find_ticket_by_number: {
+        Args: { chosen_ticket_number: string };
+        Returns: string;
+      };
       finish_end_of_day: {
         Args: { chosen_work_date: string };
         Returns: string;
+      };
+      global_work_search: {
+        Args: { chosen_include_archived?: boolean; chosen_query: string };
+        Returns: {
+          id: string;
+          kind: Database["public"]["Enums"]["work_item_kind"];
+          match_reason: string;
+          operational_status: Database["public"]["Enums"]["ticket_operational_status"];
+          ticket_number: string;
+          ticket_type_name: string;
+          title: string;
+          tracking_state: Database["public"]["Enums"]["work_tracking_state"];
+          updated_at: string;
+        }[];
       };
       is_workspace_member: {
         Args: { target_workspace_id: string };
@@ -1240,6 +1271,10 @@ export type Database = {
         Returns: undefined;
       };
       next_workday: { Args: { chosen_after_date: string }; Returns: string };
+      previous_workday: {
+        Args: { chosen_before_date: string };
+        Returns: string;
+      };
       reopen_closed_day: {
         Args: { chosen_work_date: string };
         Returns: string;

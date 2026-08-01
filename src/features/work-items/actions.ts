@@ -67,10 +67,59 @@ export async function createTicketAction(
   });
 
   if (error || !data) {
+    if (error?.message.includes("normalized_ticket_number")) {
+      const { data: existingWorkItemId } = await supabase.rpc(
+        "find_ticket_by_number",
+        { chosen_ticket_number: result.data.ticketNumber },
+      );
+      return {
+        existingWorkItemId: existingWorkItemId ?? undefined,
+        message: "That ticket number already exists in your workspace.",
+        status: "error",
+      };
+    }
     return errorState(databaseMessage(error?.message, "ticket"));
   }
 
   revalidatePath("/work");
+  if (formData.get("returnContext") === "end-of-day") {
+    const context = z
+      .object({
+        intent: z.enum(["save", "add_another", "add_next"]),
+        nextWorkDate: z.string().date(),
+        workDate: z.string().date(),
+      })
+      .safeParse({
+        intent: formData.get("intent") || "save",
+        nextWorkDate: formData.get("nextWorkDate"),
+        workDate: formData.get("workDate"),
+      });
+
+    if (context.success) {
+      if (context.data.intent === "add_next") {
+        const { error: planError } = await supabase.rpc(
+          "set_plan_item_selected",
+          {
+            chosen_selected: true,
+            chosen_work_date: context.data.nextWorkDate,
+            target_work_item_id: data,
+          },
+        );
+        if (planError)
+          return errorState(
+            "The ticket was saved, but it could not be added to the next plan.",
+          );
+      }
+      revalidatePath("/end-of-day");
+      revalidatePath("/plan");
+      if (context.data.intent === "add_another") {
+        redirect(
+          `/work/new/ticket?context=end-of-day&date=${context.data.workDate}&nextDate=${context.data.nextWorkDate}`,
+        );
+      }
+      redirect(`/end-of-day?date=${context.data.workDate}&step=1`);
+    }
+  }
   redirect(`/work/${data}`);
 }
 
@@ -271,6 +320,92 @@ export async function restoreArchivedWorkItemAction(
   revalidatePath(`/work/${result.data}`);
   revalidatePath("/plan");
   return { ok: true };
+}
+
+const bulkInputSchema = z.object({
+  workItemIds: z.array(z.string().uuid()).min(1).max(100),
+});
+
+export async function bulkAddToPlanAction(input: {
+  workDate: string;
+  workItemIds: string[];
+}): Promise<{ ok: boolean; message: string }> {
+  const result = bulkInputSchema
+    .extend({ workDate: z.string().date() })
+    .safeParse(input);
+  if (!result.success)
+    return { ok: false, message: "Choose work items and a valid work date." };
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { data, error } = await supabase.rpc("bulk_add_work_items_to_plan", {
+    chosen_work_date: result.data.workDate,
+    target_work_item_ids: result.data.workItemIds,
+  });
+  if (error)
+    return { ok: false, message: "We couldn't add these items to the plan." };
+
+  revalidatePath("/plan");
+  revalidatePath("/today");
+  return {
+    ok: true,
+    message: data
+      ? `${data} ${data === 1 ? "item" : "items"} added to the plan.`
+      : "Those items were already in the plan.",
+  };
+}
+
+export async function bulkSetReviewDateAction(input: {
+  reviewOn: string;
+  workItemIds: string[];
+}): Promise<{ ok: boolean; message: string }> {
+  const result = bulkInputSchema
+    .extend({ reviewOn: z.string().date() })
+    .safeParse(input);
+  if (!result.success)
+    return { ok: false, message: "Choose work items and a valid review date." };
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { data, error } = await supabase.rpc("bulk_set_follow_up_review", {
+    chosen_review_on: result.data.reviewOn,
+    target_work_item_ids: result.data.workItemIds,
+  });
+  if (error)
+    return { ok: false, message: "We couldn't update those review dates." };
+
+  revalidatePath("/work");
+  return {
+    ok: true,
+    message: data
+      ? `${data} open ${data === 1 ? "follow-up" : "follow-ups"} updated.`
+      : "None of the selected items has an open follow-up.",
+  };
+}
+
+export async function bulkArchiveWorkItemsAction(input: {
+  workItemIds: string[];
+}): Promise<{ ok: boolean; message: string }> {
+  const result = bulkInputSchema.safeParse(input);
+  if (!result.success)
+    return { ok: false, message: "Choose at least one work item." };
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { data, error } = await supabase.rpc("bulk_archive_work_items", {
+    target_work_item_ids: result.data.workItemIds,
+  });
+  if (error)
+    return {
+      ok: false,
+      message: error.message.includes("open daily plans")
+        ? "Remove selected items from open daily plans before archiving them."
+        : "We couldn't archive those items.",
+    };
+
+  revalidatePath("/work");
+  revalidatePath("/plan");
+  return {
+    ok: true,
+    message: `${data ?? 0} ${data === 1 ? "item" : "items"} archived. You can restore them from Archived.`,
+  };
 }
 
 export async function addWorkItemNoteAction(

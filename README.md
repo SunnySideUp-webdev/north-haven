@@ -24,9 +24,12 @@ accessible trend summaries, and the Daily/Weekly/Monthly Report Builder with
 designed PDF and data CSV exports. Phase 7.5 product completion is now in
 progress: Profile, Work schedule, manual non-working days, password changes,
 session revocation, Calendar connection, and Ticket types are functional in
-Settings. Phase 7.5B now adds versioned workspace backup/restoration, closed-day
-reopening, and visible archived-work recovery. Plan, Work, and End of Day parity
-is the next increment before Phase 8 hardening and the Netlify personal launch. No customer data, production
+Settings. Phase 7.5B adds versioned workspace backup/restoration, closed-day
+reopening, and visible archived-work recovery. Phase 7.5C now completes Plan
+navigation and filters, operational Work Inventory actions, richer Work Detail,
+embedded next-day planning in End of Day, and private Global Search.
+Authenticated coverage is the next increment before Phase 8 hardening and the
+Netlify personal launch. No customer data, production
 credentials, or Google tokens are committed.
 
 ## Local setup
@@ -75,7 +78,8 @@ npm run db:types
 schema migration changes.
 
 Settings and recovery are documented in `docs/20-settings-implementation.md`
-and `docs/21-recovery-and-lifecycle-implementation.md`.
+and `docs/21-recovery-and-lifecycle-implementation.md`. Product-completion
+parity is documented in `docs/22-operational-parity-implementation.md`.
 
 With the local stack running, the opt-in database and browser authentication
 checks are:

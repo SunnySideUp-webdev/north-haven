@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { requireAuthenticatedContext } from "@/server/auth/session";
 import type { WorkInventoryRow } from "@/features/work-items/types";
+import { todayInTimeZone } from "@/features/work-items/date";
 
 export async function getWorkInventory(): Promise<WorkInventoryRow[]> {
   const { supabase } = await requireAuthenticatedContext();
@@ -68,7 +69,7 @@ export async function getWorkItem(workItemId: string) {
 
 export async function getWorkItemActivity(workItemId: string) {
   const { supabase } = await requireAuthenticatedContext();
-  const [notes, followUps, statusEvents] = await Promise.all([
+  const [notes, followUps, statusEvents, workLogs] = await Promise.all([
     supabase
       .from("work_item_notes")
       .select("id, body, is_pinned, created_at")
@@ -87,9 +88,15 @@ export async function getWorkItemActivity(workItemId: string) {
       .eq("work_item_id", workItemId)
       .order("changed_at", { ascending: false })
       .limit(20),
+    supabase
+      .from("work_logs")
+      .select("id, worked_on, outcome, started_at, ended_at, is_automatic")
+      .eq("work_item_id", workItemId)
+      .order("worked_on", { ascending: false })
+      .limit(50),
   ]);
 
-  if (notes.error || followUps.error || statusEvents.error) {
+  if (notes.error || followUps.error || statusEvents.error || workLogs.error) {
     throw new Error("We couldn't load this item's activity.");
   }
 
@@ -97,5 +104,11 @@ export async function getWorkItemActivity(workItemId: string) {
     followUps: followUps.data,
     notes: notes.data,
     statusEvents: statusEvents.data,
+    workLogs: workLogs.data,
   };
+}
+
+export async function getDefaultPlanDate() {
+  const { profile } = await requireAuthenticatedContext();
+  return todayInTimeZone(profile?.time_zone ?? "America/Guatemala");
 }

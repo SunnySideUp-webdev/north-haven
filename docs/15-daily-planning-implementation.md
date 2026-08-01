@@ -1,7 +1,7 @@
 # Daily Planning implementation
 
-Status: Core Phase 5 complete
-Last updated: July 31, 2026
+Status: Complete through Phase 7.5C
+Last updated: August 1, 2026
 
 ## Outcome
 
@@ -39,6 +39,13 @@ Plan now provides:
 - non-blocking capacity guidance beginning at nine actionable items
 - Draft autosave after selection or ordering changes
 - Mark Ready validation requiring at least one item
+- previous and next workday navigation that respects schedule and non-working
+  dates
+- visible work schedule, meeting count, due follow-ups, and current plan state
+- Suggested, Urgent, Oldest, Waiting, Watching, and Unplanned saved filters
+- additional type, ticket type, priority, operational, tracking, backup,
+  received-date, and review-date filters retained for the browser session
+- Suggested, Oldest, Newest, Priority, and Recently Worked ordering
 
 Today now reads only the selected plan for the user's local date. It provides a
 real empty state, hides unplanned inventory, separates Tickets from normal work,
@@ -85,6 +92,12 @@ Finish End of Day is transactional and remains unavailable until:
 
 The completion state confirms `Your next workday is ready.` without scores,
 confetti, or gamification.
+
+Phase 7.5C keeps the owner inside End of Day for the full ritual. Ticket capture
+now supports Save Ticket, Save and Add Another, and Save and Add to Next Day.
+The final step embeds next-workday selection and Ready confirmation instead of
+requiring a separate Plan round trip. The closed summary includes the first
+focus item and first meeting for the next workday.
 
 ## Next product phase
 

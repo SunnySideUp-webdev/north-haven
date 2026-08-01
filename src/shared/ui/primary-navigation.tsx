@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { primaryNavigation } from "@/shared/content/navigation";
 import { QuickAddMenu } from "@/features/work-items/components/quick-add-menu";
+import { GlobalSearch } from "@/features/work-items/components/global-search";
 
 function isCurrentPath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -38,6 +39,7 @@ export function PrimaryNavigation() {
         })}
       </nav>
       <div className="text-muted ml-auto flex items-center gap-8 text-sm font-bold">
+        <GlobalSearch />
         <QuickAddMenu />
         <Link
           href="/settings"

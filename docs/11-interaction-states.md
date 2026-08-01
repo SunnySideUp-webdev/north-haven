@@ -71,7 +71,7 @@ state before creating another record.
 | Connected and current   | `Google Calendar connected` and relative sync time                                         | `Manage connection`                          |
 | Syncing                 | `Checking for calendar updates…`                                                           | Continue using all local features            |
 | Stale                   | `Calendar has not synced since {time}. Meetings may be out of date. Planning still works.` | `Try again` or `Reconnect`                   |
-| Disconnected            | `Continue without Google Calendar. Add meetings manually and connect later in Settings.`   | `Connect Google Calendar` or `Add a meeting` |
+| Disconnected            | `Calendar may be out of date. Manual planning continues normally.`                         | `Connect Google Calendar`                    |
 | Corporate access denied | `Your organization did not allow this connection.`                                         | `View setup help` and continue manually      |
 
 The application shows the last successful sync time. A stale or disconnected

@@ -33,6 +33,9 @@
 - Urgent work can be added explicitly to an OOO date.
 - Meetings default to Probably Attended after ending and are confirmed during
   End of Day.
+- Google Calendar remains the only meeting source for the personal launch.
+  Manual meeting entry is deferred to avoid duplicate records and unclear
+  source semantics; Calendar failure never blocks manual work planning.
 
 ## Experience
 
@@ -51,6 +54,9 @@
 - Reports reuse the exact metric definitions and visual language of Insights.
 - Customer-sensitive work details are excluded from reports by default and
   require explicit opt-in.
+- Private Global Search is included in the personal launch. It searches work
+  number, title, type, notes, and secure external link without placing the
+  query in the URL; archived work stays excluded until explicitly requested.
 
 ## Architecture and privacy
 

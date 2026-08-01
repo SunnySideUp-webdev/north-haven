@@ -188,12 +188,14 @@ Status: Complete
 
 ### Increment C: Plan, Work, and End of Day parity
 
-Status: Pending
+Status: Complete
 
 - Complete approved Plan filters and navigation
 - Restore approved Work Inventory and Ticket Detail actions
 - Finish End of Day efficiency and completion-state details
-- Decide the launch scope for global search and manual meeting fallback
+- Global Search is included in the personal launch; manual meeting entry is
+  deferred while the verified read-only Google Calendar connection remains the
+  single meeting source
 
 ### Increment D: Authenticated coverage
 

@@ -6,16 +6,24 @@ import { requireAuthenticatedContext } from "@/server/auth/session";
 
 export async function getDailyPlanningData(workDate: string) {
   const { profile, supabase } = await requireAuthenticatedContext();
-  const [{ data: plan, error: planError }, inventory, calendar] =
-    await Promise.all([
-      supabase
-        .from("daily_plans")
-        .select("id, work_date, status, intention, closed_at, end_of_day_step")
-        .eq("work_date", workDate)
-        .maybeSingle(),
-      getWorkInventory(),
-      getCalendarDay(workDate),
-    ]);
+  const [
+    { data: plan, error: planError },
+    inventory,
+    calendar,
+    { data: schedule },
+  ] = await Promise.all([
+    supabase
+      .from("daily_plans")
+      .select("id, work_date, status, intention, closed_at, end_of_day_step")
+      .eq("work_date", workDate)
+      .maybeSingle(),
+    getWorkInventory(),
+    getCalendarDay(workDate),
+    supabase
+      .from("work_schedules")
+      .select("starts_at_local, ends_at_local, working_weekdays")
+      .maybeSingle(),
+  ]);
 
   if (planError) throw new Error("We couldn't load this daily plan.");
 
@@ -45,9 +53,11 @@ export async function getDailyPlanningData(workDate: string) {
       planItem: selectedByWorkId.get(item.id!) ?? null,
     }));
 
-  const { data: nextWorkDate } = await supabase.rpc("next_workday", {
-    chosen_after_date: workDate,
-  });
+  const [{ data: nextWorkDate }, { data: previousWorkDate }] =
+    await Promise.all([
+      supabase.rpc("next_workday", { chosen_after_date: workDate }),
+      supabase.rpc("previous_workday", { chosen_before_date: workDate }),
+    ]);
   const { count: dueFollowUps } = await supabase
     .from("follow_ups")
     .select("id", { count: "exact", head: true })
@@ -59,7 +69,9 @@ export async function getDailyPlanningData(workDate: string) {
     dueFollowUps: dueFollowUps ?? 0,
     items,
     nextWorkDate,
+    previousWorkDate,
     plan,
+    schedule,
     timeZone: profile?.time_zone ?? "America/Guatemala",
   };
 }
@@ -92,6 +104,9 @@ export async function getEndOfDayData(workDate: string) {
   const titleById = new Map(
     planning.items.map((item) => [item.id, item.title ?? "Work item"]),
   );
+  const nextDayPlanning = planning.nextWorkDate
+    ? await getDailyPlanningData(planning.nextWorkDate)
+    : null;
 
   return {
     ...planning,
@@ -101,5 +116,6 @@ export async function getEndOfDayData(workDate: string) {
       title: titleById.get(followUp.work_item_id) ?? "Work item",
     })),
     nextPlan,
+    nextDayPlanning,
   };
 }

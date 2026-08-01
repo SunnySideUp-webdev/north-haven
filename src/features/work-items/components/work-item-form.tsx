@@ -54,11 +54,13 @@ export function WorkItemForm({
   item,
   kind,
   ticketTypes = [],
+  endOfDayContext,
 }: Readonly<{
   defaultReceivedAt: string;
   item?: WorkInventoryRow;
   kind: WorkItemKind;
   ticketTypes?: TicketTypeOption[];
+  endOfDayContext?: { workDate: string; nextWorkDate: string };
 }>) {
   const mode = item ? "edit" : "create";
   const [state, action] = useActionState(
@@ -83,12 +85,64 @@ export function WorkItemForm({
       : "";
   }
 
+  function prepareSubmission(event: React.FormEvent<HTMLFormElement>) {
+    prepareDateTime();
+    const formData = new FormData(event.currentTarget);
+
+    if (
+      kind === "ticket" &&
+      String(formData.get("receivedAt")) > defaultReceivedAt &&
+      !window.confirm(
+        "This received date is in the future. Save it intentionally?",
+      )
+    ) {
+      event.preventDefault();
+      return;
+    }
+
+    if (!item) return;
+    const nextTracking = String(formData.get("trackingState"));
+
+    if (
+      nextTracking === "closed" &&
+      item.tracking_state !== "closed" &&
+      !window.confirm(
+        "Close this item only if all downstream changes are confirmed complete. Continue?",
+      )
+    ) {
+      event.preventDefault();
+      return;
+    }
+
+    if (
+      nextTracking === "archived" &&
+      item.tracking_state !== "archived" &&
+      !window.confirm(
+        "Archive this item? It will leave active views, but you can restore it later.",
+      )
+    ) {
+      event.preventDefault();
+      return;
+    }
+
+    if (
+      kind === "ticket" &&
+      item.form_backup_completed_at &&
+      formData.get("formBackupComplete") !== "on" &&
+      !window.confirm(
+        "Mark the form backup as incomplete? The previous completion record will be cleared.",
+      )
+    ) {
+      event.preventDefault();
+    }
+  }
+
   const noun = kind[0].toUpperCase() + kind.slice(1);
 
   return (
     <form
       action={action}
-      onSubmit={prepareDateTime}
+      onSubmit={prepareSubmission}
       onKeyDown={(event) => {
         if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
           event.preventDefault();
@@ -98,9 +152,27 @@ export function WorkItemForm({
       }}
       className="border-border/70 bg-paper shadow-surface rounded-xl border p-8"
     >
-      <WorkFormMessage message={state.message} />
+      <WorkFormMessage
+        existingWorkItemId={state.existingWorkItemId}
+        message={state.message}
+      />
       {item?.id ? (
         <input type="hidden" name="workItemId" value={item.id} />
+      ) : null}
+      {endOfDayContext ? (
+        <>
+          <input type="hidden" name="returnContext" value="end-of-day" />
+          <input
+            type="hidden"
+            name="workDate"
+            value={endOfDayContext.workDate}
+          />
+          <input
+            type="hidden"
+            name="nextWorkDate"
+            value={endOfDayContext.nextWorkDate}
+          />
+        </>
       ) : null}
 
       <div className="grid grid-cols-2 gap-x-6 gap-y-6">
@@ -280,14 +352,38 @@ export function WorkItemForm({
           Save with Ctrl/⌘ Enter
         </span>
         <Link
-          href={item?.id ? `/work/${item.id}` : "/work"}
+          href={
+            item?.id
+              ? `/work/${item.id}`
+              : endOfDayContext
+                ? `/end-of-day?date=${endOfDayContext.workDate}&step=1`
+                : "/work"
+          }
           className="text-muted hover:text-ink px-3 py-2 text-sm font-bold"
         >
           Cancel
         </Link>
-        <WorkSubmitButton
-          label={mode === "edit" ? `Save ${kind}` : `Create ${kind}`}
-        />
+        {endOfDayContext && kind === "ticket" && mode === "create" ? (
+          <>
+            <WorkSubmitButton
+              label="Save and add another"
+              name="intent"
+              value="add_another"
+              variant="secondary"
+            />
+            <WorkSubmitButton
+              label="Save and add to next day"
+              name="intent"
+              value="add_next"
+              variant="secondary"
+            />
+            <WorkSubmitButton label="Save ticket" name="intent" value="save" />
+          </>
+        ) : (
+          <WorkSubmitButton
+            label={mode === "edit" ? `Save ${kind}` : `Create ${kind}`}
+          />
+        )}
       </div>
     </form>
   );

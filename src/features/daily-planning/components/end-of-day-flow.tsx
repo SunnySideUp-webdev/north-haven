@@ -15,7 +15,9 @@ import {
   reopenClosedDayAction,
   resolveEndOfDayFollowUpAction,
   saveDayNoteAction,
+  savePlanDetailsAction,
   setEndOfDayStepAction,
+  setPlanSelectionAction,
   type PlanningActionResult,
 } from "@/features/daily-planning/actions";
 import type { WorkInventoryRow } from "@/features/work-items/types";
@@ -23,6 +25,14 @@ import { PageHeader } from "@/shared/ui/page-header";
 
 type EodItem = WorkInventoryRow & {
   planItem: { id: string; position: number; execution_status: string } | null;
+};
+type NextPlanningItem = WorkInventoryRow & {
+  planItem: {
+    id: string;
+    position: number;
+    execution_status: string;
+    work_item_id: string;
+  } | null;
 };
 type Runner = (
   action: () => Promise<PlanningActionResult>,
@@ -62,6 +72,11 @@ export function EndOfDayFlow({
     }[];
     items: EodItem[];
     nextPlan: { status: string } | null;
+    nextDayPlanning: {
+      calendar: CalendarDayView;
+      items: NextPlanningItem[];
+      plan: { status: string; intention: string | null } | null;
+    } | null;
     nextWorkDate: string | null;
     plan: {
       status: string;
@@ -161,6 +176,31 @@ export function EndOfDayFlow({
                 </dd>
               </div>
             </dl>
+            {data.nextDayPlanning ? (
+              <div className="border-border mt-7 grid grid-cols-2 gap-6 border-t pt-6">
+                <div>
+                  <p className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
+                    First focus
+                  </p>
+                  <p className="text-ink mt-2 text-sm font-bold">
+                    {data.nextDayPlanning.items
+                      .filter((item) => item.planItem)
+                      .sort(
+                        (a, b) => a.planItem!.position - b.planItem!.position,
+                      )[0]?.title ?? "No focus selected"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
+                    First meeting
+                  </p>
+                  <p className="text-ink mt-2 text-sm font-bold">
+                    {data.nextDayPlanning.calendar.meetings[0]?.title ??
+                      "No meetings scheduled"}
+                  </p>
+                </div>
+              </div>
+            ) : null}
             {data.dayNote?.body ? (
               <div className="border-border mt-7 border-t pt-6">
                 <p className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
@@ -283,7 +323,7 @@ export function EndOfDayFlow({
               </p>
               <div className="mt-7 flex gap-3">
                 <Link
-                  href="/work/new/ticket"
+                  href={`/work/new/ticket?context=end-of-day&date=${workDate}&nextDate=${data.nextWorkDate ?? ""}`}
                   className="bg-lavender-700 rounded-lg px-5 py-3 text-sm font-bold text-white"
                 >
                   Add ticket
@@ -345,51 +385,207 @@ export function EndOfDayFlow({
             />
           ) : null}
           {step === 4 ? (
-            <div>
-              <h2 className="text-ink text-2xl font-bold">Plan next workday</h2>
-              <p className="text-muted mt-2 text-sm">
-                Your next available workday is{" "}
-                <strong>{data.nextWorkDate}</strong>.
-              </p>
-              <div className="bg-lavender-50 mt-7 rounded-xl p-6">
-                <p className="text-sm font-bold">
-                  Next plan:{" "}
-                  <span className="capitalize">
-                    {data.nextPlan?.status ?? "Not started"}
-                  </span>
-                </p>
-                <Link
-                  href={`/plan?date=${data.nextWorkDate}`}
-                  className="text-lavender-700 mt-3 inline-block text-sm font-bold"
-                >
-                  Review next workday plan →
-                </Link>
-              </div>
-              <div className="mt-8 flex justify-between">
-                <button
-                  onClick={() => setStep(3)}
-                  className="text-muted text-sm font-bold"
-                >
-                  Back
-                </button>
-                <button
-                  disabled={
-                    pending ||
-                    data.nextPlan?.status !== "ready" ||
-                    unresolved > 0 ||
-                    data.followUps.length > 0
-                  }
-                  onClick={() => run(() => finishEndOfDayAction({ workDate }))}
-                  className="bg-lavender-700 rounded-lg px-6 py-3 text-sm font-bold text-white disabled:opacity-40"
-                >
-                  Finish End of Day
-                </button>
-              </div>
-            </div>
+            <EodNextPlan
+              data={data.nextDayPlanning}
+              nextWorkDate={data.nextWorkDate}
+              pending={pending}
+              run={run}
+              onBack={() => setStep(3)}
+              onFinish={() => run(() => finishEndOfDayAction({ workDate }))}
+              canFinish={unresolved === 0 && data.followUps.length === 0}
+            />
           ) : null}
         </section>
       </div>
     </>
+  );
+}
+
+function EodNextPlan({
+  canFinish,
+  data,
+  nextWorkDate,
+  onBack,
+  onFinish,
+  pending,
+  run,
+}: {
+  canFinish: boolean;
+  data: {
+    items: NextPlanningItem[];
+    plan: { status: string; intention: string | null } | null;
+  } | null;
+  nextWorkDate: string | null;
+  onBack: () => void;
+  onFinish: () => void;
+  pending: boolean;
+  run: Runner;
+}) {
+  const [search, setSearch] = useState("");
+  if (!data || !nextWorkDate)
+    return (
+      <p className="text-muted">A next workday could not be calculated.</p>
+    );
+
+  const selected = data.items
+    .filter((item) => item.planItem)
+    .sort((a, b) => a.planItem!.position - b.planItem!.position);
+  const query = search.trim().toLowerCase();
+  const available = data.items
+    .filter((item) => !item.planItem)
+    .filter((item) =>
+      [item.ticket_number, item.title]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query),
+    )
+    .slice(0, 20);
+
+  return (
+    <div>
+      <div className="flex items-start justify-between gap-5">
+        <div>
+          <h2 className="text-ink text-2xl font-bold">Plan next workday</h2>
+          <p className="text-muted mt-2 text-sm">
+            Choose tomorrow&apos;s focus here. Your next available workday is{" "}
+            <strong>{nextWorkDate}</strong>.
+          </p>
+        </div>
+        <span className="bg-lavender-100 text-lavender-700 rounded-full px-4 py-2 text-xs font-bold capitalize">
+          {data.plan?.status ?? "Not started"}
+        </span>
+      </div>
+
+      <section className="bg-lavender-50 mt-7 rounded-xl p-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-ink font-bold">Selected focus</h3>
+          <span className="text-quiet text-sm">{selected.length} items</span>
+        </div>
+        <div className="mt-4">
+          {selected.length ? (
+            selected.map((item) => (
+              <div
+                key={item.id}
+                className="border-lavender-200 flex items-center gap-3 border-t py-3 first:border-t-0"
+              >
+                <button
+                  type="button"
+                  aria-label={`Remove ${item.title}`}
+                  onClick={() =>
+                    run(() =>
+                      setPlanSelectionAction({
+                        selected: false,
+                        workDate: nextWorkDate,
+                        workItemId: item.id!,
+                      }),
+                    )
+                  }
+                  className="border-lavender-500 bg-paper text-lavender-700 h-6 w-6 rounded border text-xs"
+                >
+                  ✓
+                </button>
+                <Link
+                  href={`/work/${item.id}`}
+                  className="text-ink text-sm font-bold"
+                >
+                  {item.ticket_number ? `${item.ticket_number} · ` : ""}
+                  {item.title}
+                </Link>
+              </div>
+            ))
+          ) : (
+            <p className="text-muted py-4 text-sm">
+              Choose a few items below to make the next start effortless.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="border-border mt-6 rounded-xl border">
+        <div className="border-border flex items-center gap-3 border-b p-4">
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search unplanned work"
+            className="border-border bg-canvas min-w-0 flex-1 rounded-lg border px-4 py-2.5 text-sm"
+          />
+          <Link
+            href={`/plan?date=${nextWorkDate}`}
+            className="text-lavender-700 text-sm font-bold"
+          >
+            Open full Plan
+          </Link>
+        </div>
+        <div className="max-h-64 overflow-y-auto px-5">
+          {available.map((item) => (
+            <div
+              key={item.id}
+              className="border-border flex items-center gap-3 border-t py-3 first:border-t-0"
+            >
+              <button
+                type="button"
+                aria-label={`Add ${item.title}`}
+                onClick={() =>
+                  run(() =>
+                    setPlanSelectionAction({
+                      selected: true,
+                      workDate: nextWorkDate,
+                      workItemId: item.id!,
+                    }),
+                  )
+                }
+                className="border-lavender-300 h-6 w-6 rounded border"
+              />
+              <p className="text-ink text-sm font-bold">
+                {item.ticket_number ? `${item.ticket_number} · ` : ""}
+                {item.title}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="mt-7 flex items-center justify-between">
+        <button onClick={onBack} className="text-muted text-sm font-bold">
+          Back
+        </button>
+        <div className="flex gap-3">
+          {data.plan?.status !== "ready" ? (
+            <button
+              type="button"
+              disabled={pending || selected.length === 0}
+              onClick={() =>
+                run(() =>
+                  savePlanDetailsAction({
+                    intention: data.plan?.intention ?? "",
+                    markReady: true,
+                    workDate: nextWorkDate,
+                  }),
+                )
+              }
+              className="border-lavender-300 text-lavender-700 rounded-lg border px-5 py-3 text-sm font-bold disabled:opacity-40"
+            >
+              Mark plan ready
+            </button>
+          ) : null}
+          <button
+            disabled={pending || data.plan?.status !== "ready" || !canFinish}
+            onClick={onFinish}
+            className="bg-lavender-700 rounded-lg px-6 py-3 text-sm font-bold text-white disabled:opacity-40"
+          >
+            Finish End of Day
+          </button>
+        </div>
+      </div>
+      {!canFinish ? (
+        <p className="text-waiting-ink mt-4 text-right text-xs font-bold">
+          Resolve today&apos;s open outcomes and due follow-ups before
+          finishing.
+        </p>
+      ) : null}
+    </div>
   );
 }
 
