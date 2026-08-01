@@ -121,4 +121,13 @@ test("creates a private workspace, completes setup, and restores the session", a
       name: "Your next workday is ready.",
     }),
   ).toBeVisible();
+
+  await page.getByRole("link", { name: "Insights" }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Insights" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Insights period")).toHaveValue("month");
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Work completed" }),
+  ).toBeVisible();
 });

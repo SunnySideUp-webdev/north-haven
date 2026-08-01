@@ -258,6 +258,19 @@ Do not store descriptions, attendee lists, or attachments in the MVP.
 ## Derived behavior
 
 - `backup_done` is derived from `form_backup_completed_at IS NOT NULL`.
+
+## Reporting projections
+
+Reporting data remains derived rather than copied into analytics tables:
+
+- `reporting_daily_metrics(start, end)` returns Calendar and trend rows.
+- `reporting_period_totals(start, end)` returns exact-period distinct totals.
+- `reporting_inventory_metrics(start, end)` reconstructs historical inventory
+  and ticket-age snapshots from status events.
+
+All three functions derive the authenticated personal workspace internally and
+limit ranges to 371 dates. Calendar, Insights, and Reports must consume these
+same projections so a later export cannot silently redefine a metric.
 - Ticket age is current date minus `received_at`, stopping at `closed_at` for
   historical reporting.
 - A full-day OOO event creates non-working-day records for each covered local

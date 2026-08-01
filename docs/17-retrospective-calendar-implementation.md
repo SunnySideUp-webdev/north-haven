@@ -72,9 +72,8 @@ the note without placing its content in a URL.
 
 ## Remaining Phase 7 work
 
-1. Build Week, Month, Quarter, and Custom Range Insights from the same daily
-   rows.
-2. Add accessible trend charts and text summaries.
-3. Build the Daily, Weekly, and Monthly Report Builder in Insights.
-4. Stream designed PDF and data-only CSV exports with privacy-safe defaults.
+1. Build the Daily, Weekly, and Monthly Report Builder in Insights.
+2. Stream designed PDF and data-only CSV exports with privacy-safe defaults.
 
+Week, Month, Quarter, and Custom Range Insights plus their accessible trend
+charts are complete and documented in `docs/18-insights-implementation.md`.

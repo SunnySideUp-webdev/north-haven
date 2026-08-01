@@ -127,10 +127,16 @@ calendar.
   confirmed meeting, important-note, and OOO indicators
 - In-place Day Summary with Plan vs Actual, outcomes, intention, and day note
 - RLS-protected editable monthly notes and persistent month navigation
+- Week, Month, Quarter, and Custom Range Insights with partial-period handling
+- Exact-period reporting totals plus historical Active, Waiting, Watching, and
+  ticket-age reconstruction
+- Accessible Work Completed, Received vs Resolved, Active Inventory, Ticket Age,
+  and Plan Completion charts with plain-language summaries
+- OOO-aware average daily work that respects configured working weekdays
 
 ### Pending or not started
 
-- Phase 7 Insights, accessible charts, and Daily/Weekly/Monthly report exports
+- Phase 7 Daily/Weekly/Monthly Report Builder and PDF/CSV exports
 - Hosted Supabase and deployment configuration
 - Phase 8 hardening and personal launch
 
@@ -140,11 +146,12 @@ configuration are not connected.
 
 ### Next step
 
-Continue Phase 7 with Week, Month, Quarter, and Custom Range Insights using the
-implemented daily reporting projection. Then build the approved Daily, Weekly,
-and Monthly PDF/CSV exports. Calendar and Insights must share metric definitions
-for identical periods. The Calendar increment is documented in
-`docs/17-retrospective-calendar-implementation.md`.
+Continue Phase 7 with the approved Daily, Weekly, and Monthly Report Builder,
+then stream designed PDF and data-only CSV exports. Reports must consume the
+implemented reporting projections without recomputing metrics. The Calendar and
+Insights increments are documented in
+`docs/17-retrospective-calendar-implementation.md` and
+`docs/18-insights-implementation.md`.
 
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.
@@ -294,6 +301,7 @@ The current visual specification is `docs/10-visual-system.md`.
 - `docs/15-daily-planning-implementation.md` — persisted Plan and Today implementation and next Phase 5 increment
 - `docs/16-google-calendar-implementation.md` — secure read-only Calendar implementation and live feasibility check
 - `docs/17-retrospective-calendar-implementation.md` — shared daily metrics, monthly Calendar, Day Summary, and remaining Phase 7 work
+- `docs/18-insights-implementation.md` — reporting periods, historical inventory, metric semantics, and accessible charts
 
 ## Design assets
 

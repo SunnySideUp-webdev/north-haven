@@ -435,6 +435,56 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
       tickets_worked: 0,
     });
 
+    const { data: totalsA, error: totalsErrorA } = await clientA.rpc(
+      "reporting_period_totals",
+      {
+        chosen_end_date: "2026-08-04",
+        chosen_start_date: "2026-08-04",
+      },
+    );
+    const { data: totalsB, error: totalsErrorB } = await clientB.rpc(
+      "reporting_period_totals",
+      {
+        chosen_end_date: "2026-08-04",
+        chosen_start_date: "2026-08-04",
+      },
+    );
+    const { data: inventoryMetricsA, error: inventoryMetricsErrorA } =
+      await clientA.rpc("reporting_inventory_metrics", {
+        chosen_end_date: "2026-08-04",
+        chosen_start_date: "2026-08-04",
+      });
+    const { data: inventoryMetricsB, error: inventoryMetricsErrorB } =
+      await clientB.rpc("reporting_inventory_metrics", {
+        chosen_end_date: "2026-08-04",
+        chosen_start_date: "2026-08-04",
+      });
+
+    expect(totalsErrorA).toBeNull();
+    expect(totalsErrorB).toBeNull();
+    expect(inventoryMetricsErrorA).toBeNull();
+    expect(inventoryMetricsErrorB).toBeNull();
+    expect(totalsA?.[0]).toMatchObject({
+      completed_items: 1,
+      planned_items: 2,
+      tickets_worked: 1,
+    });
+    expect(totalsB?.[0]).toMatchObject({
+      completed_items: 0,
+      planned_items: 0,
+      tickets_worked: 0,
+    });
+    expect(inventoryMetricsA?.[0]).toMatchObject({
+      active_tickets: 1,
+      waiting_tickets: 1,
+      watching_tickets: 1,
+    });
+    expect(inventoryMetricsB?.[0]).toMatchObject({
+      active_tickets: 0,
+      waiting_tickets: 0,
+      watching_tickets: 0,
+    });
+
     const { data: connection, error: connectionError } = await admin
       .from("calendar_connections")
       .insert({

@@ -1197,6 +1197,34 @@ export type Database = {
           work_date: string;
         }[];
       };
+      reporting_inventory_metrics: {
+        Args: { chosen_end_date: string; chosen_start_date: string };
+        Returns: {
+          active_tickets: number;
+          age_0_7: number;
+          age_15_30: number;
+          age_31_plus: number;
+          age_8_14: number;
+          average_active_age: number;
+          tickets_received: number;
+          waiting_tickets: number;
+          watching_tickets: number;
+          work_date: string;
+        }[];
+      };
+      reporting_period_totals: {
+        Args: { chosen_end_date: string; chosen_start_date: string };
+        Returns: {
+          completed_items: number;
+          meetings_attended: number;
+          planned_items: number;
+          reminders_completed: number;
+          tasks_completed: number;
+          tickets_closed: number;
+          tickets_resolved: number;
+          tickets_worked: number;
+        }[];
+      };
       resolve_end_of_day_follow_up: {
         Args: {
           chosen_decision: Database["public"]["Enums"]["follow_up_decision"];

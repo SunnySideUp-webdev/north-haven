@@ -1,0 +1,102 @@
+# Insights implementation
+
+Status: Phase 7 Insights increment complete
+Last updated: August 1, 2026
+
+## Outcome
+
+Insights now turns North Haven's historical work record into calm, comparable
+period summaries without assigning a productivity score. The interface supports
+Week, Month, Quarter, and Custom ranges, keeps all labels and explanations in
+English, and uses the approved lavender/blush visual language.
+
+Current Week, Month, and Quarter ranges are partial through the workspace-local
+current date. Completed periods use their complete natural boundary. Custom
+ranges support up to 371 dates. The comparison period immediately precedes the
+selected range and uses the same number of dates.
+
+## Reporting functions
+
+Migration `20260801000900_reporting_insights.sql` adds two authenticated,
+workspace-derived reporting functions:
+
+- `reporting_period_totals(start, end)` calculates exact-period distinct Tickets
+  Worked plus Resolved, Closed, completed Tasks/Reminders, confirmed Meetings,
+  and Plan Completion inputs.
+- `reporting_inventory_metrics(start, end)` reconstructs one historical
+  inventory snapshot per date with Tickets Received, Active, Waiting, Watching,
+  average active age, and four ticket-age bands.
+
+Migration `20260801001000_reporting_meeting_instances.sql` keeps recurring
+meeting instances distinct by local date while still deduplicating the same
+event if it appears through more than one selected calendar.
+
+Both functions accept ranges of at most 371 days, derive the personal workspace
+from the authenticated session, use an empty search path, and accept no
+workspace identifier from the browser. The daily Calendar projection remains
+the source for date-level activity and plan trends.
+
+Historical inventory uses the latest tracking and operational status event known
+on each local date. A ticket closed today therefore remains visible in an older
+period where it was still Active. `Waiting for Response` and `Watching` are
+subsets of Active rather than additional inventory totals.
+
+## Metric semantics
+
+- **Tickets Worked:** distinct Tickets with at least one Work Log in the exact
+  selected period. Chart bars show daily or grouped work activity, so a ticket
+  touched on multiple dates can appear in more than one chart interval without
+  inflating the headline distinct-period metric.
+- **Resolved:** historical transitions into Resolved. Reopening does not erase a
+  prior resolution.
+- **Closed:** historical transitions into Closed after downstream work is
+  confirmed.
+- **Active:** Tickets whose historical tracking state is Active or Watching at
+  period end.
+- **Waiting for Response:** Active Tickets whose historical operational status
+  is Waiting for Response at period end.
+- **Watching:** Active Tickets intentionally retained for downstream follow-up at
+  period end.
+- **Average daily worked:** daily ticket activity divided by configured working
+  dates in the selected period; weekends and full-day OOO dates are excluded
+  from both numerator and denominator.
+- **Plan Completion:** completed actionable plan items divided by eligible
+  planned items. A missing denominator displays an em dash and explanation.
+- **Average active age:** calendar days between Received date and the period-end
+  snapshot for Active Tickets.
+
+## Interface behavior
+
+- Week, Month, Quarter, and Custom range controls use dates only in the URL.
+- Current partial periods are labeled `Current period through today`.
+- Five primary metrics are followed by a quieter status and average band.
+- Work Completed, Received versus Resolved, Active Inventory, Ticket Age, and
+  Plan Completion charts include visible plain-language summaries.
+- Every visual chart includes a semantic text or table alternative.
+- An individual chart with no eligible data explains the absence instead of
+  drawing misleading zero bars.
+- Tasks, Reminders, and confirmed Meetings remain separate from ticket totals.
+- `Export report` is visible but disabled until the final Phase 7 Report Builder
+  increment is implemented, avoiding a dead or misleading route.
+
+## Verification
+
+- local migration applied without resetting personal data
+- generated Supabase TypeScript contract updated
+- database lint reports no public-schema errors
+- live authenticated aggregate and inventory RPC shapes validated without
+  exposing ticket content
+- unit coverage for period boundaries, partial ranges, equal-duration
+  comparisons, grouping, OOO-aware averages, and plan completion
+- component coverage for metric definitions, chart alternatives, and safe period
+  navigation
+- opt-in two-user integration coverage extended for both new security-definer
+  reporting functions
+
+## Remaining Phase 7 work
+
+1. Build the Daily, Weekly, and Monthly Report Builder from these exact
+   projections.
+2. Generate the designed, selectable-text PDF with privacy-safe content options.
+3. Stream the data-only CSV and PDF without retaining files server-side.
+4. Verify report totals against Calendar and Insights for identical periods.
