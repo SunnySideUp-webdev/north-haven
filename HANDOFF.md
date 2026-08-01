@@ -103,6 +103,10 @@ calendar.
 - Authenticated Today data that hides unplanned inventory and records progress
 - Work logs and next-workday calculation that skips weekends/non-working dates
 - Corrected Work search shortcut layout without overlap
+- Four-step, resumable End of Day flow with persistent progress and day notes
+- Explicit Done, Return, Deferred, Watching, and No Longer Needed outcomes
+- Due follow-up decisions and transactional End of Day completion
+- Calm next-workday-ready completion state with no automatic rollover
 
 ### Not started
 
@@ -115,11 +119,12 @@ Google Calendar credentials, and deployment configuration are not connected.
 
 ### Next step
 
-Continue Phase 5 with the four-step End of Day flow: Update Tickets, explicitly
-resolve every Today item, review due follow-ups, and prepare the calculated next
-workday. Add day-note autosave and the outcomes Return to Inventory, Plan for
-Another Date, Keep Watching, and No Longer Needed. The persistent Plan and Today
-foundation is complete and documented in `docs/15-daily-planning-implementation.md`.
+Begin Phase 6 with a corporate Google Calendar OAuth feasibility spike. Confirm
+that the corporate account permits the required external app, request read-only
+calendar scopes only, and connect meetings plus official Out of Office events
+to the existing Plan, Today, and End of Day flows. Calendar failure must never
+block manual planning. Phase 5 is complete and documented in
+`docs/15-daily-planning-implementation.md`.
 
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.

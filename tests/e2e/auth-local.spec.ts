@@ -98,4 +98,27 @@ test("creates a private workspace, completes setup, and restores the session", a
     .getByRole("button", { name: "Mark Review tomorrow's requests done" })
     .click();
   await expect(page.getByText("1 of 1", { exact: true })).toBeVisible();
+
+  await page.getByRole("link", { name: "Start End of Day" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByLabel("Day note").fill("The daily plan is complete.");
+  await page.getByRole("button", { name: "Save note" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(
+    page.getByText("No follow-ups need a decision today."),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("link", { name: /Review next workday plan/ }).click();
+  await page
+    .getByRole("button", { name: "Add Review tomorrow's requests" })
+    .click();
+  await page.getByRole("button", { name: "Mark ready" }).click();
+  await page.goBack();
+  await page.getByRole("button", { name: "Finish End of Day" }).click();
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Your next workday is ready.",
+    }),
+  ).toBeVisible();
 });

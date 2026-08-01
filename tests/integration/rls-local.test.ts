@@ -342,5 +342,53 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     expect(doneError).toBeNull();
     expect(workLog).toEqual({ worked_on: "2026-08-04", outcome: "done" });
     expect(hiddenPlan).toEqual([]);
+
+    const { error: deferredOutcomeError } = await clientA.rpc(
+      "apply_end_of_day_outcome",
+      {
+        chosen_deferred_date: "2026-08-05",
+        chosen_outcome: "deferred",
+        target_daily_plan_item_id: plannedItems![1].id,
+      },
+    );
+    const { error: noteError } = await clientA.rpc("save_day_note", {
+      chosen_body: "Waiting work was deliberately planned for tomorrow.",
+      chosen_is_important: true,
+      chosen_work_date: "2026-08-04",
+    });
+    const { error: nextReadyError } = await clientA.rpc(
+      "update_daily_plan_details",
+      {
+        chosen_intention: "Continue the deferred work.",
+        chosen_mark_ready: true,
+        chosen_work_date: "2026-08-05",
+      },
+    );
+    const { data: finishedNextDate, error: finishError } = await clientA.rpc(
+      "finish_end_of_day",
+      { chosen_work_date: "2026-08-04" },
+    );
+    const { data: closedPlan } = await clientA
+      .from("daily_plans")
+      .select("status, closed_at")
+      .eq("id", plan!.id)
+      .single();
+    const { data: dayNote } = await clientA
+      .from("day_notes")
+      .select("body, is_important")
+      .eq("work_date", "2026-08-04")
+      .single();
+
+    expect(deferredOutcomeError).toBeNull();
+    expect(noteError).toBeNull();
+    expect(nextReadyError).toBeNull();
+    expect(finishError).toBeNull();
+    expect(finishedNextDate).toBe("2026-08-05");
+    expect(closedPlan?.status).toBe("closed");
+    expect(closedPlan?.closed_at).toBeTruthy();
+    expect(dayNote).toEqual({
+      body: "Waiting work was deliberately planned for tomorrow.",
+      is_important: true,
+    });
   });
 });

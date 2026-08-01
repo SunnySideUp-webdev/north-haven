@@ -107,12 +107,20 @@ export function DailyToday({
                 />
               </div>
             </div>
-            <Link
-              href={`/plan?date=${workDate}`}
-              className="border-lavender-500 text-lavender-700 mt-auto rounded-lg border px-5 py-3 text-center text-sm font-bold"
-            >
-              Edit today&apos;s plan
-            </Link>
+            <div className="mt-auto space-y-3">
+              <Link
+                href={`/end-of-day?date=${workDate}`}
+                className="bg-lavender-700 block rounded-lg px-5 py-3 text-center text-sm font-bold text-white"
+              >
+                Start End of Day
+              </Link>
+              <Link
+                href={`/plan?date=${workDate}`}
+                className="border-lavender-500 text-lavender-700 block rounded-lg border px-5 py-3 text-center text-sm font-bold"
+              >
+                Edit today&apos;s plan
+              </Link>
+            </div>
           </aside>
           <section className="border-border/70 bg-paper shadow-surface rounded-xl border p-8">
             <h2 className="text-ink text-xl font-bold">Work plan</h2>

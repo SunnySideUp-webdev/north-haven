@@ -841,6 +841,14 @@ export type Database = {
         Args: { chosen_body: string; target_work_item_id: string };
         Returns: string;
       };
+      apply_end_of_day_outcome: {
+        Args: {
+          chosen_deferred_date?: string;
+          chosen_outcome: Database["public"]["Enums"]["work_log_outcome"];
+          target_daily_plan_item_id: string;
+        };
+        Returns: undefined;
+      };
       complete_initial_setup: {
         Args: {
           chosen_display_name: string;
@@ -884,6 +892,10 @@ export type Database = {
       };
       create_ticket_type: { Args: { chosen_name: string }; Returns: string };
       current_personal_workspace_id: { Args: never; Returns: string };
+      finish_end_of_day: {
+        Args: { chosen_work_date: string };
+        Returns: string;
+      };
       is_workspace_member: {
         Args: { target_workspace_id: string };
         Returns: boolean;
@@ -901,6 +913,22 @@ export type Database = {
         Returns: undefined;
       };
       next_workday: { Args: { chosen_after_date: string }; Returns: string };
+      resolve_end_of_day_follow_up: {
+        Args: {
+          chosen_decision: Database["public"]["Enums"]["follow_up_decision"];
+          chosen_review_on?: string;
+          target_follow_up_id: string;
+        };
+        Returns: undefined;
+      };
+      save_day_note: {
+        Args: {
+          chosen_body: string;
+          chosen_is_important: boolean;
+          chosen_work_date: string;
+        };
+        Returns: undefined;
+      };
       save_open_follow_up: {
         Args: {
           chosen_reason: string;
@@ -913,6 +941,10 @@ export type Database = {
       set_daily_plan_item_done: {
         Args: { chosen_done: boolean; target_daily_plan_item_id: string };
         Returns: undefined;
+      };
+      set_end_of_day_step: {
+        Args: { chosen_step: number; chosen_work_date: string };
+        Returns: string;
       };
       set_plan_item_selected: {
         Args: {
@@ -984,6 +1016,11 @@ export type Database = {
     };
     Enums: {
       daily_plan_status: "draft" | "ready" | "active" | "closed";
+      follow_up_decision:
+        | "still_waiting"
+        | "response_received"
+        | "external_completed"
+        | "no_longer_relevant";
       follow_up_state: "open" | "completed" | "cancelled";
       non_working_day_kind: "out_of_office" | "holiday" | "manual";
       non_working_day_source: "google" | "manual";
@@ -1130,6 +1167,12 @@ export const Constants = {
   public: {
     Enums: {
       daily_plan_status: ["draft", "ready", "active", "closed"],
+      follow_up_decision: [
+        "still_waiting",
+        "response_received",
+        "external_completed",
+        "no_longer_relevant",
+      ],
       follow_up_state: ["open", "completed", "cancelled"],
       non_working_day_kind: ["out_of_office", "holiday", "manual"],
       non_working_day_source: ["google", "manual"],

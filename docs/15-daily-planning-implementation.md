@@ -1,6 +1,6 @@
 # Daily Planning implementation
 
-Status: First persistent vertical slice complete
+Status: Core Phase 5 complete
 Last updated: July 31, 2026
 
 ## Outcome
@@ -59,14 +59,35 @@ sits inside the search field and no longer overlaps the `All types` selector.
 - Chromium covers Work creation, Plan selection, Ready confirmation, Today, and
   completion
 
-## Next increment within Phase 5
+## End of Day implementation
 
-Build the four-step End of Day flow on this foundation:
+The four-step End of Day flow is now implemented:
 
 1. Update Tickets
 2. Close Today with an explicit outcome for every planned item
 3. Review due follow-ups
 4. Prepare and mark the calculated next workday Ready
 
-That increment will also add day-note autosave, explicit deferral, Return to
-Inventory, Keep Watching, and the calm End of Day completion state.
+Each planned item requires an explicit outcome: Done, Return to Inventory, Plan
+for Another Date, Keep Watching, or No Longer Needed. Deferral requires a future
+date and creates the new selection transactionally. Nothing rolls over by
+default.
+
+Due follow-ups can remain waiting with a future review date, return a work item
+to Active, close it after an external change, or become no longer relevant.
+Day notes and their important marker persist for Calendar and reporting.
+
+Finish End of Day is transactional and remains unavailable until:
+
+- every actionable plan item has an outcome
+- every due follow-up has a decision
+- the calculated next workday has a Ready plan
+
+The completion state confirms `Your next workday is ready.` without scores,
+confetti, or gamification.
+
+## Next product phase
+
+Phase 6 is the Google Calendar feasibility and read-only synchronization work.
+It will add meetings and official OOO context to the existing Plan, Today, and
+End of Day foundations without making Calendar a dependency for manual planning.

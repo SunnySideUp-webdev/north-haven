@@ -8,7 +8,7 @@ export async function getDailyPlanningData(workDate: string) {
   const [{ data: plan, error: planError }, inventory] = await Promise.all([
     supabase
       .from("daily_plans")
-      .select("id, work_date, status, intention, closed_at")
+      .select("id, work_date, status, intention, closed_at, end_of_day_step")
       .eq("work_date", workDate)
       .maybeSingle(),
     getWorkInventory(),
@@ -56,5 +56,45 @@ export async function getDailyPlanningData(workDate: string) {
     nextWorkDate,
     plan,
     timeZone: profile?.time_zone ?? "America/Guatemala",
+  };
+}
+
+export async function getEndOfDayData(workDate: string) {
+  const planning = await getDailyPlanningData(workDate);
+  const { supabase } = await requireAuthenticatedContext();
+  const [{ data: dayNote }, { data: followUps }, { data: nextPlan }] =
+    await Promise.all([
+      supabase
+        .from("day_notes")
+        .select("body, is_important")
+        .eq("work_date", workDate)
+        .maybeSingle(),
+      supabase
+        .from("follow_ups")
+        .select("id, work_item_id, reason, waiting_on, review_on")
+        .eq("state", "open")
+        .lte("review_on", workDate)
+        .order("review_on"),
+      planning.nextWorkDate
+        ? supabase
+            .from("daily_plans")
+            .select("id, status")
+            .eq("work_date", planning.nextWorkDate)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
+    ]);
+
+  const titleById = new Map(
+    planning.items.map((item) => [item.id, item.title ?? "Work item"]),
+  );
+
+  return {
+    ...planning,
+    dayNote,
+    followUps: (followUps ?? []).map((followUp) => ({
+      ...followUp,
+      title: titleById.get(followUp.work_item_id) ?? "Work item",
+    })),
+    nextPlan,
   };
 }
