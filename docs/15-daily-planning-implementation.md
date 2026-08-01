@@ -90,5 +90,5 @@ confetti, or gamification.
 
 Phase 6 has added meetings and official OOO context to Plan, Today, Calendar,
 and End of Day without making Calendar a dependency for manual planning. The
-implementation and remaining live corporate OAuth feasibility check are
+implementation and completed live corporate OAuth feasibility check are
 documented in `docs/16-google-calendar-implementation.md`.

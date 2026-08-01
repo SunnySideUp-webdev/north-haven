@@ -1,7 +1,7 @@
 import "server-only";
 
 import {
-  expandAllDayDates,
+  fullDayOooDates,
   normalizeGoogleEventWindow,
 } from "@/features/calendar-sync/date";
 import {
@@ -120,6 +120,10 @@ async function saveEventChange({
   if (!window || new Date(window.endsAt) <= new Date(window.startsAt)) return;
 
   const normalizedType = eventType(event.eventType);
+  const oooDates =
+    normalizedType === "out_of_office"
+      ? fullDayOooDates(event.start, event.end, workspaceTimeZone)
+      : [];
   const { error } = await admin.from("external_calendar_events").upsert(
     {
       end_local_date: window.endLocalDate,
@@ -127,7 +131,7 @@ async function saveEventChange({
       event_type: normalizedType,
       external_calendar_id: calendarId,
       ical_uid: event.iCalUID ?? null,
-      is_all_day: window.isAllDay,
+      is_all_day: window.isAllDay || oooDates.length > 0,
       meeting_url: event.hangoutLink ?? null,
       provider_event_id: event.id,
       provider_url: event.htmlLink ?? null,
@@ -143,22 +147,15 @@ async function saveEventChange({
   );
   if (error) throw new Error("A calendar event could not be synced.");
 
-  if (
-    normalizedType === "out_of_office" &&
-    window.isAllDay &&
-    event.start.date &&
-    event.end.date
-  ) {
-    const rows = expandAllDayDates(event.start.date, event.end.date).map(
-      (workDate) => ({
-        allows_urgent_work: true,
-        kind: "out_of_office" as const,
-        source: "google" as const,
-        source_event_id: sourceEventId,
-        work_date: workDate,
-        workspace_id: workspaceId,
-      }),
-    );
+  if (oooDates.length) {
+    const rows = oooDates.map((workDate) => ({
+      allows_urgent_work: true,
+      kind: "out_of_office" as const,
+      source: "google" as const,
+      source_event_id: sourceEventId,
+      work_date: workDate,
+      workspace_id: workspaceId,
+    }));
     if (rows.length) {
       const { error: dayError } = await admin
         .from("non_working_days")

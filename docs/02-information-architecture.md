@@ -126,7 +126,9 @@ navigation destination.
 
 ## OOO behavior
 
-- An official Google `outOfOffice` event marks each covered date non-working.
+- An official Google `outOfOffice` event marks each complete local date
+  non-working. Complete coverage may arrive as an all-day record or an exact
+  local midnight-to-midnight interval.
 - Non-working dates are skipped when choosing the next workday.
 - A partially covered date remains a workday and displays the OOO interval.
 - The user can explicitly add urgent work to a non-working date.

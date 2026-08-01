@@ -79,7 +79,9 @@ calendar never changes locally entered work or blocks End of Day.
 
 ## Out of Office
 
-- A full-day Google `outOfOffice` event marks the date as non-working.
+- A full-day Google `outOfOffice` event marks the date as non-working. This
+  includes provider all-day records and exact local midnight-to-midnight
+  intervals, but not partial OOO blocks.
 - Plan skips that date when proposing the next workday.
 - The message names both the OOO date and the proposed next workday.
 - `Plan urgent work anyway` is always available but requires an explicit click.

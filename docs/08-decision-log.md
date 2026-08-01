@@ -26,6 +26,9 @@
 - Google Calendar is read-only in the MVP.
 - The account is corporate; OAuth permission must be validated early.
 - Official Google Out of Office events define non-working dates.
+- A Google OOO event counts as full-day when it is an all-day record or covers
+  exact local midnight to midnight. Partial lunch and outside-work OOO blocks
+  never suppress the workday.
 - Normal schedule is Monday-Friday, 8:00 AM-5:00 PM.
 - Urgent work can be added explicitly to an OOO date.
 - Meetings default to Probably Attended after ending and are confirmed during
@@ -62,3 +65,5 @@
   optional corporate authorization.
 - Generated report files are streamed on demand and are not retained in server
   storage during the MVP.
+- Local development uses `http://127.0.0.1:3000` as the canonical browser
+  origin because browser cookies are not shared with `localhost`.

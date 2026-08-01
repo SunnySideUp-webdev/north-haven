@@ -143,8 +143,9 @@ conference identifiers that are not needed by the user interface.
 ### OOO
 
 Use the provider event type, not title matching. Full-day `outOfOffice` events
-create local non-working dates. Partial events are shown as calendar context but
-do not remove the entire workday.
+include provider all-day records and exact local midnight-to-midnight intervals.
+They create local non-working dates. Partial events are shown as calendar
+context but do not remove the entire workday.
 
 ### Early technical spike
 

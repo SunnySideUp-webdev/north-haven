@@ -252,7 +252,8 @@ Do not store descriptions, attendee lists, or attachments in the MVP.
 - Ticket age is current date minus `received_at`, stopping at `closed_at` for
   historical reporting.
 - A full-day OOO event creates non-working-day records for each covered local
-  date. Partial OOO events do not.
+  date. Both provider all-day records and exact local midnight-to-midnight
+  intervals qualify; partial OOO events do not.
 - Plan completion excludes synced meetings until attendance is confirmed and
   excludes cancelled/not-applicable meetings from the denominator.
 - Calendar `worked` counts distinct tickets with a work log on that date.

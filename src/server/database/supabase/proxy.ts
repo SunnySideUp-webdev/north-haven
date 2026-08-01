@@ -27,6 +27,53 @@ export function isGuestOnlyPath(pathname: string) {
   return guestOnlyPaths.includes(pathname);
 }
 
+export function getLoopbackCanonicalRedirect(
+  requestUrl: URL,
+  configuredAppUrl: string,
+  requestHost = requestUrl.host,
+) {
+  const canonicalUrl = new URL(configuredAppUrl);
+  const loopbackHosts = new Set(["127.0.0.1", "localhost"]);
+  const normalizedRequestHost = requestHost.split(",")[0]?.trim();
+  const requestOrigin = normalizedRequestHost
+    ? new URL(`${requestUrl.protocol}//${normalizedRequestHost}`).origin
+    : requestUrl.origin;
+
+  if (
+    !loopbackHosts.has(canonicalUrl.hostname) ||
+    requestOrigin === canonicalUrl.origin
+  ) {
+    return null;
+  }
+
+  const redirectUrl = new URL(requestUrl.pathname, canonicalUrl.origin);
+  redirectUrl.search = requestUrl.search;
+  return redirectUrl;
+}
+
+export function createCanonicalRedirectDocument(destination: URL) {
+  const escapedDestination = destination
+    .toString()
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="0; url=${escapedDestination}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Opening North Haven</title>
+  </head>
+  <body>
+    <p>Opening North Haven…</p>
+    <p><a href="${escapedDestination}">Continue</a></p>
+  </body>
+</html>`;
+}
+
 function redirectWithCookies(
   request: NextRequest,
   response: NextResponse,
@@ -45,8 +92,28 @@ function redirectWithCookies(
 }
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
   const environment = getPublicSupabaseEnvironment();
+  const requestHost =
+    request.headers.get("x-forwarded-host") ??
+    request.headers.get("host") ??
+    request.nextUrl.host;
+  const canonicalRedirect = getLoopbackCanonicalRedirect(
+    request.nextUrl,
+    environment.NEXT_PUBLIC_APP_URL,
+    requestHost,
+  );
+
+  if (canonicalRedirect) {
+    return new Response(createCanonicalRedirectDocument(canonicalRedirect), {
+      headers: {
+        "cache-control": "no-store",
+        "content-type": "text/html; charset=utf-8",
+      },
+      status: 200,
+    });
+  }
+
+  let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
     environment.NEXT_PUBLIC_SUPABASE_URL,

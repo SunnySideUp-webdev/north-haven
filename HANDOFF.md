@@ -1,6 +1,6 @@
 # North Haven project handoff
 
-Last updated: July 31, 2026
+Last updated: August 1, 2026
 
 This file is the safest starting point when continuing North Haven in a new
 chat or development session. It summarizes the approved product direction and
@@ -113,28 +113,31 @@ calendar.
   tables
 - Read-only calendar selection plus initial and incremental event sync
 - Real meetings in Plan, Today, Calendar, and End of Day attendance review
-- Official full-day Google OOO records integrated with next-workday calculation
+- Official full-local-day Google OOO records integrated with next-workday
+  calculation, including midnight-to-midnight events returned as timed records
 - Reconnect, stale, denied, failure, manual sync, and disconnect experiences
+- Live corporate Google OAuth consent, calendar discovery, initial sync, token
+  encryption, and refresh-token exchange verified successfully
+- Canonical local-origin handling prevents `localhost` and `127.0.0.1` from
+  splitting the North Haven session during Google OAuth
+- Local password recovery verified end to end through Mailpit
 
 ### Pending or not started
 
-- Live corporate Google OAuth feasibility validation and real token refresh
-- Deployment configuration
-- Phase 7 retrospective Calendar, Insights, and report exports
+- Phase 7 retrospective Calendar, Day Summary, Insights, and report exports
+- Hosted Supabase and deployment configuration
+- Phase 8 hardening and personal launch
 
 Application code now exists. Production data, authentication credentials,
 Google Calendar credentials, and deployment configuration are not connected.
 
 ### Next step
 
-Complete the final Phase 6 feasibility check with the real corporate Google
-account. Create a Google Cloud Web application OAuth client, register
-`http://127.0.0.1:3000/api/google-calendar/callback`, add the ignored local
-credentials, and connect from Settings. Validate corporate consent, calendar
-listing, meetings, official OOO events, refresh, reconnect, and disconnect.
-The implementation is documented in
-`docs/16-google-calendar-implementation.md`. Do not begin Phase 7 until the live
-corporate connection is known to work or its policy blocker is documented.
+Begin Phase 7 with the retrospective monthly Calendar and Day Summary, then
+build Insights and the approved Daily, Weekly, and Monthly PDF/CSV exports.
+Calendar and Insights must share metric definitions for identical periods.
+The completed Google integration is documented in
+`docs/16-google-calendar-implementation.md`.
 
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.
@@ -142,9 +145,8 @@ approaches the current 500-item boundary; it does not block the present workflow
 The hosted Supabase development environment, hosted password-recovery check,
 remaining authenticated Today schedule data, and recovery documentation remain
 open Phase 3 hardening tasks. They are required before deployment but do not
-block local Work Inventory development. Google Calendar credentials are now
-required only for the live Phase 6 feasibility check; manual planning remains
-usable without them.
+block Phase 7. Local Google Calendar credentials are configured in the ignored
+environment file; they must never be copied into documentation or Git.
 
 ## Confirmed product decisions
 
@@ -201,7 +203,10 @@ usable without them.
 - Start with read-only synchronization.
 - Validate corporate OAuth permissions early.
 - Read meetings and official Google Out of Office events.
-- Official `outOfOffice` events create non-working dates.
+- Official `outOfOffice` events create non-working dates only when they cover a
+  complete local date.
+- Google all-day records and exact local midnight-to-midnight OOO records count
+  as full-day; lunch and outside-work OOO blocks remain partial.
 - Full-day OOO dates are skipped when calculating the next workday.
 - Urgent work can still be explicitly added to an OOO date.
 - Calendar failure must never block manual ticket planning.

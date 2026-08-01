@@ -1,7 +1,7 @@
 # Technical foundation
 
 Status: In progress  
-Last updated: July 31, 2026
+Last updated: August 1, 2026
 
 ## Implemented in the first foundation increment
 
@@ -61,8 +61,14 @@ Supabase clients validate their environment only when called. Authentication
 routes are active locally and require a configured URL plus publishable key.
 
 Google Calendar now has protected OAuth, sync, meeting, and OOO application
-layers. The live corporate OAuth feasibility check remains pending. Calendar is
-still optional and cannot block local planning.
+layers. Corporate OAuth consent, calendar discovery, initial synchronization,
+encrypted token storage, and real refresh-token exchange are verified. Calendar
+is still optional and cannot block local planning.
+
+Local authentication now canonicalizes browser access to `127.0.0.1` before
+session creation so Google OAuth cannot split cookies across `localhost` and
+`127.0.0.1`. The exact password-recovery callback is allow-listed and the local
+Mailpit recovery flow is verified end to end.
 
 ## Work Inventory increment completed
 
@@ -79,5 +85,6 @@ implementation is recorded in `docs/14-work-inventory-implementation.md`.
    environment.
 3. Document and test backup and migration recovery procedures.
 
-Docker Desktop and the local Supabase stack are operational. Google Calendar
-credentials are required only for the live corporate feasibility check.
+Docker Desktop, the local Supabase stack, and the corporate Google Calendar
+connection are operational. Local credentials remain only in the ignored
+environment file.

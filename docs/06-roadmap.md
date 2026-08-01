@@ -1,6 +1,8 @@
 # Roadmap
 
-## Phase 0: product specification — current
+## Phase 0: product specification
+
+Status: Complete and approved
 
 ### Deliverables
 
@@ -20,6 +22,8 @@
 
 ## Phase 1: low-fidelity UX
 
+Status: Complete and approved
+
 ### Deliverables
 
 - Detailed wireframes for Today, End of Day, Plan, Work, Ticket Detail,
@@ -35,6 +39,8 @@
 - No decorative visual decisions hide usability problems.
 
 ## Phase 2: visual system
+
+Status: Complete and approved
 
 ### Deliverables
 
@@ -53,6 +59,9 @@
 
 ## Phase 3: technical foundation
 
+Status: Local foundation complete; hosted environment and deployment hardening
+continue in Phase 8
+
 ### Deliverables
 
 - Next.js project
@@ -70,6 +79,8 @@
 
 ## Phase 4: core work inventory
 
+Status: Complete
+
 ### Deliverables
 
 - Ticket create/edit/archive
@@ -86,6 +97,8 @@
 - Sensitive content is absent from logs and URLs.
 
 ## Phase 5: daily planning
+
+Status: Complete
 
 ### Deliverables
 
@@ -105,8 +118,9 @@
 
 ## Phase 6: Google Calendar
 
-Status: application implementation complete; live corporate OAuth validation
-pending.
+Status: Complete. Corporate OAuth, calendar discovery, initial synchronization,
+encrypted token storage, and refresh-token exchange were validated live on
+August 1, 2026.
 
 ### Deliverables
 
@@ -124,6 +138,8 @@ pending.
 - OOO dates affect next-workday selection correctly.
 
 ## Phase 7: calendar and insights
+
+Status: Next
 
 ### Deliverables
 
@@ -144,6 +160,8 @@ pending.
 - Report files are streamed on demand and are not retained server-side.
 
 ## Phase 8: hardening and personal launch
+
+Status: Pending
 
 ### Deliverables
 

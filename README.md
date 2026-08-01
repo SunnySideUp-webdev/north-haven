@@ -17,8 +17,9 @@ persisted Today and Plan data, Supabase authentication, private workspace
 provisioning, Tickets, Tasks, Reminders, meetings, official OOO handling, and
 protected Google OAuth routes.
 
-The live corporate OAuth feasibility check is pending. No customer data,
-production credentials, or Google tokens are committed.
+The live corporate OAuth feasibility check and refresh-token exchange passed on
+August 1, 2026. Phase 7 retrospective Calendar, Insights, and report exports are
+next. No customer data, production credentials, or Google tokens are committed.
 
 ## Local setup
 

@@ -1,7 +1,7 @@
 # Google Calendar implementation
 
-Status: Application implementation complete; live corporate OAuth validation pending
-Last updated: July 31, 2026
+Status: Complete; live corporate OAuth and refresh verified
+Last updated: August 1, 2026
 
 ## Outcome
 
@@ -12,6 +12,10 @@ calendar from Settings.
 
 The integration is read-only. Calendar failure, stale data, denied corporate
 consent, and disconnection never block Work, Plan, Today, or End of Day.
+
+The real corporate Google Workspace account completed consent successfully,
+returned its readable calendar list, synchronized the selected primary
+calendar, and passed a direct refresh-token exchange. Phase 6 is complete.
 
 ## OAuth and security
 
@@ -55,8 +59,12 @@ attendees, attachments, and conference metadata are not retained.
 - An invalidated Google sync token triggers a safe full refresh.
 - Access tokens refresh server-side using the encrypted refresh token.
 - Google outOfOffice is recognized by provider event type, never title matching.
-- Only full-day OOO events create non-working dates; the Google end date is
-  treated as exclusive.
+- Only full-local-day OOO events create non-working dates. Google all-day
+  records use an exclusive end date, while timed records qualify only when they
+  cover exact local midnight to midnight.
+- Real corporate data confirmed that partial OOO blocks may represent lunch or
+  time outside working hours. These remain partial and never suppress a whole
+  workday.
 - Deselecting or disconnecting a calendar removes its derived OOO dates without
   changing manual non-working dates.
 
@@ -80,36 +88,49 @@ confirmed.
 Calendar now provides the connected-account state, today's meeting context, and
 OOO state. The retrospective monthly grid remains Phase 7.
 
-## Required live feasibility check
+## Live feasibility result
 
-The local application and database behavior are verified, but the corporate
-Google Workspace policy cannot be simulated. To complete Phase 6:
+The corporate policy check succeeded on August 1, 2026:
 
-1. Enable Google Calendar API in a Google Cloud project.
-2. Configure an OAuth consent screen and a Web application OAuth client.
-3. Register this exact local redirect URI:
-   http://127.0.0.1:3000/api/google-calendar/callback
-4. Add the client ID, client secret, local Supabase service-role key, and a
-   generated base64 encryption key to the ignored local environment file.
-5. Authorize the corporate account from Settings.
-6. Confirm calendar listing, meetings, official OOO events, manual sync, token
-   refresh, reconnect, and disconnect.
+- the Google Calendar API and Web OAuth client were accepted inside the
+  corporate Google Cloud organization
+- corporate consent completed with the intended read-only scopes
+- North Haven listed readable calendars and selected the primary calendar by
+  default
+- the bounded initial synchronization completed with an incremental sync token
+- stored access and refresh tokens were confirmed encrypted rather than raw
+- a real refresh-token exchange returned a fresh access token and expiry
+- the connection remained healthy with no provider error
 
-No OAuth credential or token may be committed to GitHub.
+The live test also exposed a local-only authentication edge case. Browser
+cookies created on `localhost` are not available to a callback registered on
+`127.0.0.1`. North Haven now transitions all local browser access to the
+configured `http://127.0.0.1:3000` origin before authentication. Exact local
+password-recovery callbacks are allow-listed, and recovery through Mailpit was
+verified without deleting the account.
+
+The ignored `.env.local` contains the local-only OAuth and encryption values.
+No OAuth credential or token is committed to GitHub. A deployed environment
+must register its own HTTPS callback and protected environment variables.
 
 ## Verification completed
 
 - clean migration replay
 - generated TypeScript database contract
-- unit coverage for all-day expansion, time-zone dates, and read-only scopes
+- unit coverage for provider all-day expansion, local midnight-to-midnight OOO,
+  rejection of partial OOO blocks, time-zone dates, canonical local origin, and
+  read-only scopes
 - browser-role denial on protected Calendar tables
 - service-only Calendar persistence
 - meeting-only Ready plan isolation across two workspaces
 - Google OOO next-workday behavior
+- live corporate consent, calendar discovery, initial sync, encrypted storage,
+  and refresh-token exchange
+- local password recovery after canonical-origin enforcement
 - full existing Chromium workflow
 - format, lint, type checking, unit tests, integration tests, and production build
 
 ## Next product phase
 
-After the live corporate OAuth check succeeds, Phase 7 builds the retrospective
-monthly Calendar, Day Summary, Insights, and Daily, Weekly, and Monthly exports.
+Phase 7 now builds the retrospective monthly Calendar, Day Summary, Insights,
+and Daily, Weekly, and Monthly exports.
