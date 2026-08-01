@@ -11,10 +11,10 @@ Spanish.
 
 ## Current phase
 
-Technical foundation is in progress. The repository now contains the Next.js
+Phase 4 Work Inventory is in progress. The repository now contains the Next.js
 application shell, approved visual tokens, an initial Today implementation,
-Supabase authentication, private workspace provisioning, first-time setup, RLS
-policies, environment boundaries, tests, and continuous-integration checks.
+Supabase authentication, private workspace provisioning, first-time setup, and
+the first production-shaped Tickets, Tasks, and Reminders vertical slice.
 
 The Today screen currently uses synthetic foundation data. No customer data,
 production credentials, or Google tokens are present.
@@ -123,3 +123,4 @@ Reassess these pins when the project moves to Node 22.
 - [Interaction states](docs/11-interaction-states.md)
 - [Reporting and exports](docs/12-reporting-and-exports.md)
 - [Technical foundation](docs/13-technical-foundation.md)
+- [Work Inventory implementation](docs/14-work-inventory-implementation.md)

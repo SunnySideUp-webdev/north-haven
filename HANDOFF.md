@@ -71,7 +71,7 @@ calendar.
 - Lavender and blush color direction
 - Fully sans serif, minimal typography direction
 
-### Technical foundation in progress
+### Technical foundation and first Work Inventory increment
 
 - Next.js App Router, React, TypeScript, Tailwind, and npm project scaffold
 - Approved design tokens, DM Sans, desktop application shell, and working routes
@@ -86,24 +86,33 @@ calendar.
 - Local end-to-end authentication coverage and two-user RLS isolation coverage
 - Formatting, linting, type checking, unit tests, browser tests, build checks, and CI
 - Security-fixed dependency overrides with a clean npm audit
+- Unified Work Item schema with distinct Ticket, Task, and Reminder detail tables
+- Ticket types, dual status semantics, notes, follow-ups, backup timestamps, and
+  automatic status history
+- RLS-protected inventory read model and transactional create/update functions
+- Real Work Inventory saved views, private local search, filters, and calm table
+- English create, detail, edit, activity-note, and open-follow-up flows
+- Browser coverage for creating, editing, closing, and finding a normal Task
+- Integration coverage for duplicate Ticket handling, history, subtype
+  distinction, and cross-workspace isolation
 
 ### Not started
 
 - Google Calendar implementation
 - Deployment configuration
-- Full work-inventory business schema
+- Persisted Daily Planning and authenticated Today data
 
 Application code now exists. Production data, authentication credentials,
 Google Calendar credentials, and deployment configuration are not connected.
 
 ### Next step
 
-Begin Phase 4 locally with the core Work Inventory. The first increment should
-define and migrate the business schema for Tickets, Tasks, Reminders, ticket
-types, statuses, notes, follow-ups, backup completion, and history; apply RLS;
-regenerate database types; and then implement the first real Work list and
-create/edit flows. Preserve the approved distinction between Tickets, Tasks,
-and Reminders.
+Finish the remaining Phase 4 interaction slice before moving to Daily Planning:
+add Ticket-type management in Settings, keyboard-efficient quick entry, and
+follow-up completion/cancellation. Then begin Phase 5 with persisted Daily Plans,
+manual inventory selection, capacity guidance, authenticated Today data, and
+the four-step End of Day flow. The current inventory already provides the
+planning-ready work source for that phase.
 
 The hosted Supabase development environment, hosted password-recovery check,
 remaining authenticated Today schedule data, and recovery documentation remain
@@ -243,6 +252,7 @@ The current visual specification is `docs/10-visual-system.md`.
 - `docs/11-interaction-states.md` — empty, saving, error, Calendar, OOO, and completion states
 - `docs/12-reporting-and-exports.md` — Daily, Weekly, and Monthly report behavior
 - `docs/13-technical-foundation.md` — implemented foundation and exact next increment
+- `docs/14-work-inventory-implementation.md` — implemented Work Inventory slice and remaining Phase 4 work
 
 ## Design assets
 

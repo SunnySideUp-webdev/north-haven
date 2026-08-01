@@ -64,17 +64,22 @@ routes are active locally and require a configured URL plus publishable key.
 Google Calendar variables are reserved but unused. Calendar remains an optional
 enhancement and cannot block local planning.
 
-## Next foundation increment
+## Work Inventory increment completed
 
-1. Begin the Phase 4 work-inventory business schema locally; the local stack,
-   authentication, and RLS foundation are ready for it.
-2. Replace the remaining synthetic Today schedule values with authenticated
+The first Phase 4 vertical slice now uses the foundation successfully. It adds
+the unified work-item schema, RLS, generated database types, Server Actions,
+real inventory and detail screens, and tested create/edit flows. The exact
+implementation is recorded in `docs/14-work-inventory-implementation.md`.
+
+## Remaining foundation hardening
+
+1. Replace the remaining synthetic Today schedule values with authenticated
    data.
-3. Establish a hosted development Supabase project and protected environment
+2. Establish a hosted development Supabase project and protected environment
    variables before deployment.
-4. Exercise email delivery and password recovery against the hosted development
+3. Exercise email delivery and password recovery against the hosted development
    environment.
-5. Document and test backup and migration recovery procedures.
+4. Document and test backup and migration recovery procedures.
 
 Docker Desktop and the local Supabase stack are now operational. This increment
 does not require Google Calendar credentials.

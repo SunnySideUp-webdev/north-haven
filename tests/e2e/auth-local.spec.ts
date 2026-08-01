@@ -37,4 +37,32 @@ test("creates a private workspace, completes setup, and restores the session", a
   await page.getByRole("button", { name: "Sign in" }).click();
 
   await expect(page).toHaveURL(/\/today$/);
+
+  await page.getByRole("link", { name: "Work" }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Work inventory" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "New task" }).click();
+  await page.getByLabel("Task title").fill("Prepare weekly summary");
+  await page
+    .getByLabel("Notes")
+    .fill("Summarize the work completed for leadership.");
+  await page.getByRole("button", { name: "Create task" }).click();
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Prepare weekly summary",
+    }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Edit" }).click();
+  await page.getByLabel("Tracking").selectOption("closed");
+  await page.getByRole("button", { name: "Save task" }).click();
+
+  await expect(page.getByText("Task · Closed", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Work" }).click();
+  await page.getByRole("button", { name: /^Closed/ }).click();
+  await expect(
+    page.getByRole("link", { name: "Prepare weekly summary" }),
+  ).toBeVisible();
 });
