@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
 import type { WorkFormState } from "@/features/work-items/types";
 import {
@@ -252,6 +253,24 @@ export async function updateReminderAction(
 
   revalidatePath("/work");
   redirect(`/work/${result.data.workItemId}`);
+}
+
+export async function restoreArchivedWorkItemAction(
+  workItemId: string,
+): Promise<{ ok: boolean; message?: string }> {
+  const result = z.string().uuid().safeParse(workItemId);
+  if (!result.success) return { ok: false, message: "Invalid work item." };
+  const { supabase } = await requireAuthenticatedContext();
+  const { error } = await supabase.rpc("restore_archived_work_item", {
+    target_work_item_id: result.data,
+  });
+  if (error) {
+    return { ok: false, message: "We couldn't restore this archived item." };
+  }
+  revalidatePath("/work");
+  revalidatePath(`/work/${result.data}`);
+  revalidatePath("/plan");
+  return { ok: true };
 }
 
 export async function addWorkItemNoteAction(

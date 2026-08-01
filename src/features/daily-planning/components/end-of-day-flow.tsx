@@ -12,6 +12,7 @@ import type {
 import {
   applyEndOfDayOutcomeAction,
   finishEndOfDayAction,
+  reopenClosedDayAction,
   resolveEndOfDayFollowUpAction,
   saveDayNoteAction,
   setEndOfDayStepAction,
@@ -62,7 +63,11 @@ export function EndOfDayFlow({
     items: EodItem[];
     nextPlan: { status: string } | null;
     nextWorkDate: string | null;
-    plan: { status: string; end_of_day_step: number } | null;
+    plan: {
+      status: string;
+      end_of_day_step: number;
+      closed_at: string | null;
+    } | null;
     timeZone: string;
   };
   initialStep: number;
@@ -74,6 +79,7 @@ export function EndOfDayFlow({
     Math.max(initialStep, data.plan?.end_of_day_step || 1),
   );
   const [message, setMessage] = useState<string>();
+  const [confirmReopen, setConfirmReopen] = useState(false);
   const [note, setNote] = useState(data.dayNote?.body ?? "");
   const [important, setImportant] = useState(
     data.dayNote?.is_important ?? false,
@@ -113,16 +119,116 @@ export function EndOfDayFlow({
           align="center"
         />
         <div className="mx-auto max-w-[760px] p-8">
-          <section className="border-border bg-paper shadow-surface rounded-xl border p-12 text-center">
-            <p className="text-muted">
-              Today is closed and your next plan is ready when you return.
-            </p>
-            <Link
-              href="/today"
-              className="bg-lavender-700 mt-7 inline-block rounded-lg px-6 py-3 text-sm font-bold text-white"
-            >
-              Return to Today
-            </Link>
+          <section className="border-border bg-paper shadow-surface rounded-xl border p-10">
+            <div className="text-center">
+              <p className="text-muted">
+                This day is closed and your next plan is ready when you return.
+              </p>
+            </div>
+            <dl className="bg-lavender-50 mt-7 grid grid-cols-3 gap-5 rounded-xl p-6 text-center">
+              <div>
+                <dt className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
+                  Planned
+                </dt>
+                <dd className="text-ink mt-2 text-2xl font-bold">
+                  {planned.length}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
+                  Completed
+                </dt>
+                <dd className="text-ink mt-2 text-2xl font-bold">
+                  {
+                    planned.filter(
+                      (item) => item.planItem?.execution_status === "done",
+                    ).length
+                  }
+                </dd>
+              </div>
+              <div>
+                <dt className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
+                  Moved or returned
+                </dt>
+                <dd className="text-ink mt-2 text-2xl font-bold">
+                  {
+                    planned.filter((item) =>
+                      ["returned", "deferred", "skipped"].includes(
+                        item.planItem?.execution_status ?? "",
+                      ),
+                    ).length
+                  }
+                </dd>
+              </div>
+            </dl>
+            {data.dayNote?.body ? (
+              <div className="border-border mt-7 border-t pt-6">
+                <p className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
+                  Day note
+                </p>
+                <p className="text-muted mt-2 text-sm leading-6 whitespace-pre-wrap">
+                  {data.dayNote.body}
+                </p>
+              </div>
+            ) : null}
+            {message ? (
+              <p
+                role="alert"
+                className="bg-urgent-surface text-urgent-ink mt-6 rounded-lg px-4 py-3 text-sm"
+              >
+                {message}
+              </p>
+            ) : null}
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <Link
+                href="/today"
+                className="bg-lavender-700 rounded-lg px-6 py-3 text-sm font-bold text-white"
+              >
+                Return to Today
+              </Link>
+              {!confirmReopen ? (
+                <button
+                  type="button"
+                  onClick={() => setConfirmReopen(true)}
+                  className="border-border text-muted rounded-lg border px-6 py-3 text-sm font-bold"
+                >
+                  Reopen this day
+                </button>
+              ) : null}
+            </div>
+            {confirmReopen ? (
+              <div className="bg-blush-50 mt-6 rounded-xl p-5 text-center">
+                <p className="text-ink text-sm font-bold">
+                  Reopen this closed day?
+                </p>
+                <p className="text-muted mt-2 text-sm leading-6">
+                  You can review its outcomes and close it again when the
+                  summary is correct.
+                </p>
+                <div className="mt-4 flex justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmReopen(false)}
+                    className="text-muted px-4 py-2 text-sm font-bold"
+                  >
+                    Keep closed
+                  </button>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() =>
+                      run(
+                        () => reopenClosedDayAction({ workDate }),
+                        () => setStep(2),
+                      )
+                    }
+                    className="bg-lavender-700 rounded-lg px-5 py-2 text-sm font-bold text-white disabled:opacity-50"
+                  >
+                    {pending ? "Reopening…" : "Confirm reopen"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </section>
         </div>
       </>

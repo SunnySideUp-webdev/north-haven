@@ -246,3 +246,21 @@ export async function finishEndOfDayAction(input: {
   revalidatePath("/plan");
   return { ok: true };
 }
+
+export async function reopenClosedDayAction(input: {
+  workDate: string;
+}): Promise<PlanningActionResult> {
+  const result = z.object({ workDate: date }).safeParse(input);
+  if (!result.success) return { ok: false, message: "Invalid work date." };
+  const { supabase } = await requireAuthenticatedContext();
+  const { error } = await supabase.rpc("reopen_closed_day", {
+    chosen_work_date: result.data.workDate,
+  });
+  if (error) {
+    return { ok: false, message: "We couldn't reopen this closed day." };
+  }
+  revalidatePath("/end-of-day");
+  revalidatePath("/calendar");
+  revalidatePath("/insights");
+  return { ok: true };
+}

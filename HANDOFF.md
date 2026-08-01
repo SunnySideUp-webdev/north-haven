@@ -154,10 +154,15 @@ calendar.
 - Manual Holiday and Personal Day management integrated with next-workday
   calculation
 - In-app password changes and global session revocation
+- Versioned, secret-free JSON workspace backup streamed on demand
+- Atomic workspace restoration with an exact confirmation phrase and rollback
+  on any invalid row
+- Confirmed meeting-outcome recovery across Google reconnection and sync
+- Closed-day summary plus confirmed reopening
+- Dedicated Archived inventory view and direct Restore to Active action
 
 ### Pending or not started
 
-- Phase 7.5B recovery and lifecycle states
 - Phase 7.5C Plan, Work, and End of Day parity
 - Phase 7.5D authenticated production-like coverage
 - Hosted Supabase and Netlify deployment configuration
@@ -169,16 +174,16 @@ configuration are not connected.
 
 ### Next step
 
-Begin Phase 7.5B recovery and lifecycle states. Build and demonstrate a complete
-workspace backup/restoration path, then implement Closed Day reopening and
-clear archived-work recovery before continuing through parity and authenticated
-coverage. Phase 8 will use hosted Supabase and Netlify after the target Netlify
-site is reviewed with the owner. The completed reporting and Settings
+Begin Phase 7.5C Plan, Work, and End of Day parity. Reconcile the remaining
+approved filters, navigation, detail actions, and End of Day efficiency before
+authenticated production-like coverage. Phase 8 will use hosted Supabase and
+Netlify after the target Netlify site is reviewed with the owner. The completed reporting, Settings, and recovery
 implementations are documented in
 `docs/17-retrospective-calendar-implementation.md`,
 `docs/18-insights-implementation.md`, and
 `docs/19-report-builder-implementation.md`, plus
-`docs/20-settings-implementation.md`.
+`docs/20-settings-implementation.md`, and
+`docs/21-recovery-and-lifecycle-implementation.md`.
 
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.

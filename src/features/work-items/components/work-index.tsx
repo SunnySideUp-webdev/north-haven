@@ -8,7 +8,7 @@ import type { WorkInventoryRow } from "@/features/work-items/types";
 import { PageHeader } from "@/shared/ui/page-header";
 
 type SavedView =
-  "active" | "waiting" | "watching" | "backup" | "closed" | "all";
+  "active" | "waiting" | "watching" | "backup" | "closed" | "archived" | "all";
 
 const savedViews: { id: SavedView; label: string }[] = [
   { id: "active", label: "Active" },
@@ -16,6 +16,7 @@ const savedViews: { id: SavedView; label: string }[] = [
   { id: "watching", label: "Watching" },
   { id: "backup", label: "Missing backup" },
   { id: "closed", label: "Closed" },
+  { id: "archived", label: "Archived" },
   { id: "all", label: "All work" },
 ];
 
@@ -38,6 +39,7 @@ function matchesView(item: WorkInventoryRow, view: SavedView) {
     );
   }
   if (view === "closed") return item.tracking_state === "closed";
+  if (view === "archived") return item.tracking_state === "archived";
   return true;
 }
 

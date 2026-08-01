@@ -68,7 +68,7 @@ describe("SettingsDashboard", () => {
     );
   });
 
-  it("shows Calendar after an OAuth result and explains backup boundaries", () => {
+  it("shows Calendar after an OAuth result and exposes workspace recovery", () => {
     const { rerender } = render(
       <SettingsDashboard
         calendarResult="connected"
@@ -89,6 +89,11 @@ describe("SettingsDashboard", () => {
       />,
     );
     fireEvent.click(screen.getByRole("link", { name: "Data and privacy" }));
-    expect(screen.getByText(/Reports are summaries/)).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Download workspace backup" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: "Restore workspace" }),
+    ).toBeVisible();
   });
 });

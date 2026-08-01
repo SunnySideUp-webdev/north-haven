@@ -271,6 +271,14 @@ export async function syncGoogleCalendar(workspaceId: string) {
       });
     }
 
+    const { error: recoveryError } = await admin.rpc(
+      "apply_calendar_outcome_recovery",
+      { target_workspace_id: workspaceId },
+    );
+    if (recoveryError) {
+      throw new Error("Recovered meeting outcomes could not be applied.");
+    }
+
     const syncedAt = new Date().toISOString();
     const { error } = await admin
       .from("calendar_connections")

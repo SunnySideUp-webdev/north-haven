@@ -65,6 +65,15 @@
   optional corporate authorization.
 - Generated report files are streamed on demand and are not retained in server
   storage during the MVP.
+- Workspace backups use a versioned JSON contract, are generated on demand, and
+  are never retained by North Haven. They exclude authentication secrets,
+  sessions, Google OAuth tokens, and reproducible provider cache.
+- Workspace restoration is an explicitly confirmed, atomic replacement of
+  user-owned workspace content. The current Google connection stays intact;
+  confirmed meeting outcomes wait safely for a matching event after sync.
+- Closed days and archived work remain reversible. Reopening a day preserves
+  its history and returns to End of Day review; restoring archived work returns
+  it to Active.
 - Netlify is the selected web deployment platform for the personal launch. The
   existing Netlify deployment will not be replaced or reconfigured without an
   explicit target-site review.

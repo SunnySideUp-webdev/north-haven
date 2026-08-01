@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { CalendarConnectionSettings } from "@/features/calendar-sync/components/calendar-connection-settings";
 import type { CalendarSettingsView } from "@/features/calendar-sync/types";
+import { DataPrivacySettings } from "@/features/settings/components/data-privacy-settings";
 import { ProfileSettings } from "@/features/settings/components/profile-settings";
 import { SecuritySettings } from "@/features/settings/components/security-settings";
 import { WorkScheduleSettings } from "@/features/settings/components/work-schedule-settings";
@@ -25,48 +25,6 @@ type SectionId = (typeof sections)[number]["id"];
 
 function isSectionId(value: string): value is SectionId {
   return sections.some((section) => section.id === value);
-}
-
-function DataAndPrivacySettings() {
-  return (
-    <section
-      id="data-and-privacy"
-      className="border-border/70 bg-paper shadow-surface rounded-xl border p-8"
-    >
-      <p className="text-blush-600 text-xs font-bold tracking-[0.12em] uppercase">
-        Private by default
-      </p>
-      <h2 className="text-ink mt-2 text-xl font-bold">Data and privacy</h2>
-      <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
-        North Haven stores only the work information you choose to enter.
-        Generated reports are streamed to your browser and are not retained by
-        the application.
-      </p>
-
-      <div className="bg-lavender-50 mt-7 rounded-xl p-6">
-        <h3 className="text-ink text-base font-bold">Report privacy</h3>
-        <p className="text-muted mt-2 text-sm leading-6">
-          Ticket titles, day notes, and follow-up reasons remain excluded until
-          you explicitly include them in a report.
-        </p>
-        <Link
-          href="/insights/reports"
-          className="text-lavender-700 mt-4 inline-block text-sm font-bold"
-        >
-          Open Report Builder →
-        </Link>
-      </div>
-
-      <div className="border-border mt-8 border-t pt-7">
-        <h3 className="text-ink text-base font-bold">Workspace recovery</h3>
-        <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
-          A complete workspace backup and verified restoration tool will be
-          added before personal launch. Reports are summaries and should not be
-          treated as backups.
-        </p>
-      </div>
-    </section>
-  );
 }
 
 export function SettingsDashboard({
@@ -138,7 +96,7 @@ export function SettingsDashboard({
             settings={calendarSettings}
           />
         ) : null}
-        {active === "data-and-privacy" ? <DataAndPrivacySettings /> : null}
+        {active === "data-and-privacy" ? <DataPrivacySettings /> : null}
         {active === "security" ? (
           <SecuritySettings email={overview.email} />
         ) : null}

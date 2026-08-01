@@ -5,6 +5,7 @@ import {
   AddNoteForm,
   FollowUpForm,
 } from "@/features/work-items/components/activity-forms";
+import { ArchivedRecovery } from "@/features/work-items/components/archived-recovery";
 import { formatDate, formatDateTime } from "@/features/work-items/date";
 import {
   getWorkItem,
@@ -56,12 +57,16 @@ export default async function WorkItemPage({
         }
         description={`${label(item.kind)} · ${label(item.tracking_state)}`}
         action={
-          <Link
-            href={`/work/${id}/edit`}
-            className="bg-lavender-700 hover:bg-lavender-500 rounded-lg px-5 py-3 text-sm font-bold text-white"
-          >
-            Edit
-          </Link>
+          item.tracking_state === "archived" ? (
+            <ArchivedRecovery workItemId={id} />
+          ) : (
+            <Link
+              href={`/work/${id}/edit`}
+              className="bg-lavender-700 hover:bg-lavender-500 rounded-lg px-5 py-3 text-sm font-bold text-white"
+            >
+              Edit
+            </Link>
+          )
         }
       />
       <div className="mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)_340px] gap-7 p-8">

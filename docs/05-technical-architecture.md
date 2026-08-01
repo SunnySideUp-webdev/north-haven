@@ -197,6 +197,11 @@ Handler. CSV remains a dependency-free server renderer.
 - Rate limits protect sign-in, exports, and expensive search operations.
 - Normal deletion is recoverable archival.
 - Database backups and restoration are tested before production use.
+- User-operated workspace recovery uses a versioned, secret-free JSON contract
+  and one PostgreSQL transaction. OAuth credentials and provider cache remain
+  outside the portable backup boundary.
+- Restored meeting outcomes are keyed by provider calendar/event identity and
+  wait in a server-only recovery queue until a matching sync record exists.
 - Dependency and secret scanning run in continuous integration.
 
 ## Observability

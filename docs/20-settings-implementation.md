@@ -1,6 +1,6 @@
 # Settings implementation
 
-Status: Phase 7.5A implemented locally
+Status: Phase 7.5A complete; Data and privacy extended in Phase 7.5B
 Last updated: August 1, 2026
 
 ## Outcome
@@ -19,9 +19,9 @@ The implemented destinations are:
 - Data and privacy
 - Security
 
-Data and privacy accurately explains the current report protections and the
-remaining workspace-recovery boundary. It does not imply that a PDF or CSV
-report is a complete backup.
+Data and privacy separates report generation from a complete, versioned
+workspace backup. It offers protected download and explicitly confirmed
+restoration without presenting PDF or CSV summaries as backups.
 
 ## Profile
 
@@ -85,8 +85,8 @@ presence of a Security section.
   continuing through Ticket Types and the core daily workflow
 - TypeScript and ESLint checks
 
-## Next increment
+## Recovery extension
 
-Phase 7.5B will add a complete workspace backup and demonstrated restoration
-path, Closed Day reopening, and explicit archived-work recovery. Deployment
-does not begin until those recovery paths are verified.
+Phase 7.5B adds the workspace backup and restore controls to Data and privacy.
+The full contract, exclusions, transactional behavior, and demonstrated restore
+test are documented in `docs/21-recovery-and-lifecycle-implementation.md`.

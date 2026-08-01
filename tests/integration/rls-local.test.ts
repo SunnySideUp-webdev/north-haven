@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { loadEnv } from "vite";
 import { describe, expect, it } from "vitest";
 
+import { workspaceBackupSchema } from "@/features/settings/workspace-backup";
 import type { Database } from "@/server/database/supabase/database.types";
 
 const runLocalIntegration = Boolean(process.env.RUN_SUPABASE_INTEGRATION);
@@ -603,7 +604,7 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
       .single();
     expect(externalCalendarError).toBeNull();
 
-    const { error: meetingError } = await admin
+    const { data: meeting, error: meetingError } = await admin
       .from("external_calendar_events")
       .insert({
         end_local_date: "2026-08-06",
@@ -616,8 +617,21 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
         starts_at: "2026-08-06T15:00:00.000Z",
         title: "Weekly sync",
         workspace_id: workspacesA![0].id,
-      });
+      })
+      .select("id")
+      .single();
     expect(meetingError).toBeNull();
+
+    const { error: meetingOutcomeError } = await admin
+      .from("meeting_outcomes")
+      .insert({
+        attendance_status: "attended",
+        confirmed_at: "2026-08-06T17:00:00.000Z",
+        external_calendar_event_id: meeting!.id,
+        local_note: "Reviewed the weekly queue.",
+        workspace_id: workspacesA![0].id,
+      });
+    expect(meetingOutcomeError).toBeNull();
 
     const { error: calendarOnlyPlanError } = await clientA.rpc(
       "update_daily_plan_details",
@@ -658,5 +672,138 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     });
     expect(googleOooError).toBeNull();
     expect(afterOooWorkday).toBe("2026-08-11");
+
+    const { data: backupData, error: backupError } = await clientA.rpc(
+      "create_workspace_backup",
+    );
+    const backup = workspaceBackupSchema.safeParse(backupData);
+    expect(backupError).toBeNull();
+    expect(backup.success).toBe(true);
+    if (!backup.success) throw new Error("Workspace backup was invalid.");
+    expect(backup.data.security).toEqual({
+      contains_authentication_secrets: false,
+      google_credentials_included: false,
+      provider_calendar_cache_included: false,
+    });
+    expect(backup.data.tables.work_items).toHaveLength(3);
+    expect(backup.data.tables.calendar_outcomes).toHaveLength(1);
+
+    const { error: changedProfileError } = await clientA.rpc(
+      "update_profile_settings",
+      { chosen_display_name: "Temporary replacement" },
+    );
+    const { error: archiveReminderError } = await clientA.rpc(
+      "update_reminder",
+      {
+        chosen_description: "Temporary change",
+        chosen_remind_at: "2026-08-03T14:00:00.000Z",
+        chosen_title: "Changed reminder",
+        chosen_tracking_state: "archived",
+        target_work_item_id: reminderId!,
+      },
+    );
+    expect(changedProfileError).toBeNull();
+    expect(archiveReminderError).toBeNull();
+
+    const { error: wrongConfirmationError } = await clientA.rpc(
+      "restore_workspace_backup",
+      {
+        chosen_backup: backup.data,
+        chosen_confirmation: "RESTORE",
+      },
+    );
+    expect(wrongConfirmationError).not.toBeNull();
+
+    const { data: restoreResult, error: restoreError } = await clientA.rpc(
+      "restore_workspace_backup",
+      {
+        chosen_backup: backup.data,
+        chosen_confirmation: "RESTORE NORTH HAVEN",
+      },
+    );
+    expect(restoreError).toBeNull();
+    expect(restoreResult).toMatchObject({
+      calendar_outcomes_applied: 1,
+      calendar_outcomes_waiting: 0,
+      daily_plans: 3,
+      work_items: 3,
+    });
+
+    const [{ data: restoredProfile }, { data: restoredReminder }] =
+      await Promise.all([
+        clientA.from("profiles").select("display_name").single(),
+        clientA
+          .from("work_inventory_rows")
+          .select("title, tracking_state")
+          .eq("id", reminderId!)
+          .single(),
+      ]);
+    const { data: restoredMeetingOutcome } = await admin
+      .from("meeting_outcomes")
+      .select("attendance_status, local_note")
+      .eq("external_calendar_event_id", meeting!.id)
+      .single();
+    const { data: preservedGoogleOoo } = await admin
+      .from("non_working_days")
+      .select("source")
+      .eq("workspace_id", workspacesA![0].id)
+      .eq("source_event_id", externalCalendar!.id + ":ooo-1")
+      .single();
+    expect(restoredProfile?.display_name).toBe("North Haven A");
+    expect(restoredReminder).toEqual({
+      title: "Check the form changes",
+      tracking_state: "active",
+    });
+    expect(restoredMeetingOutcome).toEqual({
+      attendance_status: "attended",
+      local_note: "Reviewed the weekly queue.",
+    });
+    expect(preservedGoogleOoo?.source).toBe("google");
+
+    const { error: reopenError } = await clientA.rpc("reopen_closed_day", {
+      chosen_work_date: "2026-08-04",
+    });
+    const { data: reopenedPlan } = await clientA
+      .from("daily_plans")
+      .select("status, closed_at, end_of_day_step")
+      .eq("id", plan!.id)
+      .single();
+    expect(reopenError).toBeNull();
+    expect(reopenedPlan).toEqual({
+      closed_at: null,
+      end_of_day_step: 2,
+      status: "active",
+    });
+
+    const { error: recloseError } = await clientA.rpc("finish_end_of_day", {
+      chosen_work_date: "2026-08-04",
+    });
+    expect(recloseError).toBeNull();
+
+    const { error: archiveAfterRestoreError } = await clientA.rpc(
+      "update_reminder",
+      {
+        chosen_description: "",
+        chosen_remind_at: "2026-08-03T14:00:00.000Z",
+        chosen_title: "Check the form changes",
+        chosen_tracking_state: "archived",
+        target_work_item_id: reminderId!,
+      },
+    );
+    const { error: recoverArchivedError } = await clientA.rpc(
+      "restore_archived_work_item",
+      { target_work_item_id: reminderId! },
+    );
+    const { data: recoveredReminder } = await clientA
+      .from("work_items")
+      .select("tracking_state, archived_at")
+      .eq("id", reminderId!)
+      .single();
+    expect(archiveAfterRestoreError).toBeNull();
+    expect(recoverArchivedError).toBeNull();
+    expect(recoveredReminder).toEqual({
+      archived_at: null,
+      tracking_state: "active",
+    });
   });
 });

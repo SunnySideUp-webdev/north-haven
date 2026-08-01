@@ -74,6 +74,18 @@ test("creates a private workspace, completes setup, and restores the session", a
   await expect(
     page.getByRole("link", { name: "Prepare weekly summary" }),
   ).toBeVisible();
+  await page.getByRole("link", { name: "Prepare weekly summary" }).click();
+  await page.getByRole("link", { name: "Edit" }).click();
+  await page.getByLabel("Tracking").selectOption("archived");
+  await page.getByRole("button", { name: "Save task" }).click();
+  await expect(
+    page.getByText("Task · Archived", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Work" }).click();
+  await page.getByRole("button", { name: /^Archived/ }).click();
+  await page.getByRole("link", { name: "Prepare weekly summary" }).click();
+  await page.getByRole("button", { name: "Restore to Active" }).click();
+  await expect(page.getByText("Task · Active", { exact: true })).toBeVisible();
 
   await page.getByRole("link", { name: "Settings" }).click();
   await expect(
@@ -92,6 +104,24 @@ test("creates a private workspace, completes setup, and restores the session", a
   await expect(page.locator('input[name="name"]').last()).toHaveValue(
     "Redirect",
   );
+  await page.getByRole("link", { name: "Data and privacy" }).click();
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download workspace backup" }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(
+    /^north-haven-workspace-\d{4}-\d{2}-\d{2}\.json$/,
+  );
+  const backupPath = await download.path();
+  expect(backupPath).toBeTruthy();
+  await page.getByLabel("North Haven backup file").setInputFiles(backupPath!);
+  await page
+    .getByLabel("I understand that this replaces my current workspace content.")
+    .check();
+  await page
+    .getByLabel("Type RESTORE NORTH HAVEN to confirm")
+    .fill("RESTORE NORTH HAVEN");
+  await page.getByRole("button", { name: "Restore workspace" }).click();
+  await expect(page.getByText(/Workspace restored:/)).toBeVisible();
 
   await page.keyboard.press("Control+K");
   await page.getByRole("link", { name: /New task/ }).click();
@@ -125,6 +155,20 @@ test("creates a private workspace, completes setup, and restores the session", a
     .click();
   await page.getByRole("button", { name: "Mark ready" }).click();
   await page.goBack();
+  await page.getByRole("button", { name: "Finish End of Day" }).click();
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Your next workday is ready.",
+    }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Reopen this day" }).click();
+  await page.getByRole("button", { name: "Confirm reopen" }).click();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Close today" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Finish End of Day" }).click();
   await expect(
     page.getByRole("heading", {

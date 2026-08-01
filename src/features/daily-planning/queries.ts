@@ -36,7 +36,8 @@ export async function getDailyPlanningData(workDate: string) {
     .filter(
       (item) =>
         item.id &&
-        (item.tracking_state === "active" ||
+        (selectedByWorkId.has(item.id) ||
+          item.tracking_state === "active" ||
           item.tracking_state === "watching"),
     )
     .map((item) => ({

@@ -255,6 +255,20 @@ Do not store descriptions, attendee lists, or attachments in the MVP.
 - `source_event_id`, optional
 - `allows_urgent_work`
 
+### calendar_outcome_recovery
+
+- `id`
+- `workspace_id`
+- `provider_calendar_id`
+- `provider_event_id`
+- `attendance_status`
+- `local_note`
+- `confirmed_at`
+
+This protected server-only queue preserves confirmed meeting outcomes when a
+backup is restored before the corresponding Google event has been synced. A
+later calendar sync applies and removes matching rows.
+
 ## Derived behavior
 
 - `backup_done` is derived from `form_backup_completed_at IS NOT NULL`.
@@ -311,6 +325,10 @@ only through `claim_report_export_slot()`.
   uniqueness.
 - Notes and customer content are never placed in URL parameters.
 - Hard deletion is restricted; normal user deletion archives records.
+- A workspace backup contains user-owned source data and history, not derived
+  KPI snapshots, authentication secrets, OAuth tokens, or provider cache.
+- Restore replaces user-owned workspace content atomically and remaps ownership
+  to the authenticated profile while retaining stable business identifiers.
 - KPI snapshots are not stored in the MVP. Queries or protected database views
   derive them from source events.
 

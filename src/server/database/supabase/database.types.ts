@@ -68,6 +68,47 @@ export type Database = {
           },
         ];
       };
+      calendar_outcome_recovery: {
+        Row: {
+          attendance_status: Database["public"]["Enums"]["meeting_attendance_status"];
+          confirmed_at: string | null;
+          created_at: string;
+          id: string;
+          local_note: string | null;
+          provider_calendar_id: string;
+          provider_event_id: string;
+          workspace_id: string;
+        };
+        Insert: {
+          attendance_status: Database["public"]["Enums"]["meeting_attendance_status"];
+          confirmed_at?: string | null;
+          created_at?: string;
+          id?: string;
+          local_note?: string | null;
+          provider_calendar_id: string;
+          provider_event_id: string;
+          workspace_id: string;
+        };
+        Update: {
+          attendance_status?: Database["public"]["Enums"]["meeting_attendance_status"];
+          confirmed_at?: string | null;
+          created_at?: string;
+          id?: string;
+          local_note?: string | null;
+          provider_calendar_id?: string;
+          provider_event_id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "calendar_outcome_recovery_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       daily_plan_items: {
         Row: {
           completed_at: string | null;
@@ -1121,6 +1162,10 @@ export type Database = {
         Args: { chosen_body: string; target_work_item_id: string };
         Returns: string;
       };
+      apply_calendar_outcome_recovery: {
+        Args: { target_workspace_id: string };
+        Returns: number;
+      };
       apply_end_of_day_outcome: {
         Args: {
           chosen_deferred_date?: string;
@@ -1172,6 +1217,7 @@ export type Database = {
         Returns: string;
       };
       create_ticket_type: { Args: { chosen_name: string }; Returns: string };
+      create_workspace_backup: { Args: never; Returns: Json };
       current_personal_workspace_id: { Args: never; Returns: string };
       finish_end_of_day: {
         Args: { chosen_work_date: string };
@@ -1194,6 +1240,10 @@ export type Database = {
         Returns: undefined;
       };
       next_workday: { Args: { chosen_after_date: string }; Returns: string };
+      reopen_closed_day: {
+        Args: { chosen_work_date: string };
+        Returns: string;
+      };
       reporting_daily_metrics: {
         Args: { chosen_end_date: string; chosen_start_date: string };
         Returns: {
@@ -1260,6 +1310,14 @@ export type Database = {
           target_follow_up_id: string;
         };
         Returns: undefined;
+      };
+      restore_archived_work_item: {
+        Args: { target_work_item_id: string };
+        Returns: undefined;
+      };
+      restore_workspace_backup: {
+        Args: { chosen_backup: Json; chosen_confirmation: string };
+        Returns: Json;
       };
       save_day_note: {
         Args: {
