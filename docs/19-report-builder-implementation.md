@@ -91,6 +91,11 @@ according to CSV rules. The file contains no formulas or visual markup.
 5. rebuilds the authorized report model on the server;
 6. streams the PDF or CSV with attachment and private/no-store headers.
 
+The same-origin check compares the browser origin with the public `Host` or
+`X-Forwarded-Host` value. This preserves the boundary when Next.js normalizes
+an internal development URL to `localhost` while the canonical browser origin
+is `127.0.0.1`, and it remains compatible with a hosted reverse proxy.
+
 No report bytes are written to disk, object storage, a database, logs, or URLs.
 Temporary browser object URLs are revoked immediately after download.
 
@@ -107,6 +112,7 @@ deletes attempts older than one day for that profile.
 - CSV date/total rows and escaping coverage
 - semantic Report Builder and privacy-notice component coverage
 - same-origin boundary coverage
+- normalized local URL/public-host regression coverage
 - real PDF buffer generation with embedded font assets
 - opt-in integration coverage for the database-backed per-user rate limit
 - full Vitest, TypeScript, ESLint, Prettier, and production build checks

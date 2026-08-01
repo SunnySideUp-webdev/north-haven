@@ -6,7 +6,25 @@ export function isSameOriginReportRequest(request: Request) {
   if (!origin) return true;
   try {
     const requestUrl = new URL(request.url);
-    return new URL(origin).origin === requestUrl.origin;
+    const requestOrigin = new URL(origin).origin;
+    const forwardedHost = request.headers
+      .get("x-forwarded-host")
+      ?.split(",")[0]
+      ?.trim();
+    const host =
+      forwardedHost ?? request.headers.get("host")?.split(",")[0]?.trim();
+    const forwardedProtocol = request.headers
+      .get("x-forwarded-proto")
+      ?.split(",")[0]
+      ?.trim();
+    const protocol = forwardedProtocol
+      ? `${forwardedProtocol.replace(/:$/, "")}:`
+      : requestUrl.protocol;
+    const publicOrigin = host
+      ? new URL(`${protocol}//${host}`).origin
+      : requestUrl.origin;
+
+    return requestOrigin === publicOrigin;
   } catch {
     return false;
   }

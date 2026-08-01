@@ -144,6 +144,9 @@ calendar.
   follow-up reasons until explicit opt-in
 - Authenticated, same-origin, private/no-store export endpoint with a durable
   six-per-minute PostgreSQL limit and no retained report files
+- Public-host-aware export validation that supports the canonical
+  `127.0.0.1` local origin even when Next.js normalizes its internal URL to
+  `localhost`
 
 ### Pending or not started
 
