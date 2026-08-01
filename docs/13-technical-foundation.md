@@ -66,14 +66,15 @@ enhancement and cannot block local planning.
 
 ## Next foundation increment
 
-1. Establish a hosted development Supabase project and protected environment
-   variables.
-2. Exercise email delivery and password recovery against the hosted development
-   environment.
-3. Replace the remaining synthetic Today schedule values with authenticated
+1. Begin the Phase 4 work-inventory business schema locally; the local stack,
+   authentication, and RLS foundation are ready for it.
+2. Replace the remaining synthetic Today schedule values with authenticated
    data.
-4. Document and test backup and migration recovery procedures.
-5. Prepare the Phase 4 work-inventory business schema.
+3. Establish a hosted development Supabase project and protected environment
+   variables before deployment.
+4. Exercise email delivery and password recovery against the hosted development
+   environment.
+5. Document and test backup and migration recovery procedures.
 
 Docker Desktop and the local Supabase stack are now operational. This increment
 does not require Google Calendar credentials.

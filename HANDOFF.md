@@ -98,10 +98,17 @@ Google Calendar credentials, and deployment configuration are not connected.
 
 ### Next step
 
-Continue Phase 3 from `docs/13-technical-foundation.md`: establish a hosted
-development Supabase environment, validate hosted email recovery, connect the
-remaining authenticated schedule data, and document recovery procedures. Then
-prepare the Phase 4 work-inventory schema. Google Calendar credentials are not
+Begin Phase 4 locally with the core Work Inventory. The first increment should
+define and migrate the business schema for Tickets, Tasks, Reminders, ticket
+types, statuses, notes, follow-ups, backup completion, and history; apply RLS;
+regenerate database types; and then implement the first real Work list and
+create/edit flows. Preserve the approved distinction between Tickets, Tasks,
+and Reminders.
+
+The hosted Supabase development environment, hosted password-recovery check,
+remaining authenticated Today schedule data, and recovery documentation remain
+open Phase 3 hardening tasks. They are required before deployment but do not
+block local Work Inventory development. Google Calendar credentials are not
 needed for the next increment.
 
 ## Confirmed product decisions
