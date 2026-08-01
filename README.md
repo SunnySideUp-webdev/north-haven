@@ -28,15 +28,18 @@ Settings. Phase 7.5B adds versioned workspace backup/restoration, closed-day
 reopening, and visible archived-work recovery. Phase 7.5C now completes Plan
 navigation and filters, operational Work Inventory actions, richer Work Detail,
 embedded next-day planning in End of Day, and private Global Search.
-Authenticated coverage is the next increment before Phase 8 hardening and the
-Netlify personal launch. No customer data, production
-credentials, or Google tokens are committed.
+Phase 7.5D authenticated coverage is in progress: CI provisions a clean
+Supabase stack and exercises RLS plus the full browser acceptance path,
+including PDF/CSV downloads and test-data cleanup. The same path will next run
+against hosted Supabase and Vercel before Phase 8 hardening. No customer data,
+production credentials, or Google tokens are committed.
 
 ## Local setup
 
 Requirements:
 
-- Node.js 20.19.3, recorded in `.nvmrc`
+- Node.js 24.15.0, recorded in `.nvmrc`; Vercel deploys the latest compatible
+  Node.js 24 patch
 - npm
 - Docker-compatible runtime only when starting the local Supabase stack
 
@@ -79,7 +82,9 @@ schema migration changes.
 
 Settings and recovery are documented in `docs/20-settings-implementation.md`
 and `docs/21-recovery-and-lifecycle-implementation.md`. Product-completion
-parity is documented in `docs/22-operational-parity-implementation.md`.
+parity is documented in `docs/22-operational-parity-implementation.md`. Hosted
+Supabase and Vercel setup is documented in
+`docs/23-hosted-environment-implementation.md`.
 
 With the local stack running, the opt-in database and browser authentication
 checks are:
@@ -133,9 +138,10 @@ design/                   Approved wireframes and high-fidelity references
   never retained by North Haven.
 - The initial dependency audit passes with zero known vulnerabilities.
 
-Supabase JavaScript is pinned to `2.109.0` with SSR `0.12.0` because the next
-release line requires Node 22. PostCSS and Sharp use security-fixed overrides.
-Reassess these pins when the project moves to Node 22.
+Supabase JavaScript is pinned to `2.109.0` with SSR `0.12.0` while its next
+runtime-sensitive upgrade is validated separately. The project already uses
+Node.js 24 across local development, CI, and Vercel. PostCSS and Sharp use
+security-fixed overrides.
 
 ## Documentation
 
@@ -159,3 +165,7 @@ Reassess these pins when the project moves to Node 22.
 - [Retrospective Calendar implementation](docs/17-retrospective-calendar-implementation.md)
 - [Insights implementation](docs/18-insights-implementation.md)
 - [Report Builder implementation](docs/19-report-builder-implementation.md)
+- [Settings implementation](docs/20-settings-implementation.md)
+- [Recovery and lifecycle implementation](docs/21-recovery-and-lifecycle-implementation.md)
+- [Operational parity implementation](docs/22-operational-parity-implementation.md)
+- [Hosted environment implementation](docs/23-hosted-environment-implementation.md)

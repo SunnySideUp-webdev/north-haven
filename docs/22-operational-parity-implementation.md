@@ -90,5 +90,6 @@ Migration `20260801001700_operational_completeness.sql` adds:
 ## Next step
 
 Phase 7.5D moves the same critical workflows into a hosted development Supabase
-environment and expands production-like browser coverage. It does not authorize
-replacing or reconfiguring the owner's existing Netlify deployment.
+environment and expands production-like browser coverage. Vercel is the
+approved deployment target; the owner's existing Netlify deployment remains
+untouched.

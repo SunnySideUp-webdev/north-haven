@@ -199,10 +199,13 @@ Status: Complete
 
 ### Increment D: Authenticated coverage
 
-Status: Pending
+Status: In progress
 
-- Exercise critical authenticated workflows in a production-like CI environment
-- Add Settings, recovery, report-download, and lifecycle browser coverage
+- Run the critical authenticated workflow against a clean, migrated Supabase
+  stack in CI on every change
+- Cover Settings, recovery, report download, lifecycle changes, planning, and
+  End of Day in one browser acceptance path
+- Repeat that acceptance path against hosted Supabase and the Vercel deployment
 - Reconcile implementation documents with the verified acceptance criteria
 
 ## Phase 8: hardening and personal launch

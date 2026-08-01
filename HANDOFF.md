@@ -171,11 +171,19 @@ calendar.
 - Private Global Search across ticket number, title, type, notes, and secure link
 - Explicit launch decision to keep Google Calendar as the single meeting source;
   manual meeting entry remains deferred while planning works offline
+- Node.js 24 aligned across local development, GitHub Actions, and Vercel
+- Authenticated CI job that boots a clean Supabase stack, replays migrations,
+  verifies RLS, and runs the complete browser acceptance workflow
+- Browser acceptance coverage for Settings, backup restoration, lifecycle,
+  Global Search, Plan, End of Day, Insights, and PDF/CSV report downloads
+- Hosted-test cleanup that removes its generated workspace and auth user
+- Auth-user teardown that removes a sole-owner personal workspace atomically
+  without changing North Haven's recoverable in-app archival behavior
 
 ### Pending or not started
 
-- Phase 7.5D authenticated production-like coverage
-- Hosted Supabase and Netlify deployment configuration
+- Phase 7.5D hosted Supabase and Vercel acceptance run
+- Hosted Supabase and Vercel deployment configuration
 - Phase 8 hardening and personal launch
 
 Application code and local real-calendar validation now exist. Production data,
@@ -184,17 +192,20 @@ configuration are not connected.
 
 ### Next step
 
-Begin Phase 7.5D authenticated production-like coverage. Exercise the critical
-workflows against a hosted development Supabase environment and reconcile the
-verified acceptance criteria before Phase 8. Phase 8 will use hosted Supabase and
-Netlify after the target Netlify site is reviewed with the owner. The completed reporting, Settings, and recovery
+Continue Phase 7.5D by creating the hosted development Supabase project,
+applying the reviewed migrations, importing North Haven into the owner's Tokki
+Vercel team, and running the cleanup-safe hosted acceptance path. Production
+Google Calendar consent is verified only after the stable Vercel production URL
+is registered. The exact sequence is in
+`docs/23-hosted-environment-implementation.md`. The completed reporting, Settings, and recovery
 implementations are documented in
 `docs/17-retrospective-calendar-implementation.md`,
 `docs/18-insights-implementation.md`, and
 `docs/19-report-builder-implementation.md`, plus
 `docs/20-settings-implementation.md`, and
 `docs/21-recovery-and-lifecycle-implementation.md`, plus
-`docs/22-operational-parity-implementation.md`.
+`docs/22-operational-parity-implementation.md`, and
+`docs/23-hosted-environment-implementation.md`.
 
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.
@@ -327,8 +338,8 @@ The current visual specification is `docs/10-visual-system.md`.
 - Zod validation
 - Tailwind CSS plus CSS custom properties
 - Vitest, Testing Library, and Playwright
-- Netlify deployment, subject to final data-hosting approval and explicit
-  confirmation of the target site
+- Vercel deployment in the owner's Tokki team, using hosted Supabase and exact
+  production OAuth origins
 - No microservices, Redux, or separate Express backend for the MVP
 
 ## Canonical documents
@@ -354,6 +365,9 @@ The current visual specification is `docs/10-visual-system.md`.
 - `docs/18-insights-implementation.md` — reporting periods, historical inventory, metric semantics, and accessible charts
 - `docs/19-report-builder-implementation.md` — Report Builder, PDF/CSV generation, privacy controls, and export security
 - `docs/20-settings-implementation.md` — Profile, schedule, non-working-day, and security Settings implementation
+- `docs/21-recovery-and-lifecycle-implementation.md` — backup restoration, closed-day reopening, and archived recovery
+- `docs/22-operational-parity-implementation.md` — Plan, Work, End of Day, and Global Search parity
+- `docs/23-hosted-environment-implementation.md` — hosted Supabase, Vercel, OAuth, and acceptance-run procedure
 
 ## Design assets
 

@@ -39,3 +39,32 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+
+  authenticated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Start and migrate local Supabase
+        run: |
+          npx supabase start
+          npm run db:reset
+      - name: Verify RLS and authenticated browser workflows
+        run: |
+          eval "$(npx supabase status -o env)"
+          export NEXT_PUBLIC_SUPABASE_URL="$API_URL"
+          export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="$ANON_KEY"
+          export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
+          export RUN_SUPABASE_INTEGRATION=1
+          export RUN_SUPABASE_E2E=1
+          npx vitest run tests/integration/rls-local.test.ts
+          npx playwright test tests/e2e/auth-local.spec.ts
+      - name: Stop local Supabase
+        if: always()
+        run: npx supabase stop --no-backup

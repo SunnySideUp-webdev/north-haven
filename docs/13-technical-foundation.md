@@ -38,7 +38,7 @@ Last updated: August 1, 2026
 
 ## Dependency baseline
 
-- Node.js `20.19.3`
+- Node.js `24.15.0`
 - Next.js `16.2.12`
 - React and React DOM `19.2.4`
 - Supabase JavaScript `2.109.0`
@@ -47,9 +47,10 @@ Last updated: August 1, 2026
 - Vitest `4.1.10`
 - Playwright `1.62.1`
 
-Supabase JavaScript `2.110+` requires Node 22. The compatible versions above
-are intentionally pinned until the project runtime is upgraded. PostCSS and
-Sharp use explicit security-fixed overrides. `npm audit` must remain clean.
+Node.js 24 is the shared local, CI, and Vercel runtime. Supabase JavaScript
+remains conservatively pinned while the hosted-environment increment is
+validated. PostCSS and Sharp use explicit security-fixed overrides. `npm audit`
+must remain clean.
 
 ## Foundation boundaries
 
@@ -79,11 +80,16 @@ implementation is recorded in `docs/14-work-inventory-implementation.md`.
 
 ## Remaining foundation hardening
 
-1. Establish a hosted development Supabase project and protected environment
-   variables before deployment.
-2. Exercise email delivery and password recovery against the hosted development
-   environment.
-3. Document and test backup and migration recovery procedures.
+1. Establish the hosted development Supabase project and protected Vercel
+   environment variables.
+2. Exercise email delivery, password recovery, and the authenticated browser
+   workflow against the hosted development environment.
+3. Complete the hosted backup and migration recovery drill.
+
+The GitHub quality workflow now starts an isolated Docker-backed Supabase stack,
+replays every migration, proves two-workspace RLS isolation, and exercises the
+full authenticated Playwright workflow. Hosted verification is separately
+opt-in and cleans up the generated test workspace and auth user.
 
 Docker Desktop, the local Supabase stack, and the corporate Google Calendar
 connection are operational. Local credentials remain only in the ignored

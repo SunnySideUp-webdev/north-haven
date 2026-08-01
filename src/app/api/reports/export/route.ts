@@ -16,6 +16,7 @@ import {
 } from "@/server/security/report-export";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 function errorResponse(message: string, status: number) {
   return Response.json({ message }, { headers: privateReportHeaders, status });

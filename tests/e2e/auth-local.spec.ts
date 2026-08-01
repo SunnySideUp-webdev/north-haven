@@ -1,15 +1,47 @@
 import { expect, test } from "@playwright/test";
+import { createClient } from "@supabase/supabase-js";
+
+import type { Database } from "../../src/server/database/supabase/database.types";
+
+let cleanupEmail: string | null = null;
 
 test.skip(
   !process.env.RUN_SUPABASE_E2E,
-  "Requires the Docker-backed local Supabase stack.",
+  "Requires an explicitly configured Supabase acceptance environment.",
 );
+
+test.afterEach(async () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!cleanupEmail || !url || !serviceKey) return;
+
+  const admin = createClient<Database>(url, serviceKey, {
+    auth: {
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      persistSession: false,
+    },
+  });
+  const { data, error: usersError } = await admin.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  });
+  if (usersError) throw usersError;
+  const user = data.users.find((candidate) => candidate.email === cleanupEmail);
+  if (!user) return;
+
+  const { error: userError } = await admin.auth.admin.deleteUser(user.id);
+  if (userError) throw userError;
+  cleanupEmail = null;
+});
 
 test("creates a private workspace, completes setup, and restores the session", async ({
   page,
 }) => {
   const email = `north-haven-${Date.now()}@example.com`;
+  cleanupEmail = email;
   const password = "north-haven-test-password";
+  test.setTimeout(180_000);
 
   await page.goto("/create-account");
   await page.getByLabel("Email").fill(email);
@@ -203,4 +235,27 @@ test("creates a private workspace, completes setup, and restores the session", a
   await expect(
     page.getByRole("heading", { level: 2, name: "Weekly rhythm" }),
   ).toBeVisible();
+
+  await page.getByRole("button", { name: "Export report" }).click();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Report settings" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Daily" }).click();
+
+  const pdfDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Generate PDF" }).click();
+  const pdfDownload = await pdfDownloadPromise;
+  expect(pdfDownload.suggestedFilename()).toMatch(
+    /^north-haven-daily-\d{4}-\d{2}-\d{2}\.pdf$/,
+  );
+  await expect(page.getByRole("status")).toHaveText("Your report is ready.");
+
+  await page.getByRole("button", { name: "Data CSV" }).click();
+  const csvDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download CSV" }).click();
+  const csvDownload = await csvDownloadPromise;
+  expect(csvDownload.suggestedFilename()).toMatch(
+    /^north-haven-daily-\d{4}-\d{2}-\d{2}\.csv$/,
+  );
+  await expect(page.getByRole("status")).toHaveText("Your report is ready.");
 });

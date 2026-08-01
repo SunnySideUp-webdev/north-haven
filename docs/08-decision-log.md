@@ -80,8 +80,9 @@
 - Closed days and archived work remain reversible. Reopening a day preserves
   its history and returns to End of Day review; restoring archived work returns
   it to Active.
-- Netlify is the selected web deployment platform for the personal launch. The
-  existing Netlify deployment will not be replaced or reconfigured without an
-  explicit target-site review.
+- Vercel is the selected web deployment platform for the personal launch. It
+  provides the native deployment path for the existing Next.js application.
+  The Vercel account and Tokki team are separate from the owner's existing
+  Netlify deployment, which remains untouched.
 - Local development uses `http://127.0.0.1:3000` as the canonical browser
   origin because browser cookies are not shared with `localhost`.
