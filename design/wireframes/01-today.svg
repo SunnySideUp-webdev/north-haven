@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1024" viewBox="0 0 1440 1024">
+  <defs><style>
+    .bg{fill:#f8f7f5}.paper{fill:#fffefd}.lav{fill:#e3dfeb}.lav2{fill:#f0edf4}.pink{fill:#f2dedf}.ink{fill:#434047;font-family:Arial,sans-serif}.muted{fill:#77737d;font-family:Arial,sans-serif}.line{stroke:#bbb8bf;stroke-width:1.5;fill:none}.h1{font-size:35px;font-weight:700}.h2{font-size:18px;font-weight:700}.body{font-size:15px}.small{font-size:12px}.nav{font-size:14px;font-weight:700}.meta{font-size:13px}.btn{fill:#cbc2db;stroke:#a9a2b5;stroke-width:1}
+  </style></defs>
+  <rect class="bg" width="1440" height="1024"/>
+  <rect class="paper" width="1440" height="70"/><line class="line" x1="0" y1="70" x2="1440" y2="70"/>
+  <text class="ink h2" x="42" y="43">North Haven</text>
+  <text class="ink nav" x="250" y="43">Today</text><line x1="245" y1="61" x2="297" y2="61" stroke="#b6a9cf" stroke-width="4"/>
+  <text class="muted nav" x="335" y="43">Plan</text><text class="muted nav" x="410" y="43">Work</text><text class="muted nav" x="490" y="43">Calendar</text><text class="muted nav" x="590" y="43">Insights</text>
+  <text class="muted nav" x="1220" y="43">Search</text><text class="muted nav" x="1310" y="43">Settings</text>
+
+  <rect class="lav" x="0" y="70" width="1440" height="150"/>
+  <text class="ink h1" x="720" y="130" text-anchor="middle">Today</text>
+  <text class="muted body" x="720" y="165" text-anchor="middle">Tuesday, August 4 · Your day is ready</text>
+  <text class="muted small" x="720" y="191" text-anchor="middle">Focus: finish the urgent form updates first</text>
+
+  <rect class="lav2" x="35" y="250" rx="8" width="285" height="700"/>
+  <text class="ink h2" x="65" y="295">Overview</text>
+  <text class="muted small" x="65" y="335">TODAY'S LOAD</text>
+  <text class="ink body" x="65" y="370">5 tickets</text><text class="ink body" x="65" y="398">2 meetings</text><text class="ink body" x="65" y="426">1 reminder</text>
+  <line class="line" x1="65" y1="458" x2="290" y2="458"/>
+  <text class="muted small" x="65" y="493">PROGRESS</text><text class="ink h2" x="65" y="529">3 of 8</text>
+  <rect class="paper" x="65" y="547" rx="5" width="225" height="10"/><rect fill="#c8bed8" x="65" y="547" rx="5" width="85" height="10"/>
+  <line class="line" x1="65" y1="590" x2="290" y2="590"/>
+  <text class="muted small" x="65" y="624">NEXT MEETING</text><text class="ink body" x="65" y="656">10:30 AM · Weekly sync</text><text class="muted meta" x="65" y="682">Open in Google Calendar</text>
+  <line class="line" x1="65" y1="718" x2="290" y2="718"/>
+  <text class="muted small" x="65" y="752">FOLLOW-UPS</text><text class="ink body" x="65" y="784">6 waiting or watching</text><text class="muted meta" x="65" y="810">2 need review today</text>
+  <rect class="btn" x="65" y="870" rx="7" width="225" height="48"/><text class="ink nav" x="177" y="900" text-anchor="middle">Start End of Day</text>
+
+  <rect class="paper" x="350" y="250" rx="8" width="1055" height="700"/>
+  <text class="ink h2" x="390" y="300">Work plan</text><text class="muted meta" x="1290" y="300">View unplanned work</text>
+  <rect class="lav2" x="390" y="330" rx="7" width="975" height="92"/>
+  <rect class="paper line" x="412" y="359" rx="3" width="22" height="22"/>
+  <text class="ink h2" x="458" y="367">#1909 · Update customer address</text><text class="muted meta" x="458" y="394">Urgent · received today · first priority</text><text class="ink meta" x="1270" y="374">Start</text>
+  <line class="line" x1="390" y1="449" x2="1365" y2="449"/>
+  <rect class="line" x="412" y="477" rx="3" width="22" height="22"/><text class="ink body" x="458" y="493">#1731 · Update form configuration</text><text class="muted meta" x="950" y="493">Medium · 12 days old</text><text class="muted meta" x="1270" y="493">Details</text>
+  <line class="line" x1="390" y1="525" x2="1365" y2="525"/>
+  <rect class="line" x="412" y="553" rx="3" width="22" height="22"/><text class="ink body" x="458" y="569">#1880 · Review field mapping</text><text class="muted meta" x="950" y="569">Medium · 7 days old</text><text class="muted meta" x="1270" y="569">Details</text>
+
+  <text class="ink h2" x="390" y="635">Tasks and reminders</text>
+  <line class="line" x1="390" y1="657" x2="1365" y2="657"/>
+  <rect class="line" x="412" y="682" rx="3" width="22" height="22"/><text class="ink body" x="458" y="699">Send update to coworker</text><text class="muted meta" x="1210" y="699">Task</text>
+  <line class="line" x1="390" y1="727" x2="1365" y2="727"/>
+  <rect class="line" x="412" y="752" rx="3" width="22" height="22"/><text class="ink body" x="458" y="769">Check form backup</text><text class="muted meta" x="1210" y="769">Reminder</text>
+
+  <text class="ink h2" x="390" y="835">Meetings</text>
+  <rect class="pink" x="390" y="858" rx="7" width="975" height="60"/>
+  <text class="ink body" x="420" y="894">10:30–11:00 · Weekly sync</text><text class="muted meta" x="960" y="894">Google Calendar · Join meeting</text>
+  <text class="muted small" x="1395" y="997" text-anchor="end">01 · TODAY · LOW FIDELITY</text>
+</svg>
+

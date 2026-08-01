@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --nh-canvas: #fbf9f8;
+  --nh-paper: #fffefc;
+  --nh-ink: #403a44;
+  --nh-muted: #756e79;
+  --nh-quiet: #96909a;
+  --nh-border: #ddd7df;
+  --nh-lavender-50: #f6f3f8;
+  --nh-lavender-100: #ece7f1;
+  --nh-lavender-200: #dcd4e6;
+  --nh-lavender-300: #c4b8d6;
+  --nh-lavender-500: #82709c;
+  --nh-lavender-700: #584a6b;
+  --nh-blush-50: #fff7f6;
+  --nh-blush-100: #f8e6e6;
+  --nh-blush-200: #f0d3d6;
+  --nh-blush-300: #e4b6bd;
+  --nh-blush-600: #995c67;
+  --nh-success-surface: #e6eee7;
+  --nh-success-ink: #47604d;
+  --nh-waiting-surface: #f4ead7;
+  --nh-waiting-ink: #735d35;
+  --nh-urgent-surface: #f8e0e3;
+  --nh-urgent-ink: #8a4350;
+}
+
+@theme inline {
+  --color-canvas: var(--nh-canvas);
+  --color-paper: var(--nh-paper);
+  --color-ink: var(--nh-ink);
+  --color-muted: var(--nh-muted);
+  --color-quiet: var(--nh-quiet);
+  --color-border: var(--nh-border);
+  --color-lavender-50: var(--nh-lavender-50);
+  --color-lavender-100: var(--nh-lavender-100);
+  --color-lavender-200: var(--nh-lavender-200);
+  --color-lavender-300: var(--nh-lavender-300);
+  --color-lavender-500: var(--nh-lavender-500);
+  --color-lavender-700: var(--nh-lavender-700);
+  --color-blush-50: var(--nh-blush-50);
+  --color-blush-100: var(--nh-blush-100);
+  --color-blush-200: var(--nh-blush-200);
+  --color-blush-300: var(--nh-blush-300);
+  --color-blush-600: var(--nh-blush-600);
+  --color-success-surface: var(--nh-success-surface);
+  --color-success-ink: var(--nh-success-ink);
+  --color-waiting-surface: var(--nh-waiting-surface);
+  --color-waiting-ink: var(--nh-waiting-ink);
+  --color-urgent-surface: var(--nh-urgent-surface);
+  --color-urgent-ink: var(--nh-urgent-ink);
+  --font-sans: var(--font-dm-sans);
+  --shadow-surface: 0 6px 24px rgb(117 110 121 / 8%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 1024px;
+  background: var(--nh-canvas);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--nh-canvas);
+  color: var(--nh-ink);
+  font-family: var(--font-dm-sans), Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--nh-lavender-500) 72%, white);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--nh-lavender-200);
+  color: var(--nh-ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  button {
+    transition-duration: 160ms;
+    transition-property: background-color, border-color, color, opacity;
+    transition-timing-function: ease;
+  }
+}

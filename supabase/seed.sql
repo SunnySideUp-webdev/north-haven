@@ -1,0 +1,2 @@
+-- Intentionally empty during the technical-foundation phase.
+-- Add synthetic development records only; never copy customer data here.

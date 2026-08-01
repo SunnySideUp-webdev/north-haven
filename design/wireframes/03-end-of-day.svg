@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1024" viewBox="0 0 1440 1024">
+  <defs><style>.bg{fill:#f8f7f5}.paper{fill:#fffefd}.lav{fill:#e3dfeb}.lav2{fill:#f0edf4}.pink{fill:#f2dedf}.ink{fill:#434047;font-family:Arial,sans-serif}.muted{fill:#77737d;font-family:Arial,sans-serif}.line{stroke:#bbb8bf;stroke-width:1.5;fill:none}.h1{font-size:34px;font-weight:700}.h2{font-size:18px;font-weight:700}.body{font-size:14px}.small{font-size:12px}.nav{font-size:14px;font-weight:700}.btn{fill:#cbc2db;stroke:#a9a2b5;stroke-width:1}</style></defs>
+  <rect class="bg" width="1440" height="1024"/><rect class="paper" width="1440" height="70"/><text class="ink h2" x="42" y="43">North Haven</text><text class="muted body" x="1280" y="43">Save and exit</text><line class="line" x1="0" y1="70" x2="1440" y2="70"/>
+  <rect class="lav" x="0" y="70" width="1440" height="130"/><text class="ink h1" x="720" y="128" text-anchor="middle">End of Day</text><text class="muted body" x="720" y="161" text-anchor="middle">Tuesday, August 4 · Saved just now</text>
+  <line class="line" x1="250" y1="250" x2="1190" y2="250"/>
+  <circle class="pink" cx="280" cy="250" r="22"/><text class="ink nav" x="280" y="255" text-anchor="middle">1</text><text class="ink small" x="280" y="290" text-anchor="middle">Update Tickets</text>
+  <circle class="paper line" cx="570" cy="250" r="22"/><text class="muted nav" x="570" y="255" text-anchor="middle">2</text><text class="muted small" x="570" y="290" text-anchor="middle">Close Today</text>
+  <circle class="paper line" cx="860" cy="250" r="22"/><text class="muted nav" x="860" y="255" text-anchor="middle">3</text><text class="muted small" x="860" y="290" text-anchor="middle">Review Follow-ups</text>
+  <circle class="paper line" cx="1150" cy="250" r="22"/><text class="muted nav" x="1150" y="255" text-anchor="middle">4</text><text class="muted small" x="1150" y="290" text-anchor="middle">Plan Next Workday</text>
+
+  <rect class="paper" x="95" y="340" rx="8" width="1250" height="580"/><text class="ink h2" x="135" y="388">Add tickets received today</text><text class="muted body" x="135" y="416">Use Tab to move across fields. Save and add another keeps the form ready.</text>
+  <text class="muted small" x="135" y="466">TICKET NUMBER *</text><text class="muted small" x="420" y="466">TITLE *</text><text class="muted small" x="830" y="466">TYPE *</text><text class="muted small" x="1050" y="466">PRIORITY</text>
+  <rect class="bg line" x="135" y="480" rx="5" width="250" height="45"/><text class="muted body" x="150" y="508">e.g. 1909</text>
+  <rect class="bg line" x="420" y="480" rx="5" width="375" height="45"/><text class="muted body" x="435" y="508">Describe the requested change</text>
+  <rect class="bg line" x="830" y="480" rx="5" width="185" height="45"/><text class="muted body" x="845" y="508">Select type</text>
+  <rect class="bg line" x="1050" y="480" rx="5" width="185" height="45"/><text class="ink body" x="1065" y="508">Medium</text>
+  <text class="muted small" x="135" y="574">RECEIVED DATE *</text><text class="muted small" x="420" y="574">STATUS</text><text class="muted small" x="680" y="574">EXTERNAL LINK</text>
+  <rect class="bg line" x="135" y="588" rx="5" width="250" height="45"/><text class="ink body" x="150" y="616">Today</text>
+  <rect class="bg line" x="420" y="588" rx="5" width="225" height="45"/><text class="ink body" x="435" y="616">Pending</text>
+  <rect class="bg line" x="680" y="588" rx="5" width="555" height="45"/><text class="muted body" x="695" y="616">https://...</text>
+  <rect class="line" x="135" y="670" width="20" height="20" rx="3"/><text class="ink body" x="170" y="685">Form backup completed</text><text class="muted body" x="420" y="685">+ Add a note</text>
+  <rect class="paper line" x="720" y="744" rx="7" width="245" height="48"/><text class="ink nav" x="842" y="774" text-anchor="middle">Save and add another</text>
+  <rect class="paper line" x="980" y="744" rx="7" width="255" height="48"/><text class="ink nav" x="1107" y="774" text-anchor="middle">Save and add to Friday</text>
+  <line class="line" x1="135" y1="832" x2="1235" y2="832"/><text class="muted body" x="135" y="868">2 tickets added today</text><rect class="btn" x="1090" y="845" rx="7" width="145" height="48"/><text class="ink nav" x="1162" y="875" text-anchor="middle">Continue</text>
+  <text class="muted small" x="1395" y="1000" text-anchor="end">03 · END OF DAY · STEP 1 · LOW FIDELITY</text>
+</svg>

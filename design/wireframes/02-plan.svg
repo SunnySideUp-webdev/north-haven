@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1024" viewBox="0 0 1440 1024">
+  <defs><style>.bg{fill:#f8f7f5}.paper{fill:#fffefd}.lav{fill:#e3dfeb}.lav2{fill:#f0edf4}.pink{fill:#f2dedf}.ink{fill:#434047;font-family:Arial,sans-serif}.muted{fill:#77737d;font-family:Arial,sans-serif}.line{stroke:#bbb8bf;stroke-width:1.5;fill:none}.h1{font-size:34px;font-weight:700}.h2{font-size:18px;font-weight:700}.body{font-size:14px}.small{font-size:12px}.nav{font-size:14px;font-weight:700}.btn{fill:#cbc2db;stroke:#a9a2b5;stroke-width:1}</style></defs>
+  <rect class="bg" width="1440" height="1024"/><rect class="paper" width="1440" height="70"/><line class="line" x1="0" y1="70" x2="1440" y2="70"/>
+  <text class="ink h2" x="42" y="43">North Haven</text><text class="muted nav" x="250" y="43">Today</text><text class="ink nav" x="335" y="43">Plan</text><line x1="330" y1="61" x2="370" y2="61" stroke="#b6a9cf" stroke-width="4"/><text class="muted nav" x="410" y="43">Work</text><text class="muted nav" x="490" y="43">Calendar</text><text class="muted nav" x="590" y="43">Insights</text><text class="muted nav" x="1220" y="43">Search</text><text class="muted nav" x="1310" y="43">Settings</text>
+  <rect class="lav" x="0" y="70" width="1440" height="138"/><text class="ink h1" x="55" y="130">Plan a day</text><text class="muted body" x="55" y="165">Friday, August 7</text><text class="muted body" x="1160" y="145">Previous workday   ·   Next workday</text>
+
+  <rect class="lav2" x="30" y="235" rx="8" width="245" height="745"/><text class="ink h2" x="58" y="278">Day context</text><text class="muted small" x="58" y="319">WORK HOURS</text><text class="ink body" x="58" y="346">8:00 AM–5:00 PM</text><line class="line" x1="58" y1="375" x2="247" y2="375"/>
+  <text class="muted small" x="58" y="411">MEETINGS</text><text class="ink body" x="58" y="440">10:30 · Weekly sync</text><line class="line" x1="58" y1="470" x2="247" y2="470"/>
+  <text class="muted small" x="58" y="506">FOLLOW-UPS</text><text class="ink body" x="58" y="535">2 need review</text><text class="muted small" x="58" y="559">View due items</text><line class="line" x1="58" y1="590" x2="247" y2="590"/>
+  <text class="muted small" x="58" y="626">USUAL LOAD</text><text class="ink body" x="58" y="655">6–8 actionable items</text>
+
+  <rect class="paper" x="300" y="235" rx="8" width="720" height="745"/><text class="ink h2" x="332" y="278">Work inventory</text><rect class="bg line" x="332" y="302" rx="6" width="656" height="44"/><text class="muted body" x="352" y="329">Search ticket number or title</text>
+  <rect class="lav" x="332" y="368" rx="14" width="92" height="30"/><text class="ink small" x="378" y="388" text-anchor="middle">Suggested</text><text class="muted small" x="450" y="388">Urgent</text><text class="muted small" x="520" y="388">Oldest</text><text class="muted small" x="585" y="388">Waiting</text><text class="muted small" x="662" y="388">Watching</text><text class="muted small" x="904" y="388">Filters</text>
+  <line class="line" x1="332" y1="425" x2="988" y2="425"/>
+  <rect class="line" x="344" y="451" width="20" height="20" rx="3"/><text class="ink body" x="386" y="465">#1909 · Update customer address</text><text class="ink small" x="886" y="465">URGENT</text><text class="muted small" x="386" y="489">Received today · Pending</text>
+  <line class="line" x1="332" y1="514" x2="988" y2="514"/>
+  <rect class="line" x="344" y="540" width="20" height="20" rx="3"/><text class="ink body" x="386" y="554">#1731 · Update form configuration</text><text class="muted small" x="875" y="554">12 days old</text><text class="muted small" x="386" y="578">Medium · In Progress</text>
+  <line class="line" x1="332" y1="603" x2="988" y2="603"/>
+  <rect class="line" x="344" y="629" width="20" height="20" rx="3"/><text class="ink body" x="386" y="643">#1880 · Review field mapping</text><text class="muted small" x="882" y="643">7 days old</text><text class="muted small" x="386" y="667">Medium · Pending</text>
+  <line class="line" x1="332" y1="692" x2="988" y2="692"/>
+  <rect class="line" x="344" y="718" width="20" height="20" rx="3"/><text class="ink body" x="386" y="732">#1812 · Confirm form changes</text><text class="muted small" x="386" y="756">Watching · Review due Friday</text>
+
+  <rect class="paper" x="1045" y="235" rx="8" width="365" height="745"/><text class="ink h2" x="1077" y="278">Friday's plan</text><text class="muted small" x="1298" y="278">DRAFT</text>
+  <rect class="lav2" x="1077" y="308" rx="6" width="301" height="76"/><text class="ink body" x="1097" y="338">1   #1909 · Update address</text><text class="muted small" x="1097" y="362">Move down · Remove</text>
+  <rect class="lav2" x="1077" y="398" rx="6" width="301" height="76"/><text class="ink body" x="1097" y="428">2   #1731 · Form configuration</text><text class="muted small" x="1097" y="452">Move up · Move down · Remove</text>
+  <rect class="lav2" x="1077" y="488" rx="6" width="301" height="76"/><text class="ink body" x="1097" y="518">3   #1880 · Field mapping</text><text class="muted small" x="1097" y="542">Move up · Remove</text>
+  <line class="line" x1="1077" y1="600" x2="1378" y2="600"/><text class="muted body" x="1077" y="638">+ Add task</text><text class="muted body" x="1077" y="672">+ Add reminder</text>
+  <rect class="pink" x="1077" y="716" rx="6" width="301" height="74"/><text class="ink body" x="1097" y="747">3 tickets · 1 meeting</text><text class="muted small" x="1097" y="772">Within your usual daily load</text>
+  <rect class="btn" x="1077" y="890" rx="7" width="301" height="52"/><text class="ink nav" x="1227" y="922" text-anchor="middle">Mark ready</text>
+  <text class="muted small" x="1395" y="1000" text-anchor="end">02 · PLAN · LOW FIDELITY</text>
+</svg>
+
