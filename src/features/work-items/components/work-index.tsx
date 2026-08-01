@@ -149,19 +149,23 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
 
         <section className="border-border/70 bg-paper shadow-surface min-h-[520px] rounded-xl border">
           <div className="border-border flex items-center gap-4 border-b px-6 py-5">
-            <label className="sr-only" htmlFor="work-search">
-              Search work
-            </label>
-            <input
-              ref={searchRef}
-              id="work-search"
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search ticket number or title"
-              className="border-border bg-canvas text-ink placeholder:text-quiet focus:border-lavender-500 min-w-0 flex-1 rounded-lg border px-4 py-2.5 text-sm outline-none"
-            />
-            <span className="text-quiet mr-1 -ml-12 text-xs font-bold">/</span>
+            <div className="relative min-w-0 flex-1">
+              <label className="sr-only" htmlFor="work-search">
+                Search work
+              </label>
+              <input
+                ref={searchRef}
+                id="work-search"
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search ticket number or title"
+                className="border-border bg-canvas text-ink placeholder:text-quiet focus:border-lavender-500 w-full rounded-lg border py-2.5 pr-11 pl-4 text-sm outline-none"
+              />
+              <kbd className="border-border bg-paper text-quiet pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 rounded border px-1.5 py-0.5 text-[10px] font-bold">
+                /
+              </kbd>
+            </div>
             <label className="sr-only" htmlFor="kind-filter">
               Work type
             </label>

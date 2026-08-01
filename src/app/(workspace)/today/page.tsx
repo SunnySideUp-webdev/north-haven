@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 
-import { TodayView } from "@/features/daily-planning/components/today-view";
-import { foundationPlan } from "@/features/daily-planning/data/foundation-plan";
+import { DailyToday } from "@/features/daily-planning/components/daily-today";
+import { getDailyPlanningData } from "@/features/daily-planning/queries";
+import { requireAuthenticatedContext } from "@/server/auth/session";
 
-export const metadata: Metadata = {
-  title: "Today",
-};
+export const metadata: Metadata = { title: "Today" };
 
-export default function TodayPage() {
-  return <TodayView plan={foundationPlan} />;
+export default async function TodayPage() {
+  const { profile } = await requireAuthenticatedContext();
+  const workDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: profile?.time_zone ?? "America/Guatemala",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+  const data = await getDailyPlanningData(workDate);
+  return <DailyToday data={data} workDate={workDate} />;
 }

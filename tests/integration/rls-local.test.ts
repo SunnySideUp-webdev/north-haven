@@ -272,5 +272,75 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
         { id: reminderId, kind: "reminder" },
       ]),
     );
+
+    const { data: mondayWorkday } = await clientA.rpc("next_workday", {
+      chosen_after_date: "2026-07-31",
+    });
+    expect(mondayWorkday).toBe("2026-08-03");
+
+    const { error: nonWorkingDayError } = await clientA
+      .from("non_working_days")
+      .insert({
+        kind: "holiday",
+        source: "manual",
+        work_date: "2026-08-03",
+        workspace_id: workspacesA![0].id,
+      });
+    const { data: tuesdayWorkday } = await clientA.rpc("next_workday", {
+      chosen_after_date: "2026-07-31",
+    });
+    expect(nonWorkingDayError).toBeNull();
+    expect(tuesdayWorkday).toBe("2026-08-04");
+
+    for (const workItemId of [ticketId!, taskId!]) {
+      const { error } = await clientA.rpc("set_plan_item_selected", {
+        chosen_selected: true,
+        chosen_work_date: "2026-08-04",
+        target_work_item_id: workItemId,
+      });
+      expect(error).toBeNull();
+    }
+
+    const { data: plan, error: planError } = await clientA
+      .from("daily_plans")
+      .select("id, status")
+      .eq("work_date", "2026-08-04")
+      .single();
+    const { data: plannedItems } = await clientA
+      .from("daily_plan_items")
+      .select("id, work_item_id, position")
+      .eq("daily_plan_id", plan!.id)
+      .order("position");
+
+    expect(planError).toBeNull();
+    expect(plannedItems).toHaveLength(2);
+
+    const { error: readyError } = await clientA.rpc(
+      "update_daily_plan_details",
+      {
+        chosen_intention: "Finish the oldest request first.",
+        chosen_mark_ready: true,
+        chosen_work_date: "2026-08-04",
+      },
+    );
+    expect(readyError).toBeNull();
+
+    const { error: doneError } = await clientA.rpc("set_daily_plan_item_done", {
+      chosen_done: true,
+      target_daily_plan_item_id: plannedItems![0].id,
+    });
+    const { data: workLog } = await clientA
+      .from("work_logs")
+      .select("worked_on, outcome")
+      .eq("daily_plan_item_id", plannedItems![0].id)
+      .single();
+    const { data: hiddenPlan } = await clientB
+      .from("daily_plans")
+      .select("id")
+      .eq("id", plan!.id);
+
+    expect(doneError).toBeNull();
+    expect(workLog).toEqual({ worked_on: "2026-08-04", outcome: "done" });
+    expect(hiddenPlan).toEqual([]);
   });
 });

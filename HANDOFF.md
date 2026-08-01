@@ -98,6 +98,11 @@ calendar.
 - Ticket Type management in Settings with activation and display ordering
 - Follow-up completion/cancellation with retained history
 - Global Quick Add and keyboard-efficient Work capture shortcuts
+- Persisted Daily Plans with manual, duplicate-safe Work selection and ordering
+- Draft and Ready states, intention, and calm capacity guidance above eight items
+- Authenticated Today data that hides unplanned inventory and records progress
+- Work logs and next-workday calculation that skips weekends/non-working dates
+- Corrected Work search shortcut layout without overlap
 
 ### Not started
 
@@ -110,11 +115,14 @@ Google Calendar credentials, and deployment configuration are not connected.
 
 ### Next step
 
-Begin Phase 5 with persisted Daily Plans, manual inventory selection, capacity
-guidance, authenticated Today data, and the four-step End of Day flow. The Work
-Inventory now provides the planning-ready source for that phase. Server-side
-pagination remains a scale hardening task before the inventory approaches the
-current 500-item boundary; it does not block the present workflow.
+Continue Phase 5 with the four-step End of Day flow: Update Tickets, explicitly
+resolve every Today item, review due follow-ups, and prepare the calculated next
+workday. Add day-note autosave and the outcomes Return to Inventory, Plan for
+Another Date, Keep Watching, and No Longer Needed. The persistent Plan and Today
+foundation is complete and documented in `docs/15-daily-planning-implementation.md`.
+
+Server-side pagination remains a scale hardening task before the inventory
+approaches the current 500-item boundary; it does not block the present workflow.
 
 The hosted Supabase development environment, hosted password-recovery check,
 remaining authenticated Today schedule data, and recovery documentation remain
@@ -255,6 +263,7 @@ The current visual specification is `docs/10-visual-system.md`.
 - `docs/12-reporting-and-exports.md` — Daily, Weekly, and Monthly report behavior
 - `docs/13-technical-foundation.md` — implemented foundation and exact next increment
 - `docs/14-work-inventory-implementation.md` — implemented Work Inventory slice and remaining Phase 4 work
+- `docs/15-daily-planning-implementation.md` — persisted Plan and Today implementation and next Phase 5 increment
 
 ## Design assets
 

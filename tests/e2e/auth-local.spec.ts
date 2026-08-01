@@ -81,4 +81,21 @@ test("creates a private workspace, completes setup, and restores the session", a
   await expect(page.locator('input[name="name"]').last()).toHaveValue(
     "Redirect",
   );
+
+  await page.keyboard.press("Control+K");
+  await page.getByRole("link", { name: /New task/ }).click();
+  await page.getByLabel("Task title").fill("Review tomorrow's requests");
+  await page.getByRole("button", { name: "Create task" }).click();
+  await page.getByRole("link", { name: "Plan" }).click();
+  await page
+    .getByRole("button", { name: "Add Review tomorrow's requests" })
+    .click();
+  await page.getByRole("button", { name: "Mark ready" }).click();
+  await expect(page.getByText("ready", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Today" }).click();
+  await expect(page.getByText("Review tomorrow's requests")).toBeVisible();
+  await page
+    .getByRole("button", { name: "Mark Review tomorrow's requests done" })
+    .click();
+  await expect(page.getByText("1 of 1", { exact: true })).toBeVisible();
 });

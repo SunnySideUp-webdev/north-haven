@@ -11,7 +11,8 @@ Spanish.
 
 ## Current phase
 
-The core Phase 4 Work Inventory experience is implemented. The repository contains the Next.js
+The core Phase 4 Work Inventory experience and the first persistent Phase 5
+Daily Planning slice are implemented. The repository contains the Next.js
 application shell, approved visual tokens, an initial Today implementation,
 Supabase authentication, private workspace provisioning, first-time setup, and
 the first production-shaped Tickets, Tasks, and Reminders vertical slice.
@@ -124,3 +125,4 @@ Reassess these pins when the project moves to Node 22.
 - [Reporting and exports](docs/12-reporting-and-exports.md)
 - [Technical foundation](docs/13-technical-foundation.md)
 - [Work Inventory implementation](docs/14-work-inventory-implementation.md)
+- [Daily Planning implementation](docs/15-daily-planning-implementation.md)

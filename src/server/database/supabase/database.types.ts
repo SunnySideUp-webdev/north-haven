@@ -9,6 +9,165 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      daily_plan_items: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          daily_plan_id: string;
+          deferred_to_plan_id: string | null;
+          execution_status: Database["public"]["Enums"]["plan_execution_status"];
+          id: string;
+          outcome_note: string | null;
+          position: number;
+          started_at: string | null;
+          updated_at: string;
+          work_item_id: string;
+          workspace_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          daily_plan_id: string;
+          deferred_to_plan_id?: string | null;
+          execution_status?: Database["public"]["Enums"]["plan_execution_status"];
+          id?: string;
+          outcome_note?: string | null;
+          position: number;
+          started_at?: string | null;
+          updated_at?: string;
+          work_item_id: string;
+          workspace_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          daily_plan_id?: string;
+          deferred_to_plan_id?: string | null;
+          execution_status?: Database["public"]["Enums"]["plan_execution_status"];
+          id?: string;
+          outcome_note?: string | null;
+          position?: number;
+          started_at?: string | null;
+          updated_at?: string;
+          work_item_id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "daily_plan_items_daily_plan_id_workspace_id_fkey";
+            columns: ["daily_plan_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "daily_plans";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "daily_plan_items_deferred_to_plan_id_workspace_id_fkey";
+            columns: ["deferred_to_plan_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "daily_plans";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "daily_plan_items_work_item_id_workspace_id_fkey";
+            columns: ["work_item_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "work_inventory_rows";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "daily_plan_items_work_item_id_workspace_id_fkey";
+            columns: ["work_item_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "work_items";
+            referencedColumns: ["id", "workspace_id"];
+          },
+        ];
+      };
+      daily_plans: {
+        Row: {
+          closed_at: string | null;
+          created_at: string;
+          end_of_day_step: number;
+          id: string;
+          intention: string | null;
+          ready_at: string | null;
+          status: Database["public"]["Enums"]["daily_plan_status"];
+          updated_at: string;
+          work_date: string;
+          workspace_id: string;
+        };
+        Insert: {
+          closed_at?: string | null;
+          created_at?: string;
+          end_of_day_step?: number;
+          id?: string;
+          intention?: string | null;
+          ready_at?: string | null;
+          status?: Database["public"]["Enums"]["daily_plan_status"];
+          updated_at?: string;
+          work_date: string;
+          workspace_id: string;
+        };
+        Update: {
+          closed_at?: string | null;
+          created_at?: string;
+          end_of_day_step?: number;
+          id?: string;
+          intention?: string | null;
+          ready_at?: string | null;
+          status?: Database["public"]["Enums"]["daily_plan_status"];
+          updated_at?: string;
+          work_date?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "daily_plans_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      day_notes: {
+        Row: {
+          body: string;
+          created_at: string;
+          id: string;
+          is_important: boolean;
+          updated_at: string;
+          work_date: string;
+          workspace_id: string;
+        };
+        Insert: {
+          body: string;
+          created_at?: string;
+          id?: string;
+          is_important?: boolean;
+          updated_at?: string;
+          work_date: string;
+          workspace_id: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          id?: string;
+          is_important?: boolean;
+          updated_at?: string;
+          work_date?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "day_notes_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       follow_ups: {
         Row: {
           completed_at: string | null;
@@ -66,6 +225,47 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "work_items";
             referencedColumns: ["id", "workspace_id"];
+          },
+        ];
+      };
+      non_working_days: {
+        Row: {
+          allows_urgent_work: boolean;
+          created_at: string;
+          id: string;
+          kind: Database["public"]["Enums"]["non_working_day_kind"];
+          source: Database["public"]["Enums"]["non_working_day_source"];
+          source_event_id: string | null;
+          work_date: string;
+          workspace_id: string;
+        };
+        Insert: {
+          allows_urgent_work?: boolean;
+          created_at?: string;
+          id?: string;
+          kind: Database["public"]["Enums"]["non_working_day_kind"];
+          source: Database["public"]["Enums"]["non_working_day_source"];
+          source_event_id?: string | null;
+          work_date: string;
+          workspace_id: string;
+        };
+        Update: {
+          allows_urgent_work?: boolean;
+          created_at?: string;
+          id?: string;
+          kind?: Database["public"]["Enums"]["non_working_day_kind"];
+          source?: Database["public"]["Enums"]["non_working_day_source"];
+          source_event_id?: string | null;
+          work_date?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "non_working_days_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -443,6 +643,67 @@ export type Database = {
           },
         ];
       };
+      work_logs: {
+        Row: {
+          created_at: string;
+          daily_plan_item_id: string | null;
+          ended_at: string | null;
+          id: string;
+          is_automatic: boolean;
+          outcome: Database["public"]["Enums"]["work_log_outcome"];
+          started_at: string | null;
+          work_item_id: string;
+          worked_on: string;
+          workspace_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          daily_plan_item_id?: string | null;
+          ended_at?: string | null;
+          id?: string;
+          is_automatic?: boolean;
+          outcome: Database["public"]["Enums"]["work_log_outcome"];
+          started_at?: string | null;
+          work_item_id: string;
+          worked_on: string;
+          workspace_id: string;
+        };
+        Update: {
+          created_at?: string;
+          daily_plan_item_id?: string | null;
+          ended_at?: string | null;
+          id?: string;
+          is_automatic?: boolean;
+          outcome?: Database["public"]["Enums"]["work_log_outcome"];
+          started_at?: string | null;
+          work_item_id?: string;
+          worked_on?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "work_logs_daily_plan_item_id_workspace_id_fkey";
+            columns: ["daily_plan_item_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "daily_plan_items";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "work_logs_work_item_id_workspace_id_fkey";
+            columns: ["work_item_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "work_inventory_rows";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "work_logs_work_item_id_workspace_id_fkey";
+            columns: ["work_item_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "work_items";
+            referencedColumns: ["id", "workspace_id"];
+          },
+        ];
+      };
       work_schedules: {
         Row: {
           ends_at_local: string;
@@ -631,15 +892,32 @@ export type Database = {
         Args: { target_workspace_id: string };
         Returns: boolean;
       };
+      move_daily_plan_item: {
+        Args: { chosen_direction: number; target_daily_plan_item_id: string };
+        Returns: undefined;
+      };
       move_ticket_type: {
         Args: { chosen_direction: number; target_ticket_type_id: string };
         Returns: undefined;
       };
+      next_workday: { Args: { chosen_after_date: string }; Returns: string };
       save_open_follow_up: {
         Args: {
           chosen_reason: string;
           chosen_review_on?: string;
           chosen_waiting_on?: string;
+          target_work_item_id: string;
+        };
+        Returns: string;
+      };
+      set_daily_plan_item_done: {
+        Args: { chosen_done: boolean; target_daily_plan_item_id: string };
+        Returns: undefined;
+      };
+      set_plan_item_selected: {
+        Args: {
+          chosen_selected: boolean;
+          chosen_work_date: string;
           target_work_item_id: string;
         };
         Returns: string;
@@ -650,6 +928,14 @@ export type Database = {
           target_follow_up_id: string;
         };
         Returns: undefined;
+      };
+      update_daily_plan_details: {
+        Args: {
+          chosen_intention: string;
+          chosen_mark_ready: boolean;
+          chosen_work_date: string;
+        };
+        Returns: string;
       };
       update_reminder: {
         Args: {
@@ -697,12 +983,24 @@ export type Database = {
       };
     };
     Enums: {
+      daily_plan_status: "draft" | "ready" | "active" | "closed";
       follow_up_state: "open" | "completed" | "cancelled";
-      status_dimension: "operational" | "tracking" | "backup";
+      non_working_day_kind: "out_of_office" | "holiday" | "manual";
+      non_working_day_source: "google" | "manual";
+      plan_execution_status:
+        | "planned"
+        | "in_progress"
+        | "done"
+        | "returned"
+        | "deferred"
+        | "skipped";
+      status_dimension: "operational" | "tracking" | "backup" | "execution";
       ticket_operational_status:
         "pending" | "in_progress" | "waiting_response" | "resolved";
       ticket_priority: "urgent" | "high" | "medium" | "low";
       work_item_kind: "ticket" | "task" | "reminder";
+      work_log_outcome:
+        "worked" | "done" | "returned" | "deferred" | "watching" | "skipped";
       work_tracking_state: "active" | "watching" | "closed" | "archived";
     };
     CompositeTypes: {
@@ -831,8 +1129,19 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      daily_plan_status: ["draft", "ready", "active", "closed"],
       follow_up_state: ["open", "completed", "cancelled"],
-      status_dimension: ["operational", "tracking", "backup"],
+      non_working_day_kind: ["out_of_office", "holiday", "manual"],
+      non_working_day_source: ["google", "manual"],
+      plan_execution_status: [
+        "planned",
+        "in_progress",
+        "done",
+        "returned",
+        "deferred",
+        "skipped",
+      ],
+      status_dimension: ["operational", "tracking", "backup", "execution"],
       ticket_operational_status: [
         "pending",
         "in_progress",
@@ -841,6 +1150,14 @@ export const Constants = {
       ],
       ticket_priority: ["urgent", "high", "medium", "low"],
       work_item_kind: ["ticket", "task", "reminder"],
+      work_log_outcome: [
+        "worked",
+        "done",
+        "returned",
+        "deferred",
+        "watching",
+        "skipped",
+      ],
       work_tracking_state: ["active", "watching", "closed", "archived"],
     },
   },
