@@ -149,6 +149,7 @@ export default async function WorkItemPage({
             current={
               openFollowUp
                 ? {
+                    id: openFollowUp.id,
                     reason: openFollowUp.reason,
                     review_on: openFollowUp.review_on,
                     waiting_on: openFollowUp.waiting_on,
@@ -156,6 +157,28 @@ export default async function WorkItemPage({
                 : undefined
             }
           />
+          {activity.followUps.some((followUp) => followUp.state !== "open") ? (
+            <section className="border-border/70 bg-paper shadow-surface rounded-xl border p-6">
+              <h2 className="text-ink text-base font-bold">
+                Follow-up history
+              </h2>
+              <div className="mt-5 space-y-5">
+                {activity.followUps
+                  .filter((followUp) => followUp.state !== "open")
+                  .map((followUp) => (
+                    <div key={followUp.id}>
+                      <p className="text-muted text-sm leading-5">
+                        {followUp.reason}
+                      </p>
+                      <p className="text-quiet mt-1 text-xs">
+                        {label(followUp.state)} ·{" "}
+                        {formatDateTime(followUp.completed_at)}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            </section>
+          ) : null}
           <section className="border-border/70 bg-paper shadow-surface rounded-xl border p-6">
             <h2 className="text-ink text-base font-bold">History</h2>
             <div className="mt-5 space-y-5">

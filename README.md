@@ -11,7 +11,7 @@ Spanish.
 
 ## Current phase
 
-Phase 4 Work Inventory is in progress. The repository now contains the Next.js
+The core Phase 4 Work Inventory experience is implemented. The repository contains the Next.js
 application shell, approved visual tokens, an initial Today implementation,
 Supabase authentication, private workspace provisioning, first-time setup, and
 the first production-shaped Tickets, Tasks, and Reminders vertical slice.

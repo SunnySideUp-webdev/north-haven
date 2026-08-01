@@ -36,6 +36,21 @@ export async function getTicketTypes() {
   return data;
 }
 
+export async function getManagedTicketTypes() {
+  const { supabase } = await requireAuthenticatedContext();
+  const { data, error } = await supabase
+    .from("ticket_types")
+    .select("id, name, is_active, sort_order")
+    .order("sort_order")
+    .order("name");
+
+  if (error) {
+    throw new Error("We couldn't load ticket type settings.");
+  }
+
+  return data;
+}
+
 export async function getWorkItem(workItemId: string) {
   const { supabase } = await requireAuthenticatedContext();
   const { data, error } = await supabase
@@ -61,7 +76,9 @@ export async function getWorkItemActivity(workItemId: string) {
       .order("created_at", { ascending: false }),
     supabase
       .from("follow_ups")
-      .select("id, reason, waiting_on, review_on, state, started_at")
+      .select(
+        "id, reason, waiting_on, review_on, state, started_at, completed_at",
+      )
       .eq("work_item_id", workItemId)
       .order("created_at", { ascending: false }),
     supabase

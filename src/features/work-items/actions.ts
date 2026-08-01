@@ -5,11 +5,14 @@ import { redirect } from "next/navigation";
 
 import type { WorkFormState } from "@/features/work-items/types";
 import {
+  createTicketTypeInputSchema,
   followUpInputSchema,
+  manageTicketTypeInputSchema,
   noteInputSchema,
   reminderInputSchema,
   taskInputSchema,
   ticketInputSchema,
+  transitionFollowUpInputSchema,
 } from "@/features/work-items/validation";
 import { requireAuthenticatedContext } from "@/server/auth/session";
 
@@ -306,5 +309,109 @@ export async function saveFollowUpAction(
   }
 
   revalidatePath(`/work/${result.data.workItemId}`);
+  return { status: "idle" };
+}
+
+export async function createTicketTypeAction(
+  _previousState: WorkFormState,
+  formData: FormData,
+): Promise<WorkFormState> {
+  const result = createTicketTypeInputSchema.safeParse({
+    name: formData.get("name"),
+  });
+
+  if (!result.success) {
+    return errorState("Enter a ticket type name.");
+  }
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { error } = await supabase.rpc("create_ticket_type", {
+    chosen_name: result.data.name,
+  });
+
+  if (error) {
+    return errorState(
+      error.message.includes("normalized_name")
+        ? "A ticket type with this name already exists."
+        : "We couldn't add this ticket type.",
+    );
+  }
+
+  revalidatePath("/settings");
+  revalidatePath("/work/new/ticket");
+  return { status: "idle" };
+}
+
+export async function manageTicketTypeAction(
+  _previousState: WorkFormState,
+  formData: FormData,
+): Promise<WorkFormState> {
+  const result = manageTicketTypeInputSchema.safeParse({
+    direction: formData.get("direction") || undefined,
+    intent: formData.get("direction") ? "move" : "save",
+    isActive: formData.get("isActive") === "on",
+    name: formData.get("name"),
+    ticketTypeId: formData.get("ticketTypeId"),
+  });
+
+  if (!result.success) {
+    return errorState("Review this ticket type and try again.");
+  }
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { error } =
+    result.data.intent === "move" && result.data.direction
+      ? await supabase.rpc("move_ticket_type", {
+          chosen_direction: Number(result.data.direction),
+          target_ticket_type_id: result.data.ticketTypeId,
+        })
+      : await supabase.rpc("update_ticket_type", {
+          chosen_is_active: result.data.isActive,
+          chosen_name: result.data.name,
+          target_ticket_type_id: result.data.ticketTypeId,
+        });
+
+  if (error) {
+    const message = error.message.includes("at least one active")
+      ? "Keep at least one active ticket type."
+      : error.message.includes("normalized_name")
+        ? "A ticket type with this name already exists."
+        : "We couldn't update this ticket type.";
+    return errorState(message);
+  }
+
+  revalidatePath("/settings");
+  revalidatePath("/work/new/ticket");
+  return { status: "idle" };
+}
+
+export async function transitionFollowUpAction(
+  _previousState: WorkFormState,
+  formData: FormData,
+): Promise<WorkFormState> {
+  const result = transitionFollowUpInputSchema.safeParse({
+    followUpId: formData.get("followUpId"),
+    state: formData.get("state"),
+    workItemId: formData.get("workItemId"),
+  });
+
+  if (!result.success) {
+    return errorState("We couldn't identify this follow-up.");
+  }
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { error } = await supabase.rpc("transition_follow_up", {
+    chosen_state: result.data.state,
+    target_follow_up_id: result.data.followUpId,
+  });
+
+  if (error) {
+    return errorState(
+      "We couldn't update this follow-up. Refresh and try again.",
+    );
+  }
+
+  revalidatePath(`/work/${result.data.workItemId}`);
+  revalidatePath("/work");
   return { status: "idle" };
 }

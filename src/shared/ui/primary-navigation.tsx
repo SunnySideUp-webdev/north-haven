@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { primaryNavigation } from "@/shared/content/navigation";
+import { QuickAddMenu } from "@/features/work-items/components/quick-add-menu";
 
 function isCurrentPath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -37,13 +38,7 @@ export function PrimaryNavigation() {
         })}
       </nav>
       <div className="text-muted ml-auto flex items-center gap-8 text-sm font-bold">
-        <button
-          type="button"
-          className="hover:text-ink"
-          aria-label="Search work"
-        >
-          Search
-        </button>
+        <QuickAddMenu />
         <Link
           href="/settings"
           aria-current={

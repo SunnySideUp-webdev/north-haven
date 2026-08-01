@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { formatDate, formatDateTime } from "@/features/work-items/date";
 import type { WorkInventoryRow } from "@/features/work-items/types";
@@ -45,6 +45,23 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
   const [savedView, setSavedView] = useState<SavedView>("active");
   const [kind, setKind] = useState("all");
   const [search, setSearch] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    function focusSearch(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      const isTyping = target?.matches(
+        "input, textarea, select, [contenteditable='true']",
+      );
+      if (event.key === "/" && !isTyping) {
+        event.preventDefault();
+        searchRef.current?.focus();
+      }
+    }
+
+    window.addEventListener("keydown", focusSearch);
+    return () => window.removeEventListener("keydown", focusSearch);
+  }, []);
 
   const counts = useMemo(
     () =>
@@ -136,6 +153,7 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
               Search work
             </label>
             <input
+              ref={searchRef}
               id="work-search"
               type="search"
               value={search}
@@ -143,6 +161,7 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
               placeholder="Search ticket number or title"
               className="border-border bg-canvas text-ink placeholder:text-quiet focus:border-lavender-500 min-w-0 flex-1 rounded-lg border px-4 py-2.5 text-sm outline-none"
             />
+            <span className="text-quiet mr-1 -ml-12 text-xs font-bold">/</span>
             <label className="sr-only" htmlFor="kind-filter">
               Work type
             </label>

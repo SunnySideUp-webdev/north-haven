@@ -89,6 +89,13 @@ export function WorkItemForm({
     <form
       action={action}
       onSubmit={prepareDateTime}
+      onKeyDown={(event) => {
+        if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+          event.preventDefault();
+          prepareDateTime();
+          event.currentTarget.requestSubmit();
+        }
+      }}
       className="border-border/70 bg-paper shadow-surface rounded-xl border p-8"
     >
       <WorkFormMessage message={state.message} />
@@ -103,6 +110,7 @@ export function WorkItemForm({
               Ticket number
               <input
                 name="ticketNumber"
+                autoFocus
                 required
                 maxLength={80}
                 defaultValue={item?.ticket_number ?? ""}
@@ -132,6 +140,7 @@ export function WorkItemForm({
           {noun} title
           <input
             name="title"
+            autoFocus={kind !== "ticket"}
             required
             maxLength={200}
             defaultValue={item?.title ?? ""}
@@ -267,6 +276,9 @@ export function WorkItemForm({
       </div>
 
       <div className="border-border mt-8 flex items-center justify-end gap-4 border-t pt-6">
+        <span className="text-quiet mr-auto text-xs">
+          Save with Ctrl/⌘ Enter
+        </span>
         <Link
           href={item?.id ? `/work/${item.id}` : "/work"}
           className="text-muted hover:text-ink px-3 py-2 text-sm font-bold"

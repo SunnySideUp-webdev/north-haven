@@ -95,6 +95,9 @@ calendar.
 - Browser coverage for creating, editing, closing, and finding a normal Task
 - Integration coverage for duplicate Ticket handling, history, subtype
   distinction, and cross-workspace isolation
+- Ticket Type management in Settings with activation and display ordering
+- Follow-up completion/cancellation with retained history
+- Global Quick Add and keyboard-efficient Work capture shortcuts
 
 ### Not started
 
@@ -107,12 +110,11 @@ Google Calendar credentials, and deployment configuration are not connected.
 
 ### Next step
 
-Finish the remaining Phase 4 interaction slice before moving to Daily Planning:
-add Ticket-type management in Settings, keyboard-efficient quick entry, and
-follow-up completion/cancellation. Then begin Phase 5 with persisted Daily Plans,
-manual inventory selection, capacity guidance, authenticated Today data, and
-the four-step End of Day flow. The current inventory already provides the
-planning-ready work source for that phase.
+Begin Phase 5 with persisted Daily Plans, manual inventory selection, capacity
+guidance, authenticated Today data, and the four-step End of Day flow. The Work
+Inventory now provides the planning-ready source for that phase. Server-side
+pagination remains a scale hardening task before the inventory approaches the
+current 500-item boundary; it does not block the present workflow.
 
 The hosted Supabase development environment, hosted password-recovery check,
 remaining authenticated Today schedule data, and recovery documentation remain

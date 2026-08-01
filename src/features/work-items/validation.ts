@@ -55,3 +55,21 @@ export const followUpInputSchema = z.object({
   waitingOn: z.string().trim().max(200).optional(),
   workItemId: z.string().uuid(),
 });
+
+export const createTicketTypeInputSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+});
+
+export const manageTicketTypeInputSchema = z.object({
+  direction: z.union([z.literal("-1"), z.literal("1")]).optional(),
+  intent: z.enum(["save", "move"]),
+  isActive: z.boolean(),
+  name: z.string().trim().min(1).max(80),
+  ticketTypeId: z.string().uuid(),
+});
+
+export const transitionFollowUpInputSchema = z.object({
+  followUpId: z.string().uuid(),
+  state: z.enum(["completed", "cancelled"]),
+  workItemId: z.string().uuid(),
+});

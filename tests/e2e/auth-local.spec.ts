@@ -38,11 +38,11 @@ test("creates a private workspace, completes setup, and restores the session", a
 
   await expect(page).toHaveURL(/\/today$/);
 
-  await page.getByRole("link", { name: "Work" }).click();
+  await page.keyboard.press("Control+K");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Work inventory" }),
+    page.getByRole("heading", { level: 2, name: "Quick add" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "New task" }).click();
+  await page.getByRole("link", { name: /New task/ }).click();
   await page.getByLabel("Task title").fill("Prepare weekly summary");
   await page
     .getByLabel("Notes")
@@ -55,6 +55,15 @@ test("creates a private workspace, completes setup, and restores the session", a
       name: "Prepare weekly summary",
     }),
   ).toBeVisible();
+  await page.getByLabel("Reason").fill("Waiting for leadership confirmation");
+  await page.getByLabel("Waiting on").fill("Team lead");
+  await page.getByRole("button", { name: "Save follow-up" }).click();
+  await page.getByRole("button", { name: "Mark completed" }).click();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Follow-up history" }),
+  ).toBeVisible();
+  await expect(page.getByText("Completed ·", { exact: false })).toBeVisible();
+
   await page.getByRole("link", { name: "Edit" }).click();
   await page.getByLabel("Tracking").selectOption("closed");
   await page.getByRole("button", { name: "Save task" }).click();
@@ -65,4 +74,11 @@ test("creates a private workspace, completes setup, and restores the session", a
   await expect(
     page.getByRole("link", { name: "Prepare weekly summary" }),
   ).toBeVisible();
+
+  await page.getByRole("link", { name: "Settings" }).click();
+  await page.getByLabel("New ticket type").fill("Redirect");
+  await page.getByRole("button", { name: "Add type" }).click();
+  await expect(page.locator('input[name="name"]').last()).toHaveValue(
+    "Redirect",
+  );
 });

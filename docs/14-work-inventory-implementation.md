@@ -1,6 +1,6 @@
 # Work Inventory implementation
 
-Status: First vertical slice complete  
+Status: Core interaction slice complete
 Last updated: July 31, 2026
 
 ## Outcome
@@ -51,6 +51,17 @@ The detail route provides overview data, the secure source-system link, activity
 notes, an editable open follow-up, and automatic status history. Tracking can be
 changed to Active, Watching, Closed, or Archived from Edit.
 
+The final interaction increment adds:
+
+- Ticket Type creation, renaming, activation/deactivation, and ordering in
+  Settings
+- case-insensitive duplicate protection and a requirement to retain one active
+  Ticket Type
+- completion and cancellation of open follow-ups with historical retention
+- global `Ctrl/Command + K` Quick Add for Ticket, Task, or Reminder
+- `/` to focus inventory search and `Ctrl/Command + Enter` to save entry forms
+- autofocus and visible shortcut guidance for keyboard-efficient capture
+
 ## Security and verification
 
 Validated on the Docker-backed local stack:
@@ -66,19 +77,17 @@ Validated on the Docker-backed local stack:
 - formatting, linting, strict TypeScript, unit tests, integration tests, and the
   production build pass
 
-## Remaining Phase 4 work
+## Remaining scale and deployment hardening
 
-Before declaring all Phase 4 exit criteria complete:
+The owner-facing Phase 4 interaction flow is complete. Two hardening tasks remain:
 
-1. Add Ticket-type management in Settings, including deactivate and reorder.
-2. Add keyboard-efficient quick entry and verify the interaction states with a
-   focused accessibility pass.
-3. Add follow-up completion/cancellation instead of only open-follow-up editing.
-4. Add pagination or cursor loading before inventories exceed the current
+1. Add pagination or cursor loading before inventories exceed the current
    initial 500-row read boundary.
-5. Perform the hosted-development and recovery hardening that remains from
+2. Perform the hosted-development and recovery hardening that remains from
    Phase 3 before production deployment.
 
-After the first three items, begin Phase 5 Daily Planning: persisted daily
-plans, deliberate selection, capacity guidance, authenticated Today, and the
-four-step End of Day flow.
+The next product phase is Phase 5 Daily Planning: persisted daily plans,
+deliberate selection, capacity guidance, authenticated Today, and the four-step
+End of Day flow. Pagination can be introduced before the inventory approaches
+its current 500-item boundary and does not block the user's present 35-item
+workflow.

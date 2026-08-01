@@ -621,6 +621,7 @@ export type Database = {
         };
         Returns: string;
       };
+      create_ticket_type: { Args: { chosen_name: string }; Returns: string };
       current_personal_workspace_id: { Args: never; Returns: string };
       is_workspace_member: {
         Args: { target_workspace_id: string };
@@ -630,6 +631,10 @@ export type Database = {
         Args: { target_workspace_id: string };
         Returns: boolean;
       };
+      move_ticket_type: {
+        Args: { chosen_direction: number; target_ticket_type_id: string };
+        Returns: undefined;
+      };
       save_open_follow_up: {
         Args: {
           chosen_reason: string;
@@ -638,6 +643,13 @@ export type Database = {
           target_work_item_id: string;
         };
         Returns: string;
+      };
+      transition_follow_up: {
+        Args: {
+          chosen_state: Database["public"]["Enums"]["follow_up_state"];
+          target_follow_up_id: string;
+        };
+        Returns: undefined;
       };
       update_reminder: {
         Args: {
@@ -672,6 +684,14 @@ export type Database = {
           chosen_title: string;
           chosen_tracking_state: Database["public"]["Enums"]["work_tracking_state"];
           target_work_item_id: string;
+        };
+        Returns: undefined;
+      };
+      update_ticket_type: {
+        Args: {
+          chosen_is_active: boolean;
+          chosen_name: string;
+          target_ticket_type_id: string;
         };
         Returns: undefined;
       };

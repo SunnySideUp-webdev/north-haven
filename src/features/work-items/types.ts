@@ -17,3 +17,8 @@ export type TicketTypeOption = {
   id: string;
   name: string;
 };
+
+export type ManagedTicketType = TicketTypeOption & {
+  is_active: boolean;
+  sort_order: number;
+};

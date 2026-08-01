@@ -83,6 +83,55 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
       "Other",
     ]);
 
+    const { data: redirectTypeId, error: createTypeError } = await clientA.rpc(
+      "create_ticket_type",
+      { chosen_name: "Redirect" },
+    );
+    const { error: duplicateTypeError } = await clientA.rpc(
+      "create_ticket_type",
+      { chosen_name: " redirect " },
+    );
+
+    expect(createTypeError).toBeNull();
+    expect(redirectTypeId).toBeTruthy();
+    expect(duplicateTypeError?.message).toContain("normalized_name");
+
+    const { error: renameTypeError } = await clientA.rpc("update_ticket_type", {
+      chosen_is_active: false,
+      chosen_name: "URL redirect",
+      target_ticket_type_id: redirectTypeId!,
+    });
+    const { error: crossWorkspaceTypeError } = await clientB.rpc(
+      "update_ticket_type",
+      {
+        chosen_is_active: true,
+        chosen_name: "Cross workspace",
+        target_ticket_type_id: redirectTypeId!,
+      },
+    );
+
+    expect(renameTypeError).toBeNull();
+    expect(crossWorkspaceTypeError).not.toBeNull();
+
+    const { error: moveTypeError } = await clientA.rpc("move_ticket_type", {
+      chosen_direction: -1,
+      target_ticket_type_id: redirectTypeId!,
+    });
+    const { data: reorderedTypes } = await clientA
+      .from("ticket_types")
+      .select("name")
+      .order("sort_order")
+      .order("name");
+
+    expect(moveTypeError).toBeNull();
+    expect(reorderedTypes?.map((type) => type.name)).toEqual([
+      "Change",
+      "Form",
+      "Content",
+      "URL redirect",
+      "Other",
+    ]);
+
     const { data: ticketId, error: ticketError } = await clientA.rpc(
       "create_ticket",
       {
@@ -162,6 +211,37 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
         { status_dimension: "backup", to_value: "complete" },
       ]),
     );
+
+    const { data: followUpId, error: followUpError } = await clientA.rpc(
+      "save_open_follow_up",
+      {
+        chosen_reason: "Waiting for the final form update.",
+        chosen_review_on: "2026-08-03",
+        chosen_waiting_on: "Forms team",
+        target_work_item_id: ticketId!,
+      },
+    );
+
+    expect(followUpError).toBeNull();
+
+    const { error: transitionError } = await clientA.rpc(
+      "transition_follow_up",
+      {
+        chosen_state: "completed",
+        target_follow_up_id: followUpId!,
+      },
+    );
+
+    expect(transitionError).toBeNull();
+
+    const { data: completedFollowUp } = await clientA
+      .from("follow_ups")
+      .select("state, completed_at")
+      .eq("id", followUpId!)
+      .single();
+
+    expect(completedFollowUp?.state).toBe("completed");
+    expect(completedFollowUp?.completed_at).toBeTruthy();
 
     const { data: taskId, error: taskError } = await clientA.rpc(
       "create_task",
