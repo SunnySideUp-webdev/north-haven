@@ -76,6 +76,17 @@ test("creates a private workspace, completes setup, and restores the session", a
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Settings" }).click();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Profile" }),
+  ).toBeVisible();
+  await page.getByLabel("Display name").fill("North Haven Test");
+  await page.getByRole("button", { name: "Save profile" }).click();
+  await expect(page.getByText("Profile saved.")).toBeVisible();
+  await page.getByRole("link", { name: "Work schedule" }).click();
+  await page.getByLabel("Workday end").fill("16:30");
+  await page.getByRole("button", { name: "Save schedule" }).click();
+  await expect(page.getByText("Work schedule saved.")).toBeVisible();
+  await page.getByRole("link", { name: "Ticket types" }).click();
   await page.getByLabel("New ticket type").fill("Redirect");
   await page.getByRole("button", { name: "Add type" }).click();
   await expect(page.locator('input[name="name"]').last()).toHaveValue(

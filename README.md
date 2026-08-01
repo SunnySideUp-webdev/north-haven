@@ -21,8 +21,12 @@ The live corporate OAuth feasibility check and refresh-token exchange passed on
 August 1, 2026. Phase 7 now includes shared reporting projections, retrospective
 Calendar and Day Summary, monthly notes, Week/Month/Quarter/Custom Insights,
 accessible trend summaries, and the Daily/Weekly/Monthly Report Builder with
-designed PDF and data CSV exports. Phase 8 hardening and personal launch are
-next. No customer data, production credentials, or Google tokens are committed.
+designed PDF and data CSV exports. Phase 7.5 product completion is now in
+progress: Profile, Work schedule, manual non-working days, password changes,
+session revocation, Calendar connection, and Ticket types are functional in
+Settings. Workspace backup and recovery are the next increment before Phase 8
+hardening and the Netlify personal launch. No customer data, production
+credentials, or Google tokens are committed.
 
 ## Local setup
 
@@ -68,6 +72,9 @@ npm run db:types
 
 `db:types` regenerates the checked-in TypeScript database contract after a
 schema migration changes.
+
+Settings implementation and its remaining recovery boundary are documented in
+`docs/20-settings-implementation.md`.
 
 With the local stack running, the opt-in database and browser authentication
 checks are:

@@ -1309,6 +1309,10 @@ export type Database = {
         };
         Returns: string;
       };
+      update_profile_settings: {
+        Args: { chosen_display_name: string };
+        Returns: undefined;
+      };
       update_reminder: {
         Args: {
           chosen_description?: string;
@@ -1350,6 +1354,15 @@ export type Database = {
           chosen_is_active: boolean;
           chosen_name: string;
           target_ticket_type_id: string;
+        };
+        Returns: undefined;
+      };
+      update_work_schedule_settings: {
+        Args: {
+          chosen_ends_at_local: string;
+          chosen_starts_at_local: string;
+          chosen_time_zone: string;
+          chosen_working_weekdays: number[];
         };
         Returns: undefined;
       };

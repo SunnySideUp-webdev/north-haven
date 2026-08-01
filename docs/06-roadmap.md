@@ -161,6 +161,48 @@ accessible charts, Report Builder, and PDF/CSV exports are implemented.
 - Daily, Weekly, and Monthly exports match Insights for identical periods.
 - Report files are streamed on demand and are not retained server-side.
 
+## Phase 7.5: product completion
+
+Status: In progress
+
+### Increment A: Complete Settings
+
+Status: Implemented locally
+
+- Accurate section navigation
+- Editable Profile
+- Editable working weekdays, hours, and IANA time zone
+- Manual holidays and personal non-working days
+- Existing Ticket Type and Google Calendar management
+- Password update and global session revocation
+- Explicit boundary between private reports and a complete workspace backup
+
+### Increment B: Recovery and lifecycle states
+
+Status: Pending
+
+- Complete workspace backup
+- Demonstrated restoration procedure
+- Closed-day summary and confirmed reopen flow
+- Clear archived-work recovery
+
+### Increment C: Plan, Work, and End of Day parity
+
+Status: Pending
+
+- Complete approved Plan filters and navigation
+- Restore approved Work Inventory and Ticket Detail actions
+- Finish End of Day efficiency and completion-state details
+- Decide the launch scope for global search and manual meeting fallback
+
+### Increment D: Authenticated coverage
+
+Status: Pending
+
+- Exercise critical authenticated workflows in a production-like CI environment
+- Add Settings, recovery, report-download, and lifecycle browser coverage
+- Reconcile implementation documents with the verified acceptance criteria
+
 ## Phase 8: hardening and personal launch
 
 Status: Pending

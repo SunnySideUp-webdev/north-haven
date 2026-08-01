@@ -147,10 +147,20 @@ calendar.
 - Public-host-aware export validation that supports the canonical
   `127.0.0.1` local origin even when Next.js normalizes its internal URL to
   `localhost`
+- Settings navigation with a truthful active section instead of a hard-coded
+  Ticket Types state
+- Editable Profile plus a transactional Work schedule that keeps profile and
+  reporting time zones consistent
+- Manual Holiday and Personal Day management integrated with next-workday
+  calculation
+- In-app password changes and global session revocation
 
 ### Pending or not started
 
-- Hosted Supabase and deployment configuration
+- Phase 7.5B recovery and lifecycle states
+- Phase 7.5C Plan, Work, and End of Day parity
+- Phase 7.5D authenticated production-like coverage
+- Hosted Supabase and Netlify deployment configuration
 - Phase 8 hardening and personal launch
 
 Application code and local real-calendar validation now exist. Production data,
@@ -159,14 +169,16 @@ configuration are not connected.
 
 ### Next step
 
-Begin Phase 8 hardening and personal launch. Priorities are hosted Supabase and
-Vercel configuration, a complete keyboard/accessibility audit, cross-browser
-desktop verification, hosted password recovery, report privacy/accessibility
-review, backup/export restoration, and removal of visual-review data before
-real daily use. The completed reporting implementation is documented in
+Begin Phase 7.5B recovery and lifecycle states. Build and demonstrate a complete
+workspace backup/restoration path, then implement Closed Day reopening and
+clear archived-work recovery before continuing through parity and authenticated
+coverage. Phase 8 will use hosted Supabase and Netlify after the target Netlify
+site is reviewed with the owner. The completed reporting and Settings
+implementations are documented in
 `docs/17-retrospective-calendar-implementation.md`,
 `docs/18-insights-implementation.md`, and
-`docs/19-report-builder-implementation.md`.
+`docs/19-report-builder-implementation.md`, plus
+`docs/20-settings-implementation.md`.
 
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.
@@ -299,7 +311,8 @@ The current visual specification is `docs/10-visual-system.md`.
 - Zod validation
 - Tailwind CSS plus CSS custom properties
 - Vitest, Testing Library, and Playwright
-- Vercel deployment, subject to final data-hosting approval
+- Netlify deployment, subject to final data-hosting approval and explicit
+  confirmation of the target site
 - No microservices, Redux, or separate Express backend for the MVP
 
 ## Canonical documents
@@ -324,6 +337,7 @@ The current visual specification is `docs/10-visual-system.md`.
 - `docs/17-retrospective-calendar-implementation.md` — shared daily metrics, monthly Calendar, Day Summary, and remaining Phase 7 work
 - `docs/18-insights-implementation.md` — reporting periods, historical inventory, metric semantics, and accessible charts
 - `docs/19-report-builder-implementation.md` — Report Builder, PDF/CSV generation, privacy controls, and export security
+- `docs/20-settings-implementation.md` — Profile, schedule, non-working-day, and security Settings implementation
 
 ## Design assets
 

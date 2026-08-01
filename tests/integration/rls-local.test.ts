@@ -60,6 +60,52 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     expect(workspacesB).toHaveLength(1);
     expect(workspacesA?.[0].id).not.toBe(workspacesB?.[0].id);
 
+    const { error: profileSettingsError } = await clientA.rpc(
+      "update_profile_settings",
+      { chosen_display_name: "North Haven A" },
+    );
+    const { error: scheduleSettingsError } = await clientA.rpc(
+      "update_work_schedule_settings",
+      {
+        chosen_ends_at_local: "16:30",
+        chosen_starts_at_local: "08:00",
+        chosen_time_zone: "America/New_York",
+        chosen_working_weekdays: [1, 2, 3, 4, 5],
+      },
+    );
+    const { data: profileA } = await clientA
+      .from("profiles")
+      .select("display_name, time_zone")
+      .single();
+    const { data: scheduleA } = await clientA
+      .from("work_schedules")
+      .select("ends_at_local, time_zone, working_weekdays")
+      .eq("workspace_id", workspacesA![0].id)
+      .single();
+
+    expect(profileSettingsError).toBeNull();
+    expect(scheduleSettingsError).toBeNull();
+    expect(profileA).toMatchObject({
+      display_name: "North Haven A",
+      time_zone: "America/New_York",
+    });
+    expect(scheduleA).toMatchObject({
+      ends_at_local: "16:30:00",
+      time_zone: "America/New_York",
+      working_weekdays: [1, 2, 3, 4, 5],
+    });
+
+    const { error: invalidScheduleError } = await clientA.rpc(
+      "update_work_schedule_settings",
+      {
+        chosen_ends_at_local: "17:00",
+        chosen_starts_at_local: "08:00",
+        chosen_time_zone: "Not/AZone",
+        chosen_working_weekdays: [1, 2, 3, 4, 5],
+      },
+    );
+    expect(invalidScheduleError).not.toBeNull();
+
     for (let attempt = 0; attempt < 6; attempt += 1) {
       const { data: allowed, error } = await clientA.rpc(
         "claim_report_export_slot",

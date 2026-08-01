@@ -24,7 +24,8 @@ state framework is required for the MVP.
 - Accessible headless primitives only where native HTML is insufficient
 - Vitest and Testing Library
 - Playwright for end-to-end workflows
-- Vercel for the web deployment, subject to the approved data-hosting policy
+- Netlify for the web deployment, subject to the approved data-hosting policy
+  and a platform-compatibility check immediately before deployment
 
 Package versions are selected and locked when implementation begins rather than
 recorded in the product specification.

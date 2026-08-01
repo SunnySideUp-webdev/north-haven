@@ -65,5 +65,8 @@
   optional corporate authorization.
 - Generated report files are streamed on demand and are not retained in server
   storage during the MVP.
+- Netlify is the selected web deployment platform for the personal launch. The
+  existing Netlify deployment will not be replaced or reconfigured without an
+  explicit target-site review.
 - Local development uses `http://127.0.0.1:3000` as the canonical browser
   origin because browser cookies are not shared with `localhost`.
