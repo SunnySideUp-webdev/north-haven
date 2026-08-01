@@ -167,6 +167,15 @@ confirmed End of Day outcome. Duplicate same-day automatic logs are prevented.
 - `created_at`
 - `updated_at`
 
+### month_notes
+
+- `id`
+- `workspace_id`
+- `month_start`, always the first local date of the month
+- `body`
+- `created_at`
+- `updated_at`
+
 ### status_events
 
 - `id`
@@ -264,9 +273,10 @@ Do not store descriptions, attendee lists, or attachments in the MVP.
 ## Reporting projections
 
 Reporting is read-only and derived from `daily_plans`, `daily_plan_items`,
-`work_logs`, `status_events`, `meeting_outcomes`, and follow-up history. Create
-protected SQL views or query functions for daily metric rows, then aggregate
-those same rows for weekly and monthly outputs.
+`work_logs`, `status_events`, `meeting_outcomes`, and follow-up history. The
+protected `reporting_daily_metrics` function now provides the canonical daily
+rows for Calendar, Insights, and reports. Weekly and monthly outputs aggregate
+those same rows rather than maintaining independent counters.
 
 No persistent `reports` or `report_files` table is required in the MVP. The
 Report Builder sends a validated, server-side request containing only period,

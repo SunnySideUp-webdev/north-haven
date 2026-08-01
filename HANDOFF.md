@@ -121,23 +121,30 @@ calendar.
 - Canonical local-origin handling prevents `localhost` and `127.0.0.1` from
   splitting the North Haven session during Google OAuth
 - Local password recovery verified end to end through Mailpit
+- Shared, workspace-scoped daily reporting projection for Calendar, Insights,
+  and exports
+- Retrospective six-week monthly Calendar with actual work, resolution,
+  confirmed meeting, important-note, and OOO indicators
+- In-place Day Summary with Plan vs Actual, outcomes, intention, and day note
+- RLS-protected editable monthly notes and persistent month navigation
 
 ### Pending or not started
 
-- Phase 7 retrospective Calendar, Day Summary, Insights, and report exports
+- Phase 7 Insights, accessible charts, and Daily/Weekly/Monthly report exports
 - Hosted Supabase and deployment configuration
 - Phase 8 hardening and personal launch
 
-Application code now exists. Production data, authentication credentials,
-Google Calendar credentials, and deployment configuration are not connected.
+Application code and local real-calendar validation now exist. Production data,
+hosted authentication, production Google credentials, and deployment
+configuration are not connected.
 
 ### Next step
 
-Begin Phase 7 with the retrospective monthly Calendar and Day Summary, then
-build Insights and the approved Daily, Weekly, and Monthly PDF/CSV exports.
-Calendar and Insights must share metric definitions for identical periods.
-The completed Google integration is documented in
-`docs/16-google-calendar-implementation.md`.
+Continue Phase 7 with Week, Month, Quarter, and Custom Range Insights using the
+implemented daily reporting projection. Then build the approved Daily, Weekly,
+and Monthly PDF/CSV exports. Calendar and Insights must share metric definitions
+for identical periods. The Calendar increment is documented in
+`docs/17-retrospective-calendar-implementation.md`.
 
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.
@@ -286,6 +293,7 @@ The current visual specification is `docs/10-visual-system.md`.
 - `docs/14-work-inventory-implementation.md` — implemented Work Inventory slice and remaining Phase 4 work
 - `docs/15-daily-planning-implementation.md` — persisted Plan and Today implementation and next Phase 5 increment
 - `docs/16-google-calendar-implementation.md` — secure read-only Calendar implementation and live feasibility check
+- `docs/17-retrospective-calendar-implementation.md` — shared daily metrics, monthly Calendar, Day Summary, and remaining Phase 7 work
 
 ## Design assets
 

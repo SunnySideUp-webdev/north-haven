@@ -455,6 +455,41 @@ export type Database = {
           },
         ];
       };
+      month_notes: {
+        Row: {
+          body: string;
+          created_at: string;
+          id: string;
+          month_start: string;
+          updated_at: string;
+          workspace_id: string;
+        };
+        Insert: {
+          body: string;
+          created_at?: string;
+          id?: string;
+          month_start: string;
+          updated_at?: string;
+          workspace_id: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          id?: string;
+          month_start?: string;
+          updated_at?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "month_notes_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       non_working_days: {
         Row: {
           allows_urgent_work: boolean;
@@ -1140,6 +1175,28 @@ export type Database = {
         Returns: undefined;
       };
       next_workday: { Args: { chosen_after_date: string }; Returns: string };
+      reporting_daily_metrics: {
+        Args: { chosen_end_date: string; chosen_start_date: string };
+        Returns: {
+          completed_items: number;
+          day_note: string;
+          deferred_items: number;
+          has_important_note: boolean;
+          is_out_of_office: boolean;
+          meetings_attended: number;
+          plan_intention: string;
+          plan_status: string;
+          planned_items: number;
+          reminders_completed: number;
+          returned_items: number;
+          skipped_items: number;
+          tasks_completed: number;
+          tickets_closed: number;
+          tickets_resolved: number;
+          tickets_worked: number;
+          work_date: string;
+        }[];
+      };
       resolve_end_of_day_follow_up: {
         Args: {
           chosen_decision: Database["public"]["Enums"]["follow_up_decision"];

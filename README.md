@@ -18,8 +18,10 @@ provisioning, Tickets, Tasks, Reminders, meetings, official OOO handling, and
 protected Google OAuth routes.
 
 The live corporate OAuth feasibility check and refresh-token exchange passed on
-August 1, 2026. Phase 7 retrospective Calendar, Insights, and report exports are
-next. No customer data, production credentials, or Google tokens are committed.
+August 1, 2026. Phase 7 now includes the shared daily reporting projection,
+retrospective monthly Calendar, Day Summary, and monthly notes. Insights and
+report exports are next. No customer data, production credentials, or Google
+tokens are committed.
 
 ## Local setup
 
@@ -140,3 +142,4 @@ Reassess these pins when the project moves to Node 22.
 - [Work Inventory implementation](docs/14-work-inventory-implementation.md)
 - [Daily Planning implementation](docs/15-daily-planning-implementation.md)
 - [Google Calendar implementation](docs/16-google-calendar-implementation.md)
+- [Retrospective Calendar implementation](docs/17-retrospective-calendar-implementation.md)

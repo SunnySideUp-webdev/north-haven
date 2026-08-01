@@ -139,7 +139,9 @@ August 1, 2026.
 
 ## Phase 7: calendar and insights
 
-Status: Next
+Status: In progress. The shared daily reporting projection, retrospective
+monthly Calendar, Day Summary, and monthly notes are complete. Insights, charts,
+and report exports are next.
 
 ### Deliverables
 

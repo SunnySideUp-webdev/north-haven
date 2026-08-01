@@ -403,6 +403,38 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
       is_important: true,
     });
 
+    const { data: reportingA, error: reportingErrorA } = await clientA.rpc(
+      "reporting_daily_metrics",
+      {
+        chosen_end_date: "2026-08-04",
+        chosen_start_date: "2026-08-04",
+      },
+    );
+    const { data: reportingB, error: reportingErrorB } = await clientB.rpc(
+      "reporting_daily_metrics",
+      {
+        chosen_end_date: "2026-08-04",
+        chosen_start_date: "2026-08-04",
+      },
+    );
+
+    expect(reportingErrorA).toBeNull();
+    expect(reportingErrorB).toBeNull();
+    expect(reportingA?.[0]).toMatchObject({
+      completed_items: 1,
+      deferred_items: 1,
+      has_important_note: true,
+      planned_items: 2,
+      tickets_worked: 1,
+    });
+    expect(reportingB?.[0]).toMatchObject({
+      completed_items: 0,
+      deferred_items: 0,
+      has_important_note: false,
+      planned_items: 0,
+      tickets_worked: 0,
+    });
+
     const { data: connection, error: connectionError } = await admin
       .from("calendar_connections")
       .insert({
