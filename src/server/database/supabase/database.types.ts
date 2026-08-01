@@ -9,6 +9,65 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      calendar_connections: {
+        Row: {
+          access_token_encrypted: string;
+          access_token_expires_at: string;
+          account_label: string;
+          created_at: string;
+          id: string;
+          last_error_code: string | null;
+          last_synced_at: string | null;
+          provider: string;
+          provider_account_id: string;
+          refresh_token_encrypted: string;
+          scopes: string[];
+          status: Database["public"]["Enums"]["calendar_connection_status"];
+          updated_at: string;
+          workspace_id: string;
+        };
+        Insert: {
+          access_token_encrypted: string;
+          access_token_expires_at: string;
+          account_label: string;
+          created_at?: string;
+          id?: string;
+          last_error_code?: string | null;
+          last_synced_at?: string | null;
+          provider?: string;
+          provider_account_id: string;
+          refresh_token_encrypted: string;
+          scopes?: string[];
+          status?: Database["public"]["Enums"]["calendar_connection_status"];
+          updated_at?: string;
+          workspace_id: string;
+        };
+        Update: {
+          access_token_encrypted?: string;
+          access_token_expires_at?: string;
+          account_label?: string;
+          created_at?: string;
+          id?: string;
+          last_error_code?: string | null;
+          last_synced_at?: string | null;
+          provider?: string;
+          provider_account_id?: string;
+          refresh_token_encrypted?: string;
+          scopes?: string[];
+          status?: Database["public"]["Enums"]["calendar_connection_status"];
+          updated_at?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "calendar_connections_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       daily_plan_items: {
         Row: {
           completed_at: string | null;
@@ -168,6 +227,133 @@ export type Database = {
           },
         ];
       };
+      external_calendar_events: {
+        Row: {
+          created_at: string;
+          end_local_date: string;
+          ends_at: string;
+          event_type: Database["public"]["Enums"]["external_calendar_event_type"];
+          external_calendar_id: string;
+          ical_uid: string | null;
+          id: string;
+          is_all_day: boolean;
+          meeting_url: string | null;
+          provider_event_id: string;
+          provider_updated_at: string | null;
+          provider_url: string | null;
+          start_local_date: string;
+          starts_at: string;
+          status: string;
+          synced_at: string;
+          title: string;
+          updated_at: string;
+          workspace_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          end_local_date: string;
+          ends_at: string;
+          event_type?: Database["public"]["Enums"]["external_calendar_event_type"];
+          external_calendar_id: string;
+          ical_uid?: string | null;
+          id?: string;
+          is_all_day?: boolean;
+          meeting_url?: string | null;
+          provider_event_id: string;
+          provider_updated_at?: string | null;
+          provider_url?: string | null;
+          start_local_date: string;
+          starts_at: string;
+          status?: string;
+          synced_at?: string;
+          title?: string;
+          updated_at?: string;
+          workspace_id: string;
+        };
+        Update: {
+          created_at?: string;
+          end_local_date?: string;
+          ends_at?: string;
+          event_type?: Database["public"]["Enums"]["external_calendar_event_type"];
+          external_calendar_id?: string;
+          ical_uid?: string | null;
+          id?: string;
+          is_all_day?: boolean;
+          meeting_url?: string | null;
+          provider_event_id?: string;
+          provider_updated_at?: string | null;
+          provider_url?: string | null;
+          start_local_date?: string;
+          starts_at?: string;
+          status?: string;
+          synced_at?: string;
+          title?: string;
+          updated_at?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "external_calendar_events_external_calendar_id_workspace_id_fkey";
+            columns: ["external_calendar_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "external_calendars";
+            referencedColumns: ["id", "workspace_id"];
+          },
+        ];
+      };
+      external_calendars: {
+        Row: {
+          calendar_connection_id: string;
+          created_at: string;
+          id: string;
+          is_primary: boolean;
+          is_selected: boolean;
+          last_synced_at: string | null;
+          name: string;
+          provider_calendar_id: string;
+          sync_token: string | null;
+          time_zone: string | null;
+          updated_at: string;
+          workspace_id: string;
+        };
+        Insert: {
+          calendar_connection_id: string;
+          created_at?: string;
+          id?: string;
+          is_primary?: boolean;
+          is_selected?: boolean;
+          last_synced_at?: string | null;
+          name: string;
+          provider_calendar_id: string;
+          sync_token?: string | null;
+          time_zone?: string | null;
+          updated_at?: string;
+          workspace_id: string;
+        };
+        Update: {
+          calendar_connection_id?: string;
+          created_at?: string;
+          id?: string;
+          is_primary?: boolean;
+          is_selected?: boolean;
+          last_synced_at?: string | null;
+          name?: string;
+          provider_calendar_id?: string;
+          sync_token?: string | null;
+          time_zone?: string | null;
+          updated_at?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "external_calendars_calendar_connection_id_workspace_id_fkey";
+            columns: ["calendar_connection_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "calendar_connections";
+            referencedColumns: ["id", "workspace_id"];
+          },
+        ];
+      };
       follow_ups: {
         Row: {
           completed_at: string | null;
@@ -224,6 +410,47 @@ export type Database = {
             columns: ["work_item_id", "workspace_id"];
             isOneToOne: false;
             referencedRelation: "work_items";
+            referencedColumns: ["id", "workspace_id"];
+          },
+        ];
+      };
+      meeting_outcomes: {
+        Row: {
+          attendance_status: Database["public"]["Enums"]["meeting_attendance_status"];
+          confirmed_at: string | null;
+          created_at: string;
+          external_calendar_event_id: string;
+          id: string;
+          local_note: string | null;
+          updated_at: string;
+          workspace_id: string;
+        };
+        Insert: {
+          attendance_status?: Database["public"]["Enums"]["meeting_attendance_status"];
+          confirmed_at?: string | null;
+          created_at?: string;
+          external_calendar_event_id: string;
+          id?: string;
+          local_note?: string | null;
+          updated_at?: string;
+          workspace_id: string;
+        };
+        Update: {
+          attendance_status?: Database["public"]["Enums"]["meeting_attendance_status"];
+          confirmed_at?: string | null;
+          created_at?: string;
+          external_calendar_event_id?: string;
+          id?: string;
+          local_note?: string | null;
+          updated_at?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "meeting_outcomes_external_calendar_event_id_workspace_id_fkey";
+            columns: ["external_calendar_event_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "external_calendar_events";
             referencedColumns: ["id", "workspace_id"];
           },
         ];
@@ -1015,13 +1242,24 @@ export type Database = {
       };
     };
     Enums: {
+      calendar_connection_status:
+        "connected" | "stale" | "disconnected" | "error";
       daily_plan_status: "draft" | "ready" | "active" | "closed";
+      external_calendar_event_type:
+        "default" | "out_of_office" | "focus_time" | "other";
       follow_up_decision:
         | "still_waiting"
         | "response_received"
         | "external_completed"
         | "no_longer_relevant";
       follow_up_state: "open" | "completed" | "cancelled";
+      meeting_attendance_status:
+        | "unconfirmed"
+        | "probably_attended"
+        | "attended"
+        | "cancelled"
+        | "did_not_attend"
+        | "not_applicable";
       non_working_day_kind: "out_of_office" | "holiday" | "manual";
       non_working_day_source: "google" | "manual";
       plan_execution_status:
@@ -1166,7 +1404,19 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      calendar_connection_status: [
+        "connected",
+        "stale",
+        "disconnected",
+        "error",
+      ],
       daily_plan_status: ["draft", "ready", "active", "closed"],
+      external_calendar_event_type: [
+        "default",
+        "out_of_office",
+        "focus_time",
+        "other",
+      ],
       follow_up_decision: [
         "still_waiting",
         "response_received",
@@ -1174,6 +1424,14 @@ export const Constants = {
         "no_longer_relevant",
       ],
       follow_up_state: ["open", "completed", "cancelled"],
+      meeting_attendance_status: [
+        "unconfirmed",
+        "probably_attended",
+        "attended",
+        "cancelled",
+        "did_not_attend",
+        "not_applicable",
+      ],
       non_working_day_kind: ["out_of_office", "holiday", "manual"],
       non_working_day_source: ["google", "manual"],
       plan_execution_status: [

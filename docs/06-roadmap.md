@@ -105,6 +105,9 @@
 
 ## Phase 6: Google Calendar
 
+Status: application implementation complete; live corporate OAuth validation
+pending.
+
 ### Deliverables
 
 - Corporate OAuth feasibility spike

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
+import type { CalendarDayView } from "@/features/calendar-sync/types";
 import {
   movePlanItemAction,
   savePlanDetailsAction,
@@ -29,10 +30,12 @@ export function PlanBuilder({
   workDate,
 }: {
   data: {
+    calendar: CalendarDayView;
     dueFollowUps: number;
     items: PlanningItem[];
     nextWorkDate: string | null;
     plan: { id: string; status: string; intention: string | null } | null;
+    timeZone: string;
   };
   workDate: string;
 }) {
@@ -41,6 +44,7 @@ export function PlanBuilder({
   const [search, setSearch] = useState("");
   const [intention, setIntention] = useState(data.plan?.intention ?? "");
   const [message, setMessage] = useState<string>();
+  const meetings = data.calendar.meetings;
   const selected = data.items
     .filter((item) => item.planItem)
     .sort((a, b) => a.planItem!.position - b.planItem!.position);
@@ -124,6 +128,12 @@ export function PlanBuilder({
               </dt>
               <dd className="mt-1 font-bold">{data.dueFollowUps}</dd>
             </div>
+            <div>
+              <dt className="text-quiet text-xs font-bold uppercase">
+                Meetings
+              </dt>
+              <dd className="mt-1 font-bold">{meetings.length}</dd>
+            </div>
           </dl>
           {data.nextWorkDate ? (
             <Link
@@ -135,6 +145,19 @@ export function PlanBuilder({
           ) : null}
         </aside>
         <main className="space-y-7">
+          {data.calendar.isOutOfOffice ? (
+            <div className="bg-lavender-100 text-lavender-700 rounded-xl px-6 py-5 text-sm">
+              <strong>This is an Out of Office day.</strong> North Haven
+              normally skips it when proposing work. You can still plan urgent
+              work here explicitly.
+            </div>
+          ) : null}
+          {data.calendar.connection &&
+          data.calendar.connection.state !== "connected" ? (
+            <div className="bg-waiting-surface text-waiting-ink rounded-xl px-6 py-5 text-sm">
+              Calendar may be out of date. Manual planning continues normally.
+            </div>
+          ) : null}
           {message ? (
             <p
               role="alert"
@@ -178,6 +201,49 @@ export function PlanBuilder({
               </button>
             </div>
           </section>
+          {meetings.length ? (
+            <section className="border-blush-200 bg-paper shadow-surface rounded-xl border p-7">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-ink text-xl font-bold">
+                    Meetings on this day
+                  </h2>
+                  <p className="text-muted mt-1 text-sm">
+                    Synced meetings appear automatically and do not consume
+                    actionable-item capacity.
+                  </p>
+                </div>
+                <span className="text-blush-600 text-sm font-bold">
+                  {meetings.length}
+                </span>
+              </div>
+              <div className="mt-5">
+                {meetings.map((meeting) => (
+                  <div
+                    key={meeting.id}
+                    className="border-blush-200 flex items-center gap-4 border-t py-4 first:border-t-0"
+                  >
+                    <span className="bg-blush-100 h-8 w-1 rounded-full" />
+                    <div className="min-w-0">
+                      <p className="text-ink truncate text-sm font-bold">
+                        {meeting.title}
+                      </p>
+                      <p className="text-quiet mt-1 text-xs">
+                        {new Intl.DateTimeFormat("en-US", {
+                          hour: "numeric",
+                          minute: "2-digit",
+                          timeZone: data.timeZone,
+                        }).format(new Date(meeting.startsAt))}
+                      </p>
+                    </div>
+                    <span className="text-quiet ml-auto text-xs">
+                      Google Calendar
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
           <section className="border-border/70 bg-paper shadow-surface rounded-xl border p-7">
             <div className="flex items-center justify-between">
               <h2 className="text-ink text-xl font-bold">

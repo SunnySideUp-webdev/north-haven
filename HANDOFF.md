@@ -107,24 +107,34 @@ calendar.
 - Explicit Done, Return, Deferred, Watching, and No Longer Needed outcomes
 - Due follow-up decisions and transactional End of Day completion
 - Calm next-workday-ready completion state with no automatic rollover
+- Separate, optional Google OAuth connection that can use a corporate account
+  independently from the North Haven sign-in
+- Server-only AES-256-GCM token protection and browser-inaccessible Calendar
+  tables
+- Read-only calendar selection plus initial and incremental event sync
+- Real meetings in Plan, Today, Calendar, and End of Day attendance review
+- Official full-day Google OOO records integrated with next-workday calculation
+- Reconnect, stale, denied, failure, manual sync, and disconnect experiences
 
-### Not started
+### Pending or not started
 
-- Google Calendar implementation
+- Live corporate Google OAuth feasibility validation and real token refresh
 - Deployment configuration
-- Persisted Daily Planning and authenticated Today data
+- Phase 7 retrospective Calendar, Insights, and report exports
 
 Application code now exists. Production data, authentication credentials,
 Google Calendar credentials, and deployment configuration are not connected.
 
 ### Next step
 
-Begin Phase 6 with a corporate Google Calendar OAuth feasibility spike. Confirm
-that the corporate account permits the required external app, request read-only
-calendar scopes only, and connect meetings plus official Out of Office events
-to the existing Plan, Today, and End of Day flows. Calendar failure must never
-block manual planning. Phase 5 is complete and documented in
-`docs/15-daily-planning-implementation.md`.
+Complete the final Phase 6 feasibility check with the real corporate Google
+account. Create a Google Cloud Web application OAuth client, register
+`http://127.0.0.1:3000/api/google-calendar/callback`, add the ignored local
+credentials, and connect from Settings. Validate corporate consent, calendar
+listing, meetings, official OOO events, refresh, reconnect, and disconnect.
+The implementation is documented in
+`docs/16-google-calendar-implementation.md`. Do not begin Phase 7 until the live
+corporate connection is known to work or its policy blocker is documented.
 
 Server-side pagination remains a scale hardening task before the inventory
 approaches the current 500-item boundary; it does not block the present workflow.
@@ -132,8 +142,9 @@ approaches the current 500-item boundary; it does not block the present workflow
 The hosted Supabase development environment, hosted password-recovery check,
 remaining authenticated Today schedule data, and recovery documentation remain
 open Phase 3 hardening tasks. They are required before deployment but do not
-block local Work Inventory development. Google Calendar credentials are not
-needed for the next increment.
+block local Work Inventory development. Google Calendar credentials are now
+required only for the live Phase 6 feasibility check; manual planning remains
+usable without them.
 
 ## Confirmed product decisions
 
@@ -269,6 +280,7 @@ The current visual specification is `docs/10-visual-system.md`.
 - `docs/13-technical-foundation.md` — implemented foundation and exact next increment
 - `docs/14-work-inventory-implementation.md` — implemented Work Inventory slice and remaining Phase 4 work
 - `docs/15-daily-planning-implementation.md` — persisted Plan and Today implementation and next Phase 5 increment
+- `docs/16-google-calendar-implementation.md` — secure read-only Calendar implementation and live feasibility check
 
 ## Design assets
 

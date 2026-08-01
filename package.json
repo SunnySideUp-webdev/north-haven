@@ -15,7 +15,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:local": "RUN_SUPABASE_E2E=1 playwright test tests/e2e/auth-local.spec.ts",
-    "test:integration:local": "RUN_SUPABASE_INTEGRATION=1 vitest run tests/integration/rls-local.test.ts",
+    "test:integration:local": "eval \"$(supabase status -o env)\" && SUPABASE_SERVICE_ROLE_KEY=\"$SERVICE_ROLE_KEY\" RUN_SUPABASE_INTEGRATION=1 vitest run tests/integration/rls-local.test.ts",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset --local",

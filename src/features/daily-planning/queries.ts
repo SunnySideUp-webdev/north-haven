@@ -1,18 +1,21 @@
 import "server-only";
 
+import { getCalendarDay } from "@/features/calendar-sync/queries";
 import { getWorkInventory } from "@/features/work-items/queries";
 import { requireAuthenticatedContext } from "@/server/auth/session";
 
 export async function getDailyPlanningData(workDate: string) {
   const { profile, supabase } = await requireAuthenticatedContext();
-  const [{ data: plan, error: planError }, inventory] = await Promise.all([
-    supabase
-      .from("daily_plans")
-      .select("id, work_date, status, intention, closed_at, end_of_day_step")
-      .eq("work_date", workDate)
-      .maybeSingle(),
-    getWorkInventory(),
-  ]);
+  const [{ data: plan, error: planError }, inventory, calendar] =
+    await Promise.all([
+      supabase
+        .from("daily_plans")
+        .select("id, work_date, status, intention, closed_at, end_of_day_step")
+        .eq("work_date", workDate)
+        .maybeSingle(),
+      getWorkInventory(),
+      getCalendarDay(workDate),
+    ]);
 
   if (planError) throw new Error("We couldn't load this daily plan.");
 
@@ -51,6 +54,7 @@ export async function getDailyPlanningData(workDate: string) {
     .lte("review_on", workDate);
 
   return {
+    calendar,
     dueFollowUps: dueFollowUps ?? 0,
     items,
     nextWorkDate,

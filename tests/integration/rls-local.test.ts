@@ -15,14 +15,21 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     const key =
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
       localEnvironment.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ??
+      localEnvironment.SUPABASE_SERVICE_ROLE_KEY;
 
     expect(url).toBeTruthy();
     expect(key).toBeTruthy();
+    expect(serviceKey).toBeTruthy();
 
     const clientA = createClient<Database>(url!, key!, {
       auth: { persistSession: false },
     });
     const clientB = createClient<Database>(url!, key!, {
+      auth: { persistSession: false },
+    });
+    const admin = createClient<Database>(url!, serviceKey!, {
       auth: { persistSession: false },
     });
     const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -52,6 +59,11 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     expect(workspacesA).toHaveLength(1);
     expect(workspacesB).toHaveLength(1);
     expect(workspacesA?.[0].id).not.toBe(workspacesB?.[0].id);
+
+    const { error: protectedCalendarReadError } = await clientA
+      .from("calendar_connections")
+      .select("id");
+    expect(protectedCalendarReadError).not.toBeNull();
 
     const { data: attemptedUpdate, error: attemptedUpdateError } = await clientB
       .from("workspaces")
@@ -390,5 +402,94 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
       body: "Waiting work was deliberately planned for tomorrow.",
       is_important: true,
     });
+
+    const { data: connection, error: connectionError } = await admin
+      .from("calendar_connections")
+      .insert({
+        access_token_encrypted: "server-only-access",
+        access_token_expires_at: "2026-08-01T12:00:00.000Z",
+        account_label: "work@example.com",
+        provider_account_id: "google-account-a",
+        refresh_token_encrypted: "server-only-refresh",
+        scopes: [
+          "https://www.googleapis.com/auth/calendar.events.readonly",
+          "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
+        ],
+        workspace_id: workspacesA![0].id,
+      })
+      .select("id")
+      .single();
+    expect(connectionError).toBeNull();
+
+    const { data: externalCalendar, error: externalCalendarError } = await admin
+      .from("external_calendars")
+      .insert({
+        calendar_connection_id: connection!.id,
+        is_primary: true,
+        is_selected: true,
+        name: "Work",
+        provider_calendar_id: "work@example.com",
+        time_zone: "America/Guatemala",
+        workspace_id: workspacesA![0].id,
+      })
+      .select("id")
+      .single();
+    expect(externalCalendarError).toBeNull();
+
+    const { error: meetingError } = await admin
+      .from("external_calendar_events")
+      .insert({
+        end_local_date: "2026-08-06",
+        ends_at: "2026-08-06T16:00:00.000Z",
+        event_type: "default",
+        external_calendar_id: externalCalendar!.id,
+        is_all_day: false,
+        provider_event_id: "meeting-1",
+        start_local_date: "2026-08-06",
+        starts_at: "2026-08-06T15:00:00.000Z",
+        title: "Weekly sync",
+        workspace_id: workspacesA![0].id,
+      });
+    expect(meetingError).toBeNull();
+
+    const { error: calendarOnlyPlanError } = await clientA.rpc(
+      "update_daily_plan_details",
+      {
+        chosen_intention: "Attend the scheduled meeting.",
+        chosen_mark_ready: true,
+        chosen_work_date: "2026-08-06",
+      },
+    );
+    const { error: otherWorkspaceCalendarPlanError } = await clientB.rpc(
+      "update_daily_plan_details",
+      {
+        chosen_intention: "No meeting belongs to this workspace.",
+        chosen_mark_ready: true,
+        chosen_work_date: "2026-08-06",
+      },
+    );
+    expect(calendarOnlyPlanError).toBeNull();
+    expect(otherWorkspaceCalendarPlanError).not.toBeNull();
+
+    const { error: protectedEventReadError } = await clientA
+      .from("external_calendar_events")
+      .select("title");
+    expect(protectedEventReadError).not.toBeNull();
+
+    const { error: googleOooError } = await admin
+      .from("non_working_days")
+      .insert({
+        allows_urgent_work: true,
+        kind: "out_of_office",
+        source: "google",
+        source_event_id: externalCalendar!.id + ":ooo-1",
+        work_date: "2026-08-10",
+        workspace_id: workspacesA![0].id,
+      });
+    const { data: afterOooWorkday } = await clientA.rpc("next_workday", {
+      chosen_after_date: "2026-08-07",
+    });
+    expect(googleOooError).toBeNull();
+    expect(afterOooWorkday).toBe("2026-08-11");
   });
 });

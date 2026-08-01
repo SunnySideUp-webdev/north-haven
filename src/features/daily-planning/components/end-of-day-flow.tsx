@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import { saveMeetingOutcomeAction } from "@/features/calendar-sync/actions";
+import type {
+  CalendarDayView,
+  CalendarMeetingView,
+} from "@/features/calendar-sync/types";
 import {
   applyEndOfDayOutcomeAction,
   finishEndOfDayAction,
@@ -45,6 +50,7 @@ export function EndOfDayFlow({
   workDate,
 }: {
   data: {
+    calendar: CalendarDayView;
     dayNote: { body: string; is_important: boolean } | null;
     followUps: {
       id: string;
@@ -57,6 +63,7 @@ export function EndOfDayFlow({
     nextPlan: { status: string } | null;
     nextWorkDate: string | null;
     plan: { status: string; end_of_day_step: number } | null;
+    timeZone: string;
   };
   initialStep: number;
   workDate: string;
@@ -208,6 +215,7 @@ export function EndOfDayFlow({
           ) : null}
           {step === 2 ? (
             <CloseToday
+              meetings={data.calendar.meetings}
               items={planned}
               nextDate={data.nextWorkDate}
               pending={pending}
@@ -219,6 +227,7 @@ export function EndOfDayFlow({
               workDate={workDate}
               unresolved={unresolved}
               onContinue={() => go(3)}
+              timeZone={data.timeZone}
             />
           ) : null}
           {step === 3 ? (
@@ -279,6 +288,7 @@ export function EndOfDayFlow({
 }
 
 function CloseToday({
+  meetings,
   items,
   nextDate,
   pending,
@@ -290,7 +300,9 @@ function CloseToday({
   workDate,
   unresolved,
   onContinue,
+  timeZone,
 }: {
+  meetings: CalendarMeetingView[];
   items: EodItem[];
   nextDate: string | null;
   pending: boolean;
@@ -302,6 +314,7 @@ function CloseToday({
   workDate: string;
   unresolved: number;
   onContinue: () => void;
+  timeZone: string;
 }) {
   return (
     <div>
@@ -314,6 +327,9 @@ function CloseToday({
           <OutcomeRow key={item.id} item={item} nextDate={nextDate} run={run} />
         ))}
       </div>
+      {meetings.length ? (
+        <MeetingReview meetings={meetings} run={run} timeZone={timeZone} />
+      ) : null}
       <div className="border-border mt-8 border-t pt-7">
         <label className="text-ink text-sm font-bold">
           Day note
@@ -353,6 +369,89 @@ function CloseToday({
     </div>
   );
 }
+
+function MeetingReview({
+  meetings,
+  run,
+  timeZone,
+}: {
+  meetings: CalendarMeetingView[];
+  run: Runner;
+  timeZone: string;
+}) {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone,
+  });
+  const options = [
+    ["attended", "Attended"],
+    ["did_not_attend", "Did not attend"],
+    ["cancelled", "Cancelled"],
+    ["not_applicable", "Not applicable"],
+  ] as const;
+
+  return (
+    <div className="border-blush-200 mt-8 border-t pt-7">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-ink text-base font-bold">Confirm meetings</h3>
+          <p className="text-muted mt-1 text-sm">
+            Past meetings start as probably attended. Confirm only what needs a
+            final outcome.
+          </p>
+        </div>
+        <span className="text-blush-600 text-sm font-bold">
+          {meetings.length}
+        </span>
+      </div>
+      <div className="mt-5 space-y-4">
+        {meetings.map((meeting) => (
+          <article
+            key={meeting.id}
+            className="border-blush-200 bg-blush-50 rounded-lg border p-5"
+          >
+            <div className="flex items-start justify-between gap-5">
+              <div>
+                <h4 className="text-ink text-sm font-bold">{meeting.title}</h4>
+                <p className="text-quiet mt-1 text-xs">
+                  {formatter.format(new Date(meeting.startsAt))} ·{" "}
+                  <span className="capitalize">
+                    {meeting.attendanceStatus.replaceAll("_", " ")}
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {options.map(([status, label]) => (
+                <button
+                  key={status}
+                  onClick={() =>
+                    run(() =>
+                      saveMeetingOutcomeAction({
+                        eventId: meeting.id,
+                        status,
+                      }),
+                    )
+                  }
+                  className={[
+                    "rounded-lg border px-3 py-2 text-xs font-bold",
+                    meeting.attendanceStatus === status
+                      ? "border-blush-300 bg-blush-100 text-blush-600"
+                      : "border-border bg-paper text-muted",
+                  ].join(" ")}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function OutcomeRow({
   item,
   nextDate,

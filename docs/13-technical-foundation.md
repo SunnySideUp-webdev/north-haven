@@ -53,16 +53,16 @@ Sharp use explicit security-fixed overrides. `npm audit` must remain clean.
 
 ## Foundation boundaries
 
-The current Today data is synthetic and exists only to validate layout,
-accessibility, routes, and tests. It is not a mock persistence architecture.
-The next increment replaces it through feature-owned queries after
-authentication and a local Supabase session are active.
+The original synthetic Today reference remains in the repository for visual
+unit coverage, but the active Today route now uses authenticated, persisted
+Daily Plan and Google Calendar query modules.
 
 Supabase clients validate their environment only when called. Authentication
 routes are active locally and require a configured URL plus publishable key.
 
-Google Calendar variables are reserved but unused. Calendar remains an optional
-enhancement and cannot block local planning.
+Google Calendar now has protected OAuth, sync, meeting, and OOO application
+layers. The live corporate OAuth feasibility check remains pending. Calendar is
+still optional and cannot block local planning.
 
 ## Work Inventory increment completed
 
@@ -73,13 +73,11 @@ implementation is recorded in `docs/14-work-inventory-implementation.md`.
 
 ## Remaining foundation hardening
 
-1. Replace the remaining synthetic Today schedule values with authenticated
-   data.
-2. Establish a hosted development Supabase project and protected environment
+1. Establish a hosted development Supabase project and protected environment
    variables before deployment.
-3. Exercise email delivery and password recovery against the hosted development
+2. Exercise email delivery and password recovery against the hosted development
    environment.
-4. Document and test backup and migration recovery procedures.
+3. Document and test backup and migration recovery procedures.
 
-Docker Desktop and the local Supabase stack are now operational. This increment
-does not require Google Calendar credentials.
+Docker Desktop and the local Supabase stack are operational. Google Calendar
+credentials are required only for the live corporate feasibility check.

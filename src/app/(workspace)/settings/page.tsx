@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { CalendarConnectionSettings } from "@/features/calendar-sync/components/calendar-connection-settings";
+import { getCalendarSettings } from "@/features/calendar-sync/queries";
 import { TicketTypeSettings } from "@/features/work-items/components/ticket-type-settings";
 import { getManagedTicketTypes } from "@/features/work-items/queries";
 import { PageHeader } from "@/shared/ui/page-header";
@@ -15,8 +17,16 @@ const sections = [
   "Security",
 ];
 
-export default async function SettingsPage() {
-  const ticketTypes = await getManagedTicketTypes();
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ calendar?: string }>;
+}) {
+  const [{ calendar }, ticketTypes, calendarSettings] = await Promise.all([
+    searchParams,
+    getManagedTicketTypes(),
+    getCalendarSettings(),
+  ]);
 
   return (
     <>
@@ -46,13 +56,17 @@ export default async function SettingsPage() {
           </nav>
         </aside>
         <div className="space-y-7">
+          <CalendarConnectionSettings
+            resultCode={calendar}
+            settings={calendarSettings}
+          />
           <TicketTypeSettings ticketTypes={ticketTypes} />
           <section className="border-border/70 bg-paper rounded-xl border p-7">
             <h2 className="text-ink text-base font-bold">More settings</h2>
             <p className="text-muted mt-2 text-sm leading-6">
-              Profile, schedule, calendar, privacy, and security controls remain
-              protected by the existing setup and will be expanded in their
-              planned phases.
+              Profile, schedule, privacy, and security controls remain protected
+              by the existing setup and will be expanded in their planned
+              phases.
             </p>
           </section>
         </div>

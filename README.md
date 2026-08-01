@@ -11,14 +11,14 @@ Spanish.
 
 ## Current phase
 
-The core Phase 4 Work Inventory and Phase 5 Daily Planning experiences are
-implemented. The repository contains the Next.js
-application shell, approved visual tokens, an initial Today implementation,
-Supabase authentication, private workspace provisioning, first-time setup, and
-the first production-shaped Tickets, Tasks, and Reminders vertical slice.
+The core Work Inventory, Daily Planning, End of Day, and read-only Google
+Calendar application layers are implemented. The repository contains real
+persisted Today and Plan data, Supabase authentication, private workspace
+provisioning, Tickets, Tasks, Reminders, meetings, official OOO handling, and
+protected Google OAuth routes.
 
-The Today screen currently uses synthetic foundation data. No customer data,
-production credentials, or Google tokens are present.
+The live corporate OAuth feasibility check is pending. No customer data,
+production credentials, or Google tokens are committed.
 
 ## Local setup
 
@@ -41,6 +41,18 @@ in and authenticated users to Setup or Today.
 
 Copy `.env.example` to `.env.local` and replace the placeholders with local or
 hosted project values. Never commit `.env.local`.
+
+For the live Google Calendar check, configure a Google Cloud Web application
+OAuth client with this exact local redirect URI:
+
+```text
+http://127.0.0.1:3000/api/google-calendar/callback
+```
+
+The ignored local environment then needs the client ID, client secret, a local
+Supabase service-role key, and a base64-encoded 32-byte token-encryption key.
+Generate the encryption key with `openssl rand -base64 32`. Keep every value
+server-only.
 
 Run the local database and reproduce its schema with:
 
@@ -126,3 +138,4 @@ Reassess these pins when the project moves to Node 22.
 - [Technical foundation](docs/13-technical-foundation.md)
 - [Work Inventory implementation](docs/14-work-inventory-implementation.md)
 - [Daily Planning implementation](docs/15-daily-planning-implementation.md)
+- [Google Calendar implementation](docs/16-google-calendar-implementation.md)
