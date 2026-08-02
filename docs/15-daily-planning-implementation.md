@@ -39,8 +39,8 @@ Plan now provides:
 - non-blocking capacity guidance beginning at nine actionable items
 - Draft autosave after selection or ordering changes
 - Mark Ready validation requiring at least one item
-- previous and next workday navigation that respects schedule and non-working
-  dates
+- previous and next planning-date navigation that respects the work schedule,
+  includes OOO weekdays, and skips holidays or manually blocked dates
 - visible work schedule, meeting count, due follow-ups, and current plan state
 - Suggested, Urgent, Oldest, Waiting, Watching, and Unplanned saved filters
 - additional type, ticket type, priority, operational, tracking, backup,

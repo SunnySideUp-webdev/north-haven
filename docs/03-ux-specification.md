@@ -87,8 +87,8 @@ explicitly labeled.
 - **Ready:** display the approved order.
 - **Closed:** display the completed summary and allow corrections through
   `Reopen day` with confirmation.
-- **OOO:** display `You are out of office today` and a secondary `Add urgent
-  work` action.
+- **OOO:** display `You are out of office today` while keeping the standard
+  `Plan this day` action available.
 - **Calendar stale:** retain cached meetings and show the last successful sync.
 
 ### Acceptance criteria
@@ -131,8 +131,8 @@ explicitly labeled.
 - Position controls move an item up or down; no drag-and-drop is required.
 - Tasks and reminders can be created inline.
 - Synced meetings appear automatically and are not manually selected.
-- Selecting a date with a full-day OOO event requires confirmation before
-  adding urgent work.
+- Selecting a date with a full-day OOO event keeps the normal planning controls
+  available and requires no confirmation.
 
 ### Capacity warning
 
@@ -147,8 +147,9 @@ The warning never disables `Mark ready`.
 
 - Marking Ready requires at least one actionable item or one meeting.
 - A Draft plan autosaves after every selection and order change.
-- The next workday skips weekends, full-day OOO events, and manual non-working
-  days.
+- Previous/Next in Plan includes OOO weekdays and skips holidays or manually
+  blocked dates. End of Day continues to skip OOO when choosing its next
+  required workday.
 - Changing a Ready plan returns it to Draft until reconfirmed.
 
 ## End of Day

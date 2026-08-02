@@ -30,7 +30,10 @@
   exact local midnight to midnight. Partial lunch and outside-work OOO blocks
   never suppress the workday.
 - Normal schedule is Monday-Friday, 8:00 AM-5:00 PM.
-- Urgent work can be added explicitly to an OOO date.
+- OOO is informational inside Plan, not a planning restriction. Work can be
+  added, edited, reordered, and marked Ready on an OOO date.
+- End of Day still skips full-day OOO dates when proposing the next workday, so
+  an absence never becomes a required plan.
 - Meetings default to Probably Attended after ending and are confirmed during
   End of Day.
 - Google Calendar remains the only meeting source for the personal launch.

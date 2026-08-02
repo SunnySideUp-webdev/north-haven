@@ -249,7 +249,7 @@ Useful events include:
 - Plan tomorrow and mark Ready
 - Start Today and finish work
 - Complete End of Day without automatic rollover
-- Display OOO and allow explicit urgent work
+- Display OOO as planning context without disabling normal plan operations
 - Disconnect and reconnect Google Calendar
 - Export a weekly PDF and a monthly CSV without detailed ticket content
 

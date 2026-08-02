@@ -1270,7 +1270,15 @@ export type Database = {
         Args: { chosen_direction: number; target_ticket_type_id: string };
         Returns: undefined;
       };
+      next_plannable_date: {
+        Args: { chosen_after_date: string };
+        Returns: string;
+      };
       next_workday: { Args: { chosen_after_date: string }; Returns: string };
+      previous_plannable_date: {
+        Args: { chosen_before_date: string };
+        Returns: string;
+      };
       previous_workday: {
         Args: { chosen_before_date: string };
         Returns: string;

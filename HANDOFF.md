@@ -102,6 +102,8 @@ calendar.
 - Draft and Ready states, intention, and calm capacity guidance above eight items
 - Authenticated Today data that hides unplanned inventory and records progress
 - Work logs and next-workday calculation that skips weekends/non-working dates
+- Separate Plan navigation that includes OOO weekdays while continuing to skip
+  holidays and manually blocked dates
 - Corrected Work search shortcut layout without overlap
 - Four-step, resumable End of Day flow with persistent progress and day notes
 - Explicit Done, Return, Deferred, Watching, and No Longer Needed outcomes
@@ -305,8 +307,11 @@ visually reviewed. They contain no customer information and can be removed with
   complete local date.
 - Google all-day records and exact local midnight-to-midnight OOO records count
   as full-day; lunch and outside-work OOO blocks remain partial.
-- Full-day OOO dates are skipped when calculating the next workday.
-- Urgent work can still be explicitly added to an OOO date.
+- Full-day OOO dates are skipped when End of Day proposes the next workday.
+- Plan treats OOO as context rather than a lock: work can be added, modified,
+  reordered, and marked Ready on an OOO date.
+- Previous/Next Plan navigation includes OOO weekdays while continuing to skip
+  holidays and manually blocked dates.
 - Calendar failure must never block manual ticket planning.
 
 ### Calendar and Insights

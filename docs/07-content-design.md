@@ -105,10 +105,10 @@ Actions: `Plan Today`, `View Work Inventory`
 
 Title: `You are out of office today.`
 
-Body: `North Haven will use your next available workday unless you add urgent
-work.`
+Body: `Your OOO status stays visible, and planning remains fully available
+whenever you need it.`
 
-Action: `Add Urgent Work`
+Action: `Plan This Day`
 
 ### Empty inventory
 

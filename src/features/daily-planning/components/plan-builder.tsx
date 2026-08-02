@@ -51,8 +51,8 @@ export function PlanBuilder({
     calendar: CalendarDayView;
     dueFollowUps: number;
     items: PlanningItem[];
-    nextWorkDate: string | null;
-    previousWorkDate: string | null;
+    nextPlanningDate: string | null;
+    previousPlanningDate: string | null;
     plan: { id: string; status: string; intention: string | null } | null;
     schedule: {
       starts_at_local: string;
@@ -309,9 +309,9 @@ export function PlanBuilder({
             </div>
           </dl>
           <div className="mt-7 flex items-center justify-between text-sm font-bold">
-            {data.previousWorkDate ? (
+            {data.previousPlanningDate ? (
               <Link
-                href={`/plan?date=${data.previousWorkDate}`}
+                href={`/plan?date=${data.previousPlanningDate}`}
                 className="text-lavender-700"
               >
                 ← Previous
@@ -319,9 +319,9 @@ export function PlanBuilder({
             ) : (
               <span />
             )}
-            {data.nextWorkDate ? (
+            {data.nextPlanningDate ? (
               <Link
-                href={`/plan?date=${data.nextWorkDate}`}
+                href={`/plan?date=${data.nextPlanningDate}`}
                 className="text-lavender-700"
               >
                 Next →
@@ -332,9 +332,8 @@ export function PlanBuilder({
         <main className="space-y-7">
           {data.calendar.isOutOfOffice ? (
             <div className="bg-lavender-100 text-lavender-700 rounded-xl px-6 py-5 text-sm">
-              <strong>This is an Out of Office day.</strong> North Haven
-              normally skips it when proposing work. You can still plan urgent
-              work here explicitly.
+              <strong>This date is marked Out of Office.</strong> Planning stays
+              fully available—you can add, edit, and organize work as usual.
             </div>
           ) : null}
           {data.calendar.connection &&

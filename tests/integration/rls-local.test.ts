@@ -764,8 +764,37 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     const { data: afterOooWorkday } = await clientA.rpc("next_workday", {
       chosen_after_date: "2026-08-07",
     });
+    const { data: afterOooPlanningDate } = await clientA.rpc(
+      "next_plannable_date",
+      { chosen_after_date: "2026-08-07" },
+    );
+    const { data: beforeTuesdayPlanningDate } = await clientA.rpc(
+      "previous_plannable_date",
+      { chosen_before_date: "2026-08-11" },
+    );
     expect(googleOooError).toBeNull();
     expect(afterOooWorkday).toBe("2026-08-11");
+    expect(afterOooPlanningDate).toBe("2026-08-10");
+    expect(beforeTuesdayPlanningDate).toBe("2026-08-10");
+
+    const { error: oooPlanSelectionError } = await clientA.rpc(
+      "set_plan_item_selected",
+      {
+        chosen_selected: true,
+        chosen_work_date: "2026-08-10",
+        target_work_item_id: taskId!,
+      },
+    );
+    const { error: oooPlanReadyError } = await clientA.rpc(
+      "update_daily_plan_details",
+      {
+        chosen_intention: "Keep the day intentionally light.",
+        chosen_mark_ready: true,
+        chosen_work_date: "2026-08-10",
+      },
+    );
+    expect(oooPlanSelectionError).toBeNull();
+    expect(oooPlanReadyError).toBeNull();
 
     const { data: backupData, error: backupError } = await clientA.rpc(
       "create_workspace_backup",
@@ -814,7 +843,7 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     expect(restoreResult).toMatchObject({
       calendar_outcomes_applied: 1,
       calendar_outcomes_waiting: 0,
-      daily_plans: 3,
+      daily_plans: 4,
       work_items: 3,
     });
 

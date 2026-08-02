@@ -74,8 +74,8 @@ Settings provides connection state, the connected account label, calendar
 selection, last successful sync, Sync now, reconnect, and confirmed disconnect.
 
 Plan shows meetings automatically, excludes them from capacity, allows a
-meeting-only plan to become Ready, and explains explicit urgent planning on an
-OOO day.
+meeting-only plan to become Ready, and keeps normal planning available on an
+OOO day while preserving the absence indicator.
 
 Today shows meeting times and Google links, keeps action-item progress separate
 from meetings, and presents OOO or stale-calendar states without hiding the

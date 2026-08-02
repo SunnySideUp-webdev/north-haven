@@ -95,7 +95,7 @@ export function DailyToday({
             </h2>
             <p className="text-muted mt-3 max-w-lg text-sm leading-6">
               {data.calendar.isOutOfOffice
-                ? "North Haven will skip this date when proposing your next workday. You can still add urgent work."
+                ? "Your OOO status stays visible, and planning remains fully available whenever you need it."
                 : "Choose a few items from your work inventory to create a clear plan."}
             </p>
             <div className="mt-7 flex gap-3">
@@ -103,9 +103,7 @@ export function DailyToday({
                 href={"/plan?date=" + workDate}
                 className="bg-lavender-700 rounded-lg px-6 py-3 text-sm font-bold text-white"
               >
-                {data.calendar.isOutOfOffice
-                  ? "Plan urgent work anyway"
-                  : "Plan today"}
+                Plan this day
               </Link>
               <Link
                 href="/work"

@@ -82,10 +82,11 @@ calendar never changes locally entered work or blocks End of Day.
 - A full-day Google `outOfOffice` event marks the date as non-working. This
   includes provider all-day records and exact local midnight-to-midnight
   intervals, but not partial OOO blocks.
-- Plan skips that date when proposing the next workday.
-- The message names both the OOO date and the proposed next workday.
-- `Plan urgent work anyway` is always available but requires an explicit click.
-- Manually planning urgent work does not remove or alter the Google event.
+- Plan navigation includes the date and keeps every planning control available.
+- The OOO message is informational and does not require confirmation.
+- Adding, editing, reordering, or marking a plan Ready does not remove or alter
+  the Google event.
+- End of Day still skips OOO when proposing the next required workday plan.
 
 ## Capacity reminder
 

@@ -129,11 +129,12 @@ navigation destination.
 - An official Google `outOfOffice` event marks each complete local date
   non-working. Complete coverage may arrive as an all-day record or an exact
   local midnight-to-midnight interval.
-- Non-working dates are skipped when choosing the next workday.
+- End of Day skips OOO dates when choosing the next required workday.
 - A partially covered date remains a workday and displays the OOO interval.
-- The user can explicitly add urgent work to a non-working date.
-- Capacity warnings are suppressed on OOO days; the interface instead confirms
-  the exceptional plan.
+- Plan navigation includes OOO weekdays, and all normal add, edit, reorder, and
+  Ready controls remain available without confirmation.
+- Holidays and manually blocked dates remain excluded from Previous/Next Plan
+  navigation but can still be reached deliberately through the date picker.
 - If Google is disconnected, existing OOO records remain visible with a stale
   indicator until reconnection.
 

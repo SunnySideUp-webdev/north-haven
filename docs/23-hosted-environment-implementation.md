@@ -11,7 +11,7 @@ available and the owner's existing Netlify deployment is not changed.
 
 `North Haven Development` was created in the Tokki organization on the Free
 plan in East US (North Virginia). The repository is linked through the Supabase
-CLI, all 20 reviewed migrations were applied successfully, and a subsequent
+CLI, all 21 reviewed migrations were applied successfully, and a subsequent
 remote dry run reports that the database is up to date. No demo seed or customer
 data was applied.
 

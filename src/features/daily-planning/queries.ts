@@ -53,11 +53,19 @@ export async function getDailyPlanningData(workDate: string) {
       planItem: selectedByWorkId.get(item.id!) ?? null,
     }));
 
-  const [{ data: nextWorkDate }, { data: previousWorkDate }] =
-    await Promise.all([
-      supabase.rpc("next_workday", { chosen_after_date: workDate }),
-      supabase.rpc("previous_workday", { chosen_before_date: workDate }),
-    ]);
+  const [
+    { data: nextWorkDate },
+    { data: previousWorkDate },
+    { data: nextPlanningDate },
+    { data: previousPlanningDate },
+  ] = await Promise.all([
+    supabase.rpc("next_workday", { chosen_after_date: workDate }),
+    supabase.rpc("previous_workday", { chosen_before_date: workDate }),
+    supabase.rpc("next_plannable_date", { chosen_after_date: workDate }),
+    supabase.rpc("previous_plannable_date", {
+      chosen_before_date: workDate,
+    }),
+  ]);
   const { count: dueFollowUps } = await supabase
     .from("follow_ups")
     .select("id", { count: "exact", head: true })
@@ -68,7 +76,9 @@ export async function getDailyPlanningData(workDate: string) {
     calendar,
     dueFollowUps: dueFollowUps ?? 0,
     items,
+    nextPlanningDate,
     nextWorkDate,
+    previousPlanningDate,
     previousWorkDate,
     plan,
     schedule,
