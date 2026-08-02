@@ -11,6 +11,7 @@ import {
   type ReportPeriod,
   type ReportView,
 } from "@/features/reporting/reports";
+import { formatTicketNumber } from "@/shared/ticket-number";
 
 const entryStorageKey = "north-haven:report-entry";
 
@@ -352,7 +353,8 @@ function PdfPreview({ report }: { report: ReportView }) {
           <ul className="mt-3 divide-y">
             {report.ticketDetails.map((ticket) => (
               <li key={ticket.ticketNumber} className="py-3 text-xs">
-                <strong>{ticket.ticketNumber}</strong> · {ticket.title}
+                <strong>{formatTicketNumber(ticket.ticketNumber)}</strong> ·{" "}
+                {ticket.title}
                 <span className="text-muted mt-1 block">
                   Worked {ticket.workDates.map(shortDate).join(", ")}
                 </span>
@@ -390,7 +392,9 @@ function PdfPreview({ report }: { report: ReportView }) {
                 className="py-3 text-xs"
               >
                 <strong>
-                  {followUp.ticketNumber ? `${followUp.ticketNumber} · ` : ""}
+                  {followUp.ticketNumber
+                    ? `${formatTicketNumber(followUp.ticketNumber)} · `
+                    : ""}
                   {followUp.title}
                 </strong>
                 <span className="text-muted mt-1 block">

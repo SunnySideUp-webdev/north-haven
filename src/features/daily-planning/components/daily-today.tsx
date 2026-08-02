@@ -7,6 +7,7 @@ import { useTransition } from "react";
 import type { CalendarDayView } from "@/features/calendar-sync/types";
 import { setPlanItemDoneAction } from "@/features/daily-planning/actions";
 import type { WorkInventoryRow } from "@/features/work-items/types";
+import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
 
 type TodayItem = WorkInventoryRow & {
@@ -264,7 +265,7 @@ export function DailyToday({
                         <div className="min-w-0 flex-1">
                           <h3 className={titleClassName}>
                             {item.ticket_number
-                              ? item.ticket_number + " · "
+                              ? formatTicketNumber(item.ticket_number) + " · "
                               : ""}
                             {item.title}
                           </h3>

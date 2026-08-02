@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { formatTicketNumber } from "@/shared/ticket-number";
+
 type SearchResult = {
   id: string;
   kind: string;
@@ -163,7 +165,9 @@ export function GlobalSearch() {
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-ink truncate text-sm font-bold">
-                      {result.ticket_number ? `${result.ticket_number} · ` : ""}
+                      {result.ticket_number
+                        ? `${formatTicketNumber(result.ticket_number)} · `
+                        : ""}
                       {result.title}
                     </p>
                     <p className="text-quiet mt-1 text-xs">

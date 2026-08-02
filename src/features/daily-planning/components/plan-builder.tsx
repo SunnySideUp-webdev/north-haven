@@ -12,6 +12,7 @@ import {
 } from "@/features/daily-planning/actions";
 import { shouldShowCapacityReminder } from "@/features/daily-planning/capacity";
 import type { WorkInventoryRow } from "@/features/work-items/types";
+import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
 
 type PlanningItem = WorkInventoryRow & {
@@ -459,7 +460,9 @@ export function PlanBuilder({
                     </button>
                     <div className="min-w-0 flex-1">
                       <p className="text-ink truncate text-sm font-bold">
-                        {item.ticket_number ? `${item.ticket_number} · ` : ""}
+                        {item.ticket_number
+                          ? `${formatTicketNumber(item.ticket_number)} · `
+                          : ""}
                         {item.title}
                       </p>
                       <p className="text-quiet mt-1 text-xs capitalize">
@@ -690,7 +693,9 @@ export function PlanBuilder({
                   />
                   <div>
                     <p className="text-ink text-sm font-bold">
-                      {item.ticket_number ? `${item.ticket_number} · ` : ""}
+                      {item.ticket_number
+                        ? `${formatTicketNumber(item.ticket_number)} · `
+                        : ""}
                       {item.title}
                     </p>
                     <p className="text-quiet mt-1 text-xs capitalize">

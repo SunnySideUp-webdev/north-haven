@@ -21,6 +21,7 @@ import {
   type PlanningActionResult,
 } from "@/features/daily-planning/actions";
 import type { WorkInventoryRow } from "@/features/work-items/types";
+import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
 
 type EodItem = WorkInventoryRow & {
@@ -344,7 +345,7 @@ export function EndOfDayFlow({
                       href={`/work/${item.id}/edit`}
                       className="border-border flex rounded-lg border px-5 py-4 text-sm font-bold"
                     >
-                      {item.ticket_number} · {item.title}
+                      {formatTicketNumber(item.ticket_number!)} · {item.title}
                       <span className="text-lavender-700 ml-auto">Review</span>
                     </Link>
                   ))}
@@ -489,7 +490,9 @@ function EodNextPlan({
                   href={`/work/${item.id}`}
                   className="text-ink text-sm font-bold"
                 >
-                  {item.ticket_number ? `${item.ticket_number} · ` : ""}
+                  {item.ticket_number
+                    ? `${formatTicketNumber(item.ticket_number)} · `
+                    : ""}
                   {item.title}
                 </Link>
               </div>
@@ -539,7 +542,9 @@ function EodNextPlan({
                 className="border-lavender-300 h-6 w-6 rounded border"
               />
               <p className="text-ink text-sm font-bold">
-                {item.ticket_number ? `${item.ticket_number} · ` : ""}
+                {item.ticket_number
+                  ? `${formatTicketNumber(item.ticket_number)} · `
+                  : ""}
                 {item.title}
               </p>
             </div>
@@ -770,7 +775,9 @@ function OutcomeRow({
       <div className="flex items-center">
         <div>
           <p className="text-ink text-sm font-bold">
-            {item.ticket_number ? `${item.ticket_number} · ` : ""}
+            {item.ticket_number
+              ? `${formatTicketNumber(item.ticket_number)} · `
+              : ""}
             {item.title}
           </p>
           <p className="text-quiet mt-1 text-xs capitalize">

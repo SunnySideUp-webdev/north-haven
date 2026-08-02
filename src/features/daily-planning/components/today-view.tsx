@@ -2,6 +2,7 @@ import type {
   FoundationPlan,
   PlannedWorkItem,
 } from "@/features/daily-planning/types";
+import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
 
 function formatWorkDate(date: Date) {
@@ -20,7 +21,7 @@ function WorkRow({
   featured?: boolean;
 }) {
   const displayTitle = item.ticketNumber
-    ? `#${item.ticketNumber} · ${item.title}`
+    ? `${formatTicketNumber(item.ticketNumber)} · ${item.title}`
     : item.title;
 
   return (

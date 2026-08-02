@@ -14,6 +14,7 @@ import {
   getWorkItemActivity,
   getDefaultPlanDate,
 } from "@/features/work-items/queries";
+import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
 
 export const metadata: Metadata = { title: "Work details" };
@@ -57,7 +58,7 @@ export default async function WorkItemPage({
         backLink={{ href: "/work", label: "Work inventory" }}
         title={
           item.ticket_number
-            ? `${item.ticket_number} · ${item.title}`
+            ? `${formatTicketNumber(item.ticket_number)} · ${item.title}`
             : (item.title ?? "Work item")
         }
         titleSize="compact"

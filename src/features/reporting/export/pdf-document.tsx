@@ -18,6 +18,7 @@ import {
   reportTitle,
   type ReportView,
 } from "@/features/reporting/reports";
+import { formatTicketNumber } from "@/shared/ticket-number";
 
 Font.register({
   family: "DM Sans",
@@ -529,7 +530,7 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
                 wrap={false}
               >
                 <Text style={styles.detailTitle}>
-                  {ticket.ticketNumber} · {ticket.title}
+                  {formatTicketNumber(ticket.ticketNumber)} · {ticket.title}
                 </Text>
                 <Text style={styles.detailMeta}>
                   Worked {ticket.workDates.map(shortDate).join(", ")}
@@ -564,7 +565,9 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
                 wrap={false}
               >
                 <Text style={styles.detailTitle}>
-                  {followUp.ticketNumber ? `${followUp.ticketNumber} · ` : ""}
+                  {followUp.ticketNumber
+                    ? `${formatTicketNumber(followUp.ticketNumber)} · `
+                    : ""}
                   {followUp.title}
                 </Text>
                 <Text style={styles.detailMeta}>

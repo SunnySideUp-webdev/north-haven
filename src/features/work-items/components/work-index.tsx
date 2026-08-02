@@ -11,6 +11,7 @@ import {
 } from "@/features/work-items/actions";
 import { formatDate, formatDateTime } from "@/features/work-items/date";
 import type { WorkInventoryRow } from "@/features/work-items/types";
+import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
 
 type SavedView =
@@ -475,7 +476,7 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
                             className="text-ink hover:text-lavender-700 block font-bold"
                           >
                             {item.ticket_number
-                              ? `${item.ticket_number} · `
+                              ? `${formatTicketNumber(item.ticket_number)} · `
                               : ""}
                             {item.title}
                           </Link>
