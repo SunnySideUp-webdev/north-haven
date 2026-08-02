@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 import type { AuthFormState } from "@/features/auth/types";
+import { getCreateAccountErrorMessage } from "@/features/auth/error-messages";
 import {
   createAccountSchema,
   emailSchema,
@@ -82,9 +83,7 @@ export async function createAccountAction(
   });
 
   if (error) {
-    return invalidForm(
-      "We couldn't create the account. Review the details and try again.",
-    );
+    return invalidForm(getCreateAccountErrorMessage(error.code));
   }
 
   if (!data.session) {

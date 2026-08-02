@@ -182,25 +182,41 @@ calendar.
 - Hosted `North Haven Development` Supabase project in the Tokki organization,
   East US (North Virginia), linked to the repository with all 19 reviewed
   migrations applied and no demo or customer data
+- Production Vercel project deployed in the Tokki team at
+  `https://north-haven-steel.vercel.app`, with the stable domain aliased and
+  public smoke coverage passing
+- Supabase production and preview variables corrected through the Vercel CLI;
+  the browser uses the default publishable key and server-only administration
+  uses the legacy `service_role` key
+- Production signup failures traced to Supabase's built-in two-auth-emails-per-
+  hour allowance rather than invalid user credentials or a database failure
+- Account creation now translates the Supabase email-rate-limit code into a
+  calm, actionable message instead of a generic signup error
 
 ### Pending or not started
 
-- Phase 7.5D Vercel deployment and hosted acceptance run
-- Hosted environment variables, redirects, password recovery, and production
-  Google Calendar callback validation
+- Complete the authenticated portion of the Phase 7.5D hosted acceptance run
+  after the built-in Supabase email allowance refills
+- Confirm the owner's production signup email, finish first-time setup, and
+  verify hosted session restoration
+- Verify hosted password recovery in a separate email-rate-limit window
+- Validate the production Google Calendar callback and one read-only corporate
+  calendar sync
 - Phase 8 hardening and personal launch
 
-Application code, local real-calendar validation, and the empty hosted database
-schema now exist. Production data, hosted authentication acceptance, production
-Google credentials, and Vercel deployment configuration are not connected.
+Application code, local real-calendar validation, the hosted database schema,
+and the Vercel production deployment now exist. No customer data has been
+entered. Hosted owner authentication and production Google Calendar acceptance
+remain to be completed.
 
 ### Next step
 
-Continue Phase 7.5D by importing North Haven into the owner's Tokki Vercel team,
-configuring protected environment values and redirects, and running the
-cleanup-safe hosted acceptance path. Production
-Google Calendar consent is verified only after the stable Vercel production URL
-is registered. The exact sequence is in
+Continue Phase 7.5D after the Supabase email allowance refills: create and
+confirm the owner's account at the stable production URL, complete setup, then
+run the remaining cleanup-safe hosted acceptance checks without consuming the
+signup and password-recovery emails in the same one-hour window. Production
+Google Calendar consent is verified only after its stable Vercel origin and
+callback are registered. The exact sequence is in
 `docs/23-hosted-environment-implementation.md`. The completed reporting, Settings, and recovery
 implementations are documented in
 `docs/17-retrospective-calendar-implementation.md`,
