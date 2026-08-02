@@ -45,7 +45,7 @@ export async function getDailyPlanningData(workDate: string) {
     await supabase
       .from("daily_plan_items")
       .select(
-        "work_item_id, execution_status, daily_plans!inner(work_date, status)",
+        "work_item_id, execution_status, daily_plans!daily_plan_items_daily_plan_id_workspace_id_fkey!inner(work_date, status)",
       )
       .neq("daily_plans.work_date", workDate)
       .neq("daily_plans.status", "closed")

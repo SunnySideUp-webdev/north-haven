@@ -26,7 +26,9 @@ export async function setPlanSelectionAction(input: {
     const { data: existingPlanItems, error: existingPlanItemsError } =
       await supabase
         .from("daily_plan_items")
-        .select("id, daily_plans!inner(work_date, status)")
+        .select(
+          "id, daily_plans!daily_plan_items_daily_plan_id_workspace_id_fkey!inner(work_date, status)",
+        )
         .eq("work_item_id", result.data.workItemId)
         .neq("daily_plans.work_date", result.data.workDate)
         .neq("daily_plans.status", "closed")
