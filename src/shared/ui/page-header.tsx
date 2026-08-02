@@ -40,9 +40,14 @@ export function PageHeader({
           {backLink ? (
             <Link
               href={backLink.href}
-              className="border-lavender-300 bg-paper/80 text-lavender-700 hover:bg-paper inline-flex min-h-10 items-center rounded-lg border px-3.5 text-sm font-bold"
+              className="group text-lavender-700 hover:text-ink inline-flex items-center text-sm font-bold transition-colors"
             >
-              <span aria-hidden="true">←</span>
+              <span
+                aria-hidden="true"
+                className="transition-transform group-hover:-translate-x-0.5"
+              >
+                ←
+              </span>
               <span className="ml-2">{backLink.label}</span>
             </Link>
           ) : null}
