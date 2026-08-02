@@ -70,8 +70,9 @@ The PDF includes:
 - generation time, workspace time zone, and page numbers
 - optional detail sections that wrap onto additional pages
 
-All content remains selectable text. Charts also include text summaries and do
-not rely on color alone.
+All content remains selectable text. The weekly chart uses weekday labels plus
+per-day Worked/Resolved totals with matching color swatches beneath each bar, so
+the PDF does not rely on color alone or a dense paragraph legend.
 
 ## Data CSV
 

@@ -141,37 +141,61 @@ function TrendPreview({ report }: { report: ReportView }) {
           <span className="bg-blush-200 h-2.5 w-2.5" /> Resolved
         </span>
       </div>
-      <div className="border-border mt-4 flex h-40 items-end gap-5 border-b px-3">
+      <div className="mt-4 flex items-end gap-5 px-3">
         {report.daily.map((day) => {
           const total = day.ticketsWorked + day.ticketsResolved;
           return (
             <div
               key={day.workDate}
-              className="flex h-full min-w-8 flex-1 flex-col items-center justify-end"
+              className="flex min-w-8 flex-1 flex-col items-center"
             >
-              <div
-                className="flex w-8 flex-col justify-end overflow-hidden rounded-t-sm"
-                style={{
-                  height: `${Math.max(total ? 8 : 1, (total / max) * 75)}%`,
-                }}
-                aria-hidden="true"
-              >
+              <div className="border-border flex h-40 w-full items-end justify-center border-b">
                 <span
-                  className="bg-lavender-300"
+                  className="flex w-8 flex-col justify-end overflow-hidden rounded-t-sm"
                   style={{
-                    height: `${total ? (day.ticketsWorked / total) * 100 : 100}%`,
+                    height: `${Math.max(total ? 8 : 1, (total / max) * 75)}%`,
                   }}
-                />
-                <span
-                  className="bg-blush-200"
-                  style={{
-                    height: `${total ? (day.ticketsResolved / total) * 100 : 0}%`,
-                  }}
-                />
+                  aria-hidden="true"
+                >
+                  <span
+                    className="bg-lavender-300"
+                    style={{
+                      height: `${total ? (day.ticketsWorked / total) * 100 : 100}%`,
+                    }}
+                  />
+                  <span
+                    className="bg-blush-200"
+                    style={{
+                      height: `${total ? (day.ticketsResolved / total) * 100 : 0}%`,
+                    }}
+                  />
+                </span>
               </div>
-              <span className="text-quiet mt-2 pb-2 text-[10px]">
+              <span className="text-quiet mt-2 text-[10px] font-bold">
                 {weekday(day.workDate)}
               </span>
+              <dl
+                className="mt-1.5 grid gap-1 text-[10px]"
+                aria-label={`${weekday(day.workDate)} activity totals`}
+              >
+                <div className="flex justify-center">
+                  <dt className="sr-only">Worked</dt>
+                  <dd className="text-muted flex min-w-7 items-center gap-1">
+                    <span
+                      className="bg-lavender-300 h-2 w-2"
+                      aria-hidden="true"
+                    />
+                    {day.ticketsWorked}
+                  </dd>
+                </div>
+                <div className="flex justify-center">
+                  <dt className="sr-only">Resolved</dt>
+                  <dd className="text-muted flex min-w-7 items-center gap-1">
+                    <span className="bg-blush-200 h-2 w-2" aria-hidden="true" />
+                    {day.ticketsResolved}
+                  </dd>
+                </div>
+              </dl>
             </div>
           );
         })}

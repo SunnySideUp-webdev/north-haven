@@ -83,7 +83,9 @@ CSV unless explicitly selected.
 - Removes application navigation and interactive controls
 - Includes report period, generation time, time zone, and page number
 - Includes a `Private work summary` label
-- Uses text labels in addition to color in every chart
+- Uses text labels in addition to color in every chart. Weekly stacked bars show
+  weekday labels and per-day color-keyed Worked/Resolved totals beneath each
+  bar.
 - Fits the common summary on one page; detail lists may add pages
 
 ### Data CSV
@@ -143,7 +145,7 @@ this before detailed ticket content is included.
 ## Accessibility
 
 - The preview has a semantic heading structure and readable table alternative.
-- Every chart includes a plain-text summary.
+- Every chart includes a plain-text summary or semantic table alternative.
 - PDF reading order follows the visible order.
 - PDF text remains selectable; reports are not flattened images.
 - CSV is an accessible alternative for users who need raw tabular data.

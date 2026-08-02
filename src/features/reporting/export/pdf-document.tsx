@@ -115,24 +115,41 @@ const styles = StyleSheet.create({
   sectionDescription: { color: color.muted, fontSize: 8, marginTop: 5 },
   bars: {
     alignItems: "flex-end",
-    borderBottomColor: color.border,
-    borderBottomWidth: 1,
     flexDirection: "row",
     gap: 10,
-    height: 125,
     marginTop: 16,
     paddingHorizontal: 4,
   },
   barColumn: {
     alignItems: "center",
     flexGrow: 1,
-    height: 117,
+  },
+  barPlot: {
+    alignItems: "flex-end",
+    borderBottomColor: color.border,
+    borderBottomWidth: 1,
+    height: 102,
     justifyContent: "flex-end",
+    width: "100%",
   },
   barStack: { justifyContent: "flex-end", width: 25 },
   workedBar: { backgroundColor: color.lavenderStrong },
   resolvedBar: { backgroundColor: color.blushStrong },
-  barLabel: { color: color.muted, fontSize: 6.5, marginTop: 5 },
+  barLabel: {
+    color: color.muted,
+    fontSize: 6.5,
+    fontWeight: 700,
+    marginTop: 5,
+  },
+  barTotals: { gap: 2, marginTop: 4 },
+  barTotalRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 3,
+    justifyContent: "center",
+  },
+  barTotalSwatch: { height: 5, width: 5 },
+  barTotalText: { color: color.muted, fontSize: 6 },
   legend: {
     flexDirection: "row",
     gap: 14,
@@ -274,25 +291,29 @@ function TrendBars({ report }: { report: ReportView }) {
             : 0;
           return (
             <View key={day.workDate} style={styles.barColumn}>
-              <View style={[styles.barStack, { height }]}>
-                <View style={[styles.workedBar, { height: workedHeight }]} />
-                <View
-                  style={[styles.resolvedBar, { height: resolvedHeight }]}
-                />
+              <View style={styles.barPlot}>
+                <View style={[styles.barStack, { height }]}>
+                  <View style={[styles.workedBar, { height: workedHeight }]} />
+                  <View
+                    style={[styles.resolvedBar, { height: resolvedHeight }]}
+                  />
+                </View>
               </View>
               <Text style={styles.barLabel}>{weekday(day.workDate)}</Text>
+              <View style={styles.barTotals}>
+                <View style={styles.barTotalRow}>
+                  <View style={[styles.barTotalSwatch, styles.workedBar]} />
+                  <Text style={styles.barTotalText}>{day.ticketsWorked}</Text>
+                </View>
+                <View style={styles.barTotalRow}>
+                  <View style={[styles.barTotalSwatch, styles.resolvedBar]} />
+                  <Text style={styles.barTotalText}>{day.ticketsResolved}</Text>
+                </View>
+              </View>
             </View>
           );
         })}
       </View>
-      <Text style={styles.sectionDescription}>
-        {report.daily
-          .map(
-            (day) =>
-              `${weekday(day.workDate)}: ${day.ticketsWorked} worked, ${day.ticketsResolved} resolved`,
-          )
-          .join(" · ")}
-      </Text>
     </>
   );
 }

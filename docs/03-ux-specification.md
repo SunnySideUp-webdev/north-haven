@@ -382,7 +382,8 @@ Only non-zero metrics render.
 
 ### Charts
 
-- Work completed by day
+- Work completed by day with stacked Worked/Resolved bars, weekday labels, and
+  per-day color-keyed totals
 - Received versus resolved tickets
 - Active inventory trend
 - Ticket age distribution
@@ -427,7 +428,9 @@ plain-text summary.
 - North Haven wordmark and `Private work summary`
 - Period name, exact date range, workspace time zone, and generation time
 - Worked, Resolved, Closed, and Plan Completion
-- Period-appropriate trend chart and status snapshot
+- Period-appropriate trend chart and status snapshot. Weekly work charts show
+  weekday labels and per-day color-keyed Worked/Resolved totals beneath each
+  stacked bar.
 - Plain-language summary
 - Optional detailed item list on additional pages
 

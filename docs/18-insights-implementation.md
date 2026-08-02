@@ -77,6 +77,9 @@ subsets of Active rather than additional inventory totals.
 - Five primary metrics are followed by a quieter status and average band.
 - The primary analysis surface mirrors the approved high-fidelity direction:
   stacked Worked/Resolved bars on the left and a Work Status donut on the right.
+- Stacked activity bars show the weekday or bucket label below each bar, then
+  color-keyed Worked and Resolved totals below the label to avoid ambiguous
+  paragraph summaries.
 - Work Completed, Received versus Resolved, Active Inventory, Ticket Age, and
   Plan Completion charts include visible plain-language summaries.
 - Every visual chart includes a semantic text or table alternative.

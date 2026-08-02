@@ -192,18 +192,9 @@ function StackedActivityBars({ buckets }: { buckets: InsightBucket[] }) {
           <span className="bg-blush-200 h-3 w-3 rounded-sm" /> Resolved
         </span>
       </div>
-      <div className="border-border relative mt-5 h-52 overflow-x-auto border-b">
+      <div className="mt-5 overflow-x-auto">
         <div
-          className="pointer-events-none absolute inset-0 flex flex-col justify-between pb-7"
-          aria-hidden="true"
-        >
-          <span className="border-border border-t" />
-          <span className="border-border border-t" />
-          <span className="border-border border-t" />
-          <span className="border-border border-t" />
-        </div>
-        <div
-          className="relative flex h-full w-full items-end gap-7 px-3"
+          className="flex w-full items-end gap-7 px-3"
           style={{ minWidth: `${Math.max(540, buckets.length * 92)}px` }}
         >
           {buckets.map((bucket) => {
@@ -211,31 +202,67 @@ function StackedActivityBars({ buckets }: { buckets: InsightBucket[] }) {
             return (
               <div
                 key={bucket.start}
-                className="flex h-full min-w-16 flex-1 flex-col items-center justify-end"
+                className="flex min-w-16 flex-1 flex-col items-center"
               >
-                <div
-                  className="flex w-11 flex-col justify-end overflow-hidden rounded-t-sm"
-                  style={{
-                    height: `${Math.max(total ? 5 : 0, (total / max) * 78)}%`,
-                  }}
-                  aria-hidden="true"
-                >
+                <div className="border-border relative flex h-52 w-full items-end justify-center border-b">
                   <div
-                    className="bg-lavender-300"
-                    style={{
-                      height: `${total ? (bucket.worked / total) * 100 : 0}%`,
-                    }}
-                  />
+                    className="pointer-events-none absolute inset-0 flex flex-col justify-between"
+                    aria-hidden="true"
+                  >
+                    <span className="border-border border-t" />
+                    <span className="border-border border-t" />
+                    <span className="border-border border-t" />
+                    <span className="border-border border-t" />
+                  </div>
                   <div
-                    className="bg-blush-200"
+                    className="relative flex w-11 flex-col justify-end overflow-hidden rounded-t-sm"
                     style={{
-                      height: `${total ? (bucket.resolved / total) * 100 : 0}%`,
+                      height: `${Math.max(total ? 5 : 0, (total / max) * 78)}%`,
                     }}
-                  />
+                    aria-hidden="true"
+                  >
+                    <div
+                      className="bg-lavender-300"
+                      style={{
+                        height: `${total ? (bucket.worked / total) * 100 : 0}%`,
+                      }}
+                    />
+                    <div
+                      className="bg-blush-200"
+                      style={{
+                        height: `${total ? (bucket.resolved / total) * 100 : 0}%`,
+                      }}
+                    />
+                  </div>
                 </div>
-                <span className="text-quiet mt-3 pb-2 text-center text-[11px]">
+                <span className="text-quiet mt-3 text-center text-[11px] font-bold">
                   {bucket.label}
                 </span>
+                <dl
+                  className="mt-2 grid gap-1 text-[11px]"
+                  aria-label={`${bucket.label} activity totals`}
+                >
+                  <div className="flex items-center justify-center gap-1.5">
+                    <dt className="sr-only">Worked</dt>
+                    <dd className="text-muted flex min-w-9 items-center gap-1.5">
+                      <span
+                        className="bg-lavender-300 h-2.5 w-2.5 rounded-sm"
+                        aria-hidden="true"
+                      />
+                      {bucket.worked}
+                    </dd>
+                  </div>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <dt className="sr-only">Resolved</dt>
+                    <dd className="text-muted flex min-w-9 items-center gap-1.5">
+                      <span
+                        className="bg-blush-200 h-2.5 w-2.5 rounded-sm"
+                        aria-hidden="true"
+                      />
+                      {bucket.resolved}
+                    </dd>
+                  </div>
+                </dl>
               </div>
             );
           })}
