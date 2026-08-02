@@ -45,9 +45,13 @@ function mapDailyMetric(row: {
   meetings_attended: number | null;
   plan_intention: string | null;
   planned_items: number | null;
+  planned_reminders: number | null;
+  planned_tasks: number | null;
+  planned_tickets: number | null;
   plan_status: string | null;
   reminders_completed: number | null;
   returned_items: number | null;
+  scheduled_meetings: number | null;
   skipped_items: number | null;
   tasks_completed: number | null;
   tickets_closed: number | null;
@@ -64,9 +68,13 @@ function mapDailyMetric(row: {
     meetingsAttended: number(row.meetings_attended),
     planIntention: row.plan_intention,
     plannedItems: number(row.planned_items),
+    plannedReminders: number(row.planned_reminders),
+    plannedTasks: number(row.planned_tasks),
+    plannedTickets: number(row.planned_tickets),
     planStatus: row.plan_status,
     remindersCompleted: number(row.reminders_completed),
     returnedItems: number(row.returned_items),
+    scheduledMeetings: number(row.scheduled_meetings),
     skippedItems: number(row.skipped_items),
     tasksCompleted: number(row.tasks_completed),
     ticketsClosed: number(row.tickets_closed),

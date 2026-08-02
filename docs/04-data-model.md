@@ -290,7 +290,9 @@ or calendar synchronization behavior.
 
 Reporting data remains derived rather than copied into analytics tables:
 
-- `reporting_daily_metrics(start, end)` returns Calendar and trend rows.
+- `reporting_daily_metrics(start, end)` returns Calendar and trend rows,
+  including planned item counts split by Tickets, Tasks, and Reminders, plus
+  scheduled Meetings from selected Google calendars.
 - `reporting_period_totals(start, end)` returns exact-period distinct totals.
 - `reporting_inventory_metrics(start, end)` reconstructs historical inventory
   and ticket-age snapshots from status events.
@@ -307,6 +309,8 @@ same projections so a later export cannot silently redefine a metric.
   intervals qualify; partial OOO events do not.
 - Plan completion excludes synced meetings until attendance is confirmed and
   excludes cancelled/not-applicable meetings from the denominator.
+- Scheduled meeting counts come from selected Google calendars and are separate
+  from confirmed attended meeting counts.
 - Calendar `worked` counts distinct tickets with a work log on that date.
 - Resolved and Closed counts come from status events, supporting reopen history.
 - Daily, Weekly, and Monthly reports use the same reporting projections as

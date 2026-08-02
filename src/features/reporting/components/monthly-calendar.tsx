@@ -104,32 +104,24 @@ function dailyActivityLines(
 ): string[] {
   const lines: string[] = [];
 
-  if (visible.planned && row.plannedItems) {
+  if (visible.planned && row.plannedTickets) {
+    lines.push(`${plural(row.plannedTickets, "ticket")}`);
+  }
+
+  if (visible.meetings && row.scheduledMeetings) {
+    lines.push(`${plural(row.scheduledMeetings, "meeting")}`);
+  }
+
+  if (visible.planned && row.plannedTasks) {
+    lines.push(`${plural(row.plannedTasks, "task")}`);
+  }
+
+  if (visible.planned && row.plannedReminders) {
+    lines.push(`${plural(row.plannedReminders, "reminder")}`);
+  }
+
+  if (visible.planned && !lines.length && row.plannedItems) {
     lines.push(`${plural(row.plannedItems, "planned", "planned")}`);
-  }
-
-  if (visible.worked && row.ticketsWorked) {
-    lines.push(`${plural(row.ticketsWorked, "ticket")} worked`);
-  }
-
-  if (visible.resolved && row.ticketsResolved) {
-    lines.push(`${plural(row.ticketsResolved, "ticket")} resolved`);
-  }
-
-  if (visible.resolved && row.ticketsClosed) {
-    lines.push(`${plural(row.ticketsClosed, "ticket")} closed`);
-  }
-
-  if (visible.worked && row.tasksCompleted) {
-    lines.push(`${plural(row.tasksCompleted, "task")} completed`);
-  }
-
-  if (visible.worked && row.remindersCompleted) {
-    lines.push(`${plural(row.remindersCompleted, "reminder")} completed`);
-  }
-
-  if (visible.meetings && row.meetingsAttended) {
-    lines.push(`${plural(row.meetingsAttended, "meeting")} attended`);
   }
 
   return lines;
@@ -490,11 +482,7 @@ export function MonthlyCalendar({
                       {activityLines.map((line) => (
                         <p
                           key={line}
-                          className={
-                            line.includes("planned")
-                              ? "text-lavender-700 font-bold"
-                              : undefined
-                          }
+                          className="text-lavender-700 font-bold"
                         >
                           {line}
                         </p>
@@ -636,6 +624,11 @@ export function MonthlyCalendar({
                 {selected.plannedItems} planned · {selected.completedItems}{" "}
                 completed
               </p>
+              {selected.scheduledMeetings ? (
+                <p className="text-ink mt-2 text-sm">
+                  {plural(selected.scheduledMeetings, "meeting")}
+                </p>
+              ) : null}
               {selected.deferredItems || selected.returnedItems ? (
                 <p className="text-muted mt-2 text-xs">
                   {selected.deferredItems} deferred · {selected.returnedItems}

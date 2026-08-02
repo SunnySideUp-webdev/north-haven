@@ -41,9 +41,13 @@ const calendar: MonthlyCalendarView = {
       meetingsAttended: 0,
       planIntention: "Prepare the oldest requests.",
       plannedItems: 4,
+      plannedReminders: 0,
+      plannedTasks: 0,
+      plannedTickets: 4,
       planStatus: "ready",
       remindersCompleted: 0,
       returnedItems: 0,
+      scheduledMeetings: 5,
       skippedItems: 0,
       tasksCompleted: 0,
       ticketsClosed: 0,
@@ -60,9 +64,13 @@ const calendar: MonthlyCalendarView = {
       meetingsAttended: 2,
       planIntention: "Finish the oldest requests first.",
       plannedItems: 6,
+      plannedReminders: 1,
+      plannedTasks: 1,
+      plannedTickets: 4,
       planStatus: "closed",
       remindersCompleted: 1,
       returnedItems: 0,
+      scheduledMeetings: 2,
       skippedItems: 0,
       tasksCompleted: 1,
       ticketsClosed: 1,
@@ -79,9 +87,13 @@ const calendar: MonthlyCalendarView = {
       meetingsAttended: 0,
       planIntention: null,
       plannedItems: 0,
+      plannedReminders: 0,
+      plannedTasks: 0,
+      plannedTickets: 0,
       planStatus: null,
       remindersCompleted: 0,
       returnedItems: 0,
+      scheduledMeetings: 0,
       skippedItems: 0,
       tasksCompleted: 0,
       ticketsClosed: 0,
@@ -104,12 +116,10 @@ describe("MonthlyCalendar", () => {
   it("shows retrospective metrics and a selected Day Summary", () => {
     render(<MonthlyCalendar calendar={calendar} googleConnected />);
 
-    expect(screen.getAllByText("3 tickets worked")).toHaveLength(2);
-    expect(screen.getAllByText("1 ticket resolved")).toHaveLength(2);
-    expect(screen.getAllByText("1 task completed")).toHaveLength(2);
-    expect(screen.getAllByText("1 reminder completed")).toHaveLength(2);
-    expect(screen.getAllByText("6 planned")).toHaveLength(1);
-    expect(screen.getAllByText("2 meetings attended")).toHaveLength(2);
+    expect(screen.getAllByText("4 tickets")).toHaveLength(2);
+    expect(screen.getAllByText("2 meetings")).toHaveLength(2);
+    expect(screen.getByText("1 task")).toBeInTheDocument();
+    expect(screen.getByText("1 reminder")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Tuesday, August 4, 2026" }),
     ).toBeInTheDocument();
@@ -124,17 +134,16 @@ describe("MonthlyCalendar", () => {
   it("hides a metric without losing the selected summary", () => {
     render(<MonthlyCalendar calendar={calendar} googleConnected />);
 
-    expect(screen.getAllByText("3 tickets worked")).toHaveLength(2);
-    fireEvent.click(screen.getByRole("checkbox", { name: "worked" }));
-    expect(screen.getAllByText("3 tickets worked")).toHaveLength(1);
-    expect(screen.getAllByText("1 task completed")).toHaveLength(1);
-    expect(screen.getAllByText("1 reminder completed")).toHaveLength(1);
+    expect(screen.getAllByText("2 meetings")).toHaveLength(2);
+    fireEvent.click(screen.getByRole("checkbox", { name: "meetings" }));
+    expect(screen.getAllByText("2 meetings")).toHaveLength(1);
   });
 
   it("shows a planned-only day inside its calendar cell", () => {
     render(<MonthlyCalendar calendar={calendar} googleConnected />);
 
-    expect(screen.getByText("4 planned")).toBeInTheDocument();
+    expect(screen.getAllByText("4 tickets")).toHaveLength(2);
+    expect(screen.getByText("5 meetings")).toBeInTheDocument();
     fireEvent.click(
       screen.getByRole("button", {
         name: "Open summary for Monday, August 3, 2026",
@@ -148,6 +157,7 @@ describe("MonthlyCalendar", () => {
     expect(screen.getByText(/4 planned ·/)).toHaveTextContent(
       "4 planned · 0 completed",
     );
+    expect(screen.getAllByText("5 meetings")).toHaveLength(2);
   });
 
   it("uses the soft OOO surface from the planner palette", () => {

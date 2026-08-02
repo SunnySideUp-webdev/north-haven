@@ -1335,8 +1335,12 @@ export type Database = {
           plan_intention: string;
           plan_status: string;
           planned_items: number;
+          planned_reminders: number;
+          planned_tasks: number;
+          planned_tickets: number;
           reminders_completed: number;
           returned_items: number;
+          scheduled_meetings: number;
           skipped_items: number;
           tasks_completed: number;
           tickets_closed: number;

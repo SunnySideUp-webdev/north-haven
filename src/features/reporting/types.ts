@@ -19,9 +19,13 @@ export type DailyMetric = {
   meetingsAttended: number;
   planIntention: string | null;
   plannedItems: number;
+  plannedReminders: number;
+  plannedTasks: number;
+  plannedTickets: number;
   planStatus: string | null;
   remindersCompleted: number;
   returnedItems: number;
+  scheduledMeetings: number;
   skippedItems: number;
   tasksCompleted: number;
   ticketsClosed: number;

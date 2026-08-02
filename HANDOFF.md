@@ -129,6 +129,8 @@ calendar.
   and exports
 - Six-week monthly Calendar with planned and completed work, resolution,
   confirmed meeting, important-note, and OOO indicators
+- Calendar day cells show planned work split by Tickets, Tasks, and Reminders,
+  plus scheduled Meetings from selected Google calendars
 - Planned-only dates show a mini summary inside the cell instead of relying on
   the detached Day Summary panel
 - OOO dates use the softer `#DDD5E6` planner lavender with muted purple text,
@@ -327,8 +329,8 @@ visually reviewed. They contain no customer information and can be removed with
 ### Calendar and Insights
 
 - The monthly Calendar is retrospective, not a traditional agenda.
-- Day cells summarize actual tickets worked, resolved tickets, meetings, and
-  important notes.
+- Day cells summarize planned tickets, tasks, reminders, scheduled Google
+  meetings, and important notes.
 - Metrics are kept out of Today.
 - Insights distinguishes Worked, Resolved, Closed, and Plan Completion.
 - There is no combined productivity score.

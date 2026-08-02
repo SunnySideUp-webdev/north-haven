@@ -27,7 +27,10 @@ The projection derives:
 - Resolved and Closed from historical status events in the workspace time zone
 - completed Tasks and Reminders from final work-log outcomes
 - confirmed Meetings Attended from selected Google calendars
-- planned, completed, returned, deferred, and skipped plan-item counts
+- scheduled Meetings from selected Google calendars, before attendance is
+  confirmed
+- planned Tickets, Tasks, Reminders, plus completed, returned, deferred, and
+  skipped plan-item counts
 - important Day Note state and note content
 - full-local-day Google OOO state
 - plan intention and historical plan status
@@ -54,9 +57,9 @@ Calendar, OOO, or reporting data.
 
 - fixed six-week, Sunday-first planner grid
 - blush weekday header and muted adjacent-month/weekend cells
-- non-zero Planned, Worked, Resolved, confirmed Meetings, and Important Note
-  indicators
-- planned-only dates display their count directly in the cell
+- non-zero planned Tickets, scheduled Meetings, planned Tasks, planned
+  Reminders, and Important Note indicators
+- planned-only dates display their type breakdown directly in the cell
 - full-day OOO treatment with the soft `#DDD5E6` planner lavender, muted purple
   text, and no misleading zero-productivity metric
 - hover-only three-dot menu for Default, Lavender, Blush, Rose, Cream, and Sage
