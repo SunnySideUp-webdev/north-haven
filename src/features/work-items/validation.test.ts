@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   reminderInputSchema,
   ticketInputSchema,
+  ticketWorkflowInputSchema,
 } from "@/features/work-items/validation";
 
 describe("work item validation", () => {
@@ -41,6 +42,23 @@ describe("work item validation", () => {
         description: "",
         remindAt: "2026-08-03T08:00",
         title: "Review the changes",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("accepts only supported quick ticket workflow values", () => {
+    const update = {
+      operationalStatus: "waiting_response",
+      systemPriority: "urgent",
+      trackingState: "watching",
+      workItemId: "91ddc257-9ed6-4178-bd22-ccb20453cb90",
+    };
+
+    expect(ticketWorkflowInputSchema.safeParse(update).success).toBe(true);
+    expect(
+      ticketWorkflowInputSchema.safeParse({
+        ...update,
+        trackingState: "deleted",
       }).success,
     ).toBe(false);
   });

@@ -180,7 +180,7 @@ calendar.
 - Auth-user teardown that removes a sole-owner personal workspace atomically
   without changing North Haven's recoverable in-app archival behavior
 - Hosted `North Haven Development` Supabase project in the Tokki organization,
-  East US (North Virginia), linked to the repository with all 19 reviewed
+  East US (North Virginia), linked to the repository with all 20 reviewed
   migrations applied and no demo or customer data
 - Production Vercel project deployed in the Tokki team at
   `https://north-haven-steel.vercel.app`, with the stable domain aliased and
@@ -198,31 +198,30 @@ calendar.
 - Shared page headers use collision-safe grid layout instead of absolutely
   positioned actions; Work Detail uses a calmer compact title and explicit
   return navigation to Work Inventory, with matching exits on Create and Edit
+- Ticket Work Detail provides auto-saving inline controls for operational
+  status, tracking, and priority; status/tracking history, close/archive
+  confirmations, RLS isolation, and open-plan archival guards remain intact
+- The owner account, initial setup, and corporate Google Calendar connection
+  have been completed successfully on the stable production deployment
 
 ### Pending or not started
 
 - Complete the authenticated portion of the Phase 7.5D hosted acceptance run
   after the built-in Supabase email allowance refills
-- Confirm the owner's production signup email, finish first-time setup, and
-  verify hosted session restoration
 - Verify hosted password recovery in a separate email-rate-limit window
-- Add the stable Vercel origin and callback to the existing Google OAuth web
-  client, then validate one read-only corporate calendar sync
 - Phase 8 hardening and personal launch
 
 Application code, local real-calendar validation, the hosted database schema,
-and the Vercel production deployment now exist. No customer data has been
-entered. Hosted owner authentication and production Google Calendar acceptance
-remain to be completed.
+and the Vercel production deployment now exist. The owner is actively entering
+work in the hosted personal workspace, so it must be treated as production and
+must never receive demo seeds. Final acceptance and password recovery remain to
+be completed.
 
 ### Next step
 
-Continue Phase 7.5D by registering
-`https://north-haven-steel.vercel.app` and its exact Google Calendar callback in
-the existing Google OAuth web client, then connect the corporate Calendar from
-production and verify one read-only sync. Run the remaining cleanup-safe hosted
-acceptance checks without consuming signup and password-recovery emails in the
-same one-hour window. The exact sequence is in
+Continue Phase 7.5D with the remaining cleanup-safe hosted acceptance checks and
+password recovery, without altering the owner's real workspace or consuming
+multiple Auth emails in the same one-hour window. The exact sequence is in
 `docs/23-hosted-environment-implementation.md`. The completed reporting, Settings, and recovery
 implementations are documented in
 `docs/17-retrospective-calendar-implementation.md`,

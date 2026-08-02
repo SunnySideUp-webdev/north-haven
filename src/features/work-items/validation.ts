@@ -3,6 +3,13 @@ import { z } from "zod";
 const title = z.string().trim().min(1).max(200);
 const description = z.string().trim().max(10_000).optional();
 const trackingState = z.enum(["active", "watching", "closed", "archived"]);
+const operationalStatus = z.enum([
+  "pending",
+  "in_progress",
+  "waiting_response",
+  "resolved",
+]);
+const systemPriority = z.enum(["urgent", "high", "medium", "low"]);
 const isoDateTime = z.string().datetime({ offset: true });
 
 export const ticketInputSchema = z.object({
@@ -13,19 +20,21 @@ export const ticketInputSchema = z.object({
   ]),
   formBackupComplete: z.boolean(),
   note: z.string().trim().max(10_000).optional(),
-  operationalStatus: z.enum([
-    "pending",
-    "in_progress",
-    "waiting_response",
-    "resolved",
-  ]),
+  operationalStatus,
   receivedAt: z.string().date(),
-  systemPriority: z.enum(["urgent", "high", "medium", "low"]),
+  systemPriority,
   ticketNumber: z.string().trim().min(1).max(80),
   ticketTypeId: z.string().uuid(),
   title,
   trackingState: trackingState.optional(),
   workItemId: z.string().uuid().optional(),
+});
+
+export const ticketWorkflowInputSchema = z.object({
+  operationalStatus,
+  systemPriority,
+  trackingState,
+  workItemId: z.string().uuid(),
 });
 
 export const taskInputSchema = z.object({

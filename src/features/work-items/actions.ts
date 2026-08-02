@@ -13,6 +13,7 @@ import {
   reminderInputSchema,
   taskInputSchema,
   ticketInputSchema,
+  ticketWorkflowInputSchema,
   transitionFollowUpInputSchema,
 } from "@/features/work-items/validation";
 import { requireAuthenticatedContext } from "@/server/auth/session";
@@ -228,6 +229,43 @@ export async function updateTicketAction(
 
   revalidatePath("/work");
   redirect(`/work/${result.data.workItemId}`);
+}
+
+export async function updateTicketWorkflowAction(input: {
+  operationalStatus: string;
+  systemPriority: string;
+  trackingState: string;
+  workItemId: string;
+}): Promise<{ ok: boolean; message: string }> {
+  const result = ticketWorkflowInputSchema.safeParse(input);
+  if (!result.success) {
+    return { ok: false, message: "Choose a valid ticket update." };
+  }
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { error } = await supabase.rpc("update_ticket_workflow", {
+    chosen_operational_status: result.data.operationalStatus,
+    chosen_system_priority: result.data.systemPriority,
+    chosen_tracking_state: result.data.trackingState,
+    target_work_item_id: result.data.workItemId,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: error.message.includes("open daily plans")
+        ? "Remove this ticket from its open plan before archiving it."
+        : "We couldn't update this ticket. Try again.",
+    };
+  }
+
+  revalidatePath("/work");
+  revalidatePath(`/work/${result.data.workItemId}`);
+  revalidatePath("/plan");
+  revalidatePath("/today");
+  revalidatePath("/calendar");
+  revalidatePath("/insights");
+  return { ok: true, message: "Changes saved." };
 }
 
 export async function updateTaskAction(

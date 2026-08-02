@@ -7,6 +7,7 @@ import {
 } from "@/features/work-items/components/activity-forms";
 import { ArchivedRecovery } from "@/features/work-items/components/archived-recovery";
 import { AddToPlan } from "@/features/work-items/components/add-to-plan";
+import { TicketWorkflowControls } from "@/features/work-items/components/ticket-workflow-controls";
 import { formatDate, formatDateTime } from "@/features/work-items/date";
 import {
   getWorkItem,
@@ -81,16 +82,21 @@ export default async function WorkItemPage({
         <div className="space-y-7">
           <section className="border-border/70 bg-paper shadow-surface rounded-xl border p-8">
             <h2 className="text-ink text-xl font-bold">Overview</h2>
-            <dl className="mt-7 grid grid-cols-3 gap-x-6 gap-y-8">
+            {item.kind === "ticket" ? (
+              <div className="mt-7">
+                <TicketWorkflowControls
+                  operationalStatus={item.operational_status ?? "pending"}
+                  systemPriority={item.system_priority ?? "medium"}
+                  trackingState={item.tracking_state ?? "active"}
+                  workItemId={id}
+                />
+              </div>
+            ) : null}
+            <dl className="mt-7 grid grid-cols-4 gap-x-6 gap-y-8">
               <Detail
                 title="Type"
                 value={item.ticket_type_name ?? label(item.kind)}
               />
-              <Detail
-                title="Work status"
-                value={label(item.operational_status)}
-              />
-              <Detail title="Priority" value={label(item.system_priority)} />
               <Detail title="Received" value={formatDate(item.received_at)} />
               <Detail
                 title="Due / remind"

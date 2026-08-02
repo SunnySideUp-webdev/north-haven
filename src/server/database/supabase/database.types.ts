@@ -1450,6 +1450,15 @@ export type Database = {
         };
         Returns: undefined;
       };
+      update_ticket_workflow: {
+        Args: {
+          chosen_operational_status: Database["public"]["Enums"]["ticket_operational_status"];
+          chosen_system_priority: Database["public"]["Enums"]["ticket_priority"];
+          chosen_tracking_state: Database["public"]["Enums"]["work_tracking_state"];
+          target_work_item_id: string;
+        };
+        Returns: undefined;
+      };
       update_work_schedule_settings: {
         Args: {
           chosen_ends_at_local: string;

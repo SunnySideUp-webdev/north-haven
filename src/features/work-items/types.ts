@@ -5,6 +5,9 @@ export type WorkInventoryRow =
 export type WorkItemKind = Database["public"]["Enums"]["work_item_kind"];
 export type WorkTrackingState =
   Database["public"]["Enums"]["work_tracking_state"];
+export type TicketOperationalStatus =
+  Database["public"]["Enums"]["ticket_operational_status"];
+export type TicketPriority = Database["public"]["Enums"]["ticket_priority"];
 
 export type WorkFormState = {
   status: "idle" | "error";

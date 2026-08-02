@@ -48,6 +48,13 @@ grid column. Header actions no longer use absolute positioning, so Add to Plan
 and Edit cannot overlap the title. Work Detail exposes a clear return to Work
 Inventory, and the Create/Edit screens provide matching contextual exits.
 
+Ticket Work Detail also exposes Work Status, Tracking, and Priority as a calm
+Quick Update group inside Overview. Each selection saves automatically through
+one workspace-scoped transaction. Operational and tracking changes continue to
+populate History; closure and archival retain explicit confirmation, and a
+ticket cannot be archived while it remains Planned or In Progress in an open
+daily plan. Edit remains available for structural ticket information.
+
 ## End of Day
 
 Ticket capture entered from End of Day now offers Save Ticket, Save and Add

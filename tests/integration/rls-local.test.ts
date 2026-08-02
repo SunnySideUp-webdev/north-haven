@@ -288,6 +288,52 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
       ]),
     );
 
+    const { error: quickUpdateError } = await clientA.rpc(
+      "update_ticket_workflow",
+      {
+        chosen_operational_status: "resolved",
+        chosen_system_priority: "high",
+        chosen_tracking_state: "active",
+        target_work_item_id: ticketId!,
+      },
+    );
+    const { error: crossWorkspaceQuickUpdateError } = await clientB.rpc(
+      "update_ticket_workflow",
+      {
+        chosen_operational_status: "resolved",
+        chosen_system_priority: "low",
+        chosen_tracking_state: "closed",
+        target_work_item_id: ticketId!,
+      },
+    );
+    const { data: quicklyUpdatedTicket } = await clientA
+      .from("work_inventory_rows")
+      .select(
+        "system_priority, operational_status, tracking_state, resolved_at",
+      )
+      .eq("id", ticketId!)
+      .single();
+
+    expect(quickUpdateError).toBeNull();
+    expect(crossWorkspaceQuickUpdateError).not.toBeNull();
+    expect(quicklyUpdatedTicket).toMatchObject({
+      operational_status: "resolved",
+      system_priority: "high",
+      tracking_state: "active",
+    });
+    expect(quicklyUpdatedTicket?.resolved_at).toBeTruthy();
+
+    const { error: restoreWorkflowFixtureError } = await clientA.rpc(
+      "update_ticket_workflow",
+      {
+        chosen_operational_status: "waiting_response",
+        chosen_system_priority: "urgent",
+        chosen_tracking_state: "watching",
+        target_work_item_id: ticketId!,
+      },
+    );
+    expect(restoreWorkflowFixtureError).toBeNull();
+
     const { data: followUpId, error: followUpError } = await clientA.rpc(
       "save_open_follow_up",
       {
