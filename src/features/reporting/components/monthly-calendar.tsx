@@ -392,7 +392,7 @@ export function MonthlyCalendar({
             {appearanceMessage}
           </p>
         ) : null}
-        <div className="border-border bg-paper grid grid-cols-7 overflow-hidden rounded-xl border">
+        <div className="border-border bg-paper grid grid-cols-7 rounded-xl border">
           {weekdays.map((weekday) => (
             <div
               key={weekday}
@@ -413,9 +413,15 @@ export function MonthlyCalendar({
               : savedColor
                 ? dayColorSurfaces[savedColor]
                 : row?.isOutOfOffice
-                  ? "bg-lavender-300 hover:bg-lavender-300"
+                  ? "bg-[#DDD5E6] text-[#5f526d] hover:bg-[#DDD5E6]"
                   : dayColorSurfaces.default;
             const appearanceOpen = openAppearanceDate === date;
+            const popupHorizontal =
+              index % 7 <= 1
+                ? "left-2"
+                : index % 7 >= 5
+                  ? "right-2"
+                  : "left-1/2 -translate-x-1/2";
             return (
               <div
                 key={date}
@@ -439,7 +445,7 @@ export function MonthlyCalendar({
                   {inMonth && row ? (
                     <div className="mt-3 space-y-1.5 text-[11px] leading-4">
                       {row.isOutOfOffice ? (
-                        <span className="bg-lavender-700 inline-block rounded-full px-2 py-1 text-[9px] font-bold tracking-[0.08em] text-white uppercase">
+                        <span className="inline-block rounded-full bg-[#DDD5E6] px-2 py-1 text-[9px] font-bold tracking-[0.08em] text-[#5f526d] uppercase ring-1 ring-[#c9bdd5]">
                           OOO
                         </span>
                       ) : null}
@@ -491,7 +497,7 @@ export function MonthlyCalendar({
                   <div
                     role="dialog"
                     aria-label={`Day color for ${fullDate(date)}`}
-                    className={`border-border bg-paper shadow-surface absolute right-2 z-30 w-[210px] rounded-xl border p-4 ${index >= 35 ? "bottom-10" : "top-10"}`}
+                    className={`border-border bg-paper shadow-surface absolute z-30 w-[210px] rounded-xl border p-4 ${popupHorizontal} ${index >= 35 ? "bottom-10" : "top-10"}`}
                   >
                     <p className="text-quiet text-[10px] font-bold tracking-[0.12em] uppercase">
                       Day color

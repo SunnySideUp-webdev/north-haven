@@ -32,6 +32,8 @@
 - Normal schedule is Monday-Friday, 8:00 AM-5:00 PM.
 - OOO is informational inside Plan, not a planning restriction. Work can be
   added, edited, reordered, and marked Ready on an OOO date.
+- Marking a plan Ready should leave a visible saved confirmation on the Plan
+  screen, including the date, selected work count, meeting count, and intention.
 - End of Day still skips full-day OOO dates when proposing the next workday, so
   an absence never becomes a required plan.
 - Meetings default to Probably Attended after ending and are confirmed during
@@ -43,6 +45,8 @@
   are visible without opening Day Summary.
 - A hover-only appearance menu stores optional pastel day colors. These colors
   are presentation metadata and never change the meaning of OOO or work data.
+- OOO uses the softer planner lavender `#DDD5E6`; custom color menus must avoid
+  clipping at the calendar edges.
 
 ## Experience
 

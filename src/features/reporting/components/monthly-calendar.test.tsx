@@ -146,14 +146,15 @@ describe("MonthlyCalendar", () => {
     );
   });
 
-  it("uses the stronger lavender surface for an OOO day", () => {
+  it("uses the soft OOO surface from the planner palette", () => {
     render(<MonthlyCalendar calendar={calendar} googleConnected />);
 
     expect(
       screen.getByRole("button", {
         name: "Open summary for Wednesday, August 5, 2026",
       }).parentElement,
-    ).toHaveClass("bg-lavender-300");
+    ).toHaveClass("bg-[#DDD5E6]");
+    expect(screen.getByText("OOO")).toHaveClass("text-[#5f526d]");
   });
 
   it("changes month without putting work content in the URL", () => {
@@ -188,5 +189,21 @@ describe("MonthlyCalendar", () => {
         workDate: "2026-08-04",
       }),
     );
+  });
+
+  it("keeps edge color menus inside the calendar grid", () => {
+    render(<MonthlyCalendar calendar={calendar} googleConnected />);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Customize Saturday, August 1, 2026",
+      }),
+    );
+
+    expect(
+      screen.getByRole("dialog", {
+        name: "Day color for Saturday, August 1, 2026",
+      }),
+    ).toHaveClass("right-2");
   });
 });

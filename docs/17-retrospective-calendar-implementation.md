@@ -57,9 +57,11 @@ Calendar, OOO, or reporting data.
 - non-zero Planned, Worked, Resolved, confirmed Meetings, and Important Note
   indicators
 - planned-only dates display their count directly in the cell
-- full-day OOO treatment with a stronger lavender surface and no misleading
-  zero-productivity metric
+- full-day OOO treatment with the soft `#DDD5E6` planner lavender, muted purple
+  text, and no misleading zero-productivity metric
 - hover-only three-dot menu for Default, Lavender, Blush, Rose, Cream, and Sage
+- edge-aware appearance popovers that stay visible near the left, right, and
+  bottom edges of the monthly grid
 - explicit current date and selected-date states
 - month/year selectors plus Previous and Next controls
 - independent display filters for Planned, Worked, Resolved, Meetings, and Notes
@@ -75,8 +77,8 @@ Calendar, OOO, or reporting data.
 - real workspace projection returned the complete requested date range and
   recognized synchronized OOO dates
 - unit coverage for month parsing, year boundaries, and the fixed 42-day grid
-- component coverage for planned-only cells, stronger OOO styling, saved color
-  selection, metrics, Day Summary, filters, and month navigation
+- component coverage for planned-only cells, soft OOO styling, edge-safe saved
+  color selection, metrics, Day Summary, filters, and month navigation
 - opt-in integration coverage asserts workspace isolation for the
   security-definer reporting projection
 - TypeScript and ESLint pass

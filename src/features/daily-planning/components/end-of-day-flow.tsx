@@ -56,6 +56,31 @@ const steps = [
   "Plan Next Workday",
 ];
 
+function dateFromKey(value: string) {
+  return new Date(`${value}T12:00:00Z`);
+}
+
+function fullDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "full",
+    timeZone: "UTC",
+  }).format(dateFromKey(value));
+}
+
+function completionTime(value: string | null, timeZone: string) {
+  if (!value) return null;
+
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone,
+  }).format(new Date(value));
+}
+
+function plural(value: number, singular: string, pluralValue = `${singular}s`) {
+  return `${value} ${value === 1 ? singular : pluralValue}`;
+}
+
 export function EndOfDayFlow({
   data,
   initialStep,
@@ -106,6 +131,33 @@ export function EndOfDayFlow({
   const unresolved = planned.filter((item) =>
     ["planned", "in_progress"].includes(item.planItem!.execution_status),
   ).length;
+  const completed = planned.filter(
+    (item) => item.planItem?.execution_status === "done",
+  ).length;
+  const movedOrReturned = planned.filter((item) =>
+    ["returned", "deferred", "skipped"].includes(
+      item.planItem?.execution_status ?? "",
+    ),
+  ).length;
+  const nextSelected =
+    data.nextDayPlanning?.items
+      .filter((item) => item.planItem)
+      .sort((a, b) => a.planItem!.position - b.planItem!.position) ?? [];
+  const nextTickets = nextSelected.filter(
+    (item) => item.kind === "ticket",
+  ).length;
+  const nextTasks = nextSelected.filter((item) => item.kind === "task").length;
+  const nextReminders = nextSelected.filter(
+    (item) => item.kind === "reminder",
+  ).length;
+  const nextMeetings = data.nextDayPlanning?.calendar.meetings.length ?? 0;
+  const nextPlanPieces = [
+    nextTickets ? plural(nextTickets, "ticket") : null,
+    nextTasks ? plural(nextTasks, "task") : null,
+    nextReminders ? plural(nextReminders, "reminder") : null,
+    nextMeetings ? plural(nextMeetings, "meeting") : null,
+  ].filter(Boolean);
+  const closedAt = completionTime(data.plan?.closed_at ?? null, data.timeZone);
 
   function run(
     action: () => Promise<{ ok: boolean; message?: string }>,
@@ -130,78 +182,106 @@ export function EndOfDayFlow({
     return (
       <>
         <PageHeader
-          title="Your next workday is ready."
-          description={data.nextWorkDate ?? "End of Day complete"}
-          align="center"
+          title="End of Day"
+          description={`${fullDate(workDate)} · complete`}
         />
-        <div className="mx-auto max-w-[760px] p-8">
-          <section className="border-border bg-paper shadow-surface rounded-xl border p-10">
+        <div className="mx-auto max-w-[1040px] p-8">
+          <section className="border-border bg-paper shadow-surface rounded-xl border px-12 py-11">
             <div className="text-center">
-              <p className="text-muted">
-                This day is closed and your next plan is ready when you return.
+              <div
+                aria-hidden="true"
+                className="bg-success-surface mx-auto flex h-20 w-20 items-center justify-center rounded-full"
+              >
+                <span className="border-success-ink h-8 w-4 rotate-45 border-r-4 border-b-4" />
+              </div>
+              <h2 className="text-ink mt-5 text-3xl font-bold">
+                Your next workday is ready
+              </h2>
+              <p className="text-muted mt-3 text-sm">
+                You can close the day knowing{" "}
+                {data.nextWorkDate ? fullDate(data.nextWorkDate) : "your next plan"}{" "}
+                is already organized.
               </p>
             </div>
-            <dl className="bg-lavender-50 mt-7 grid grid-cols-3 gap-5 rounded-xl p-6 text-center">
-              <div>
-                <dt className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
-                  Planned
+            <dl className="mt-9 grid gap-5 md:grid-cols-3">
+              <div className="bg-lavender-50 rounded-lg p-6">
+                <dt className="text-quiet text-[10px] font-bold tracking-[0.12em] uppercase">
+                  Today
                 </dt>
-                <dd className="text-ink mt-2 text-2xl font-bold">
-                  {planned.length}
+                <dd className="text-ink mt-3 text-lg font-bold">
+                  {completed} of {planned.length} items completed
                 </dd>
+                <p className="text-muted mt-2 text-xs">
+                  {movedOrReturned
+                    ? `${plural(movedOrReturned, "item")} moved or returned`
+                    : "Everything selected has an outcome"}
+                </p>
               </div>
-              <div>
-                <dt className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
-                  Completed
+              <div className="bg-blush-100 rounded-lg p-6">
+                <dt className="text-quiet text-[10px] font-bold tracking-[0.12em] uppercase">
+                  Follow-ups
                 </dt>
-                <dd className="text-ink mt-2 text-2xl font-bold">
-                  {
-                    planned.filter(
-                      (item) => item.planItem?.execution_status === "done",
-                    ).length
-                  }
+                <dd className="text-ink mt-3 text-lg font-bold">
+                  {data.followUps.length
+                    ? plural(data.followUps.length, "review")
+                    : "No open reviews"}
                 </dd>
+                <p className="text-muted mt-2 text-xs">
+                  Nothing is waiting without a decision
+                </p>
               </div>
-              <div>
-                <dt className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
-                  Moved or returned
+              <div className="bg-lavender-50 rounded-lg p-6">
+                <dt className="text-quiet text-[10px] font-bold tracking-[0.12em] uppercase">
+                  {data.nextWorkDate ? fullDate(data.nextWorkDate).split(",")[0] : "Next plan"}
                 </dt>
-                <dd className="text-ink mt-2 text-2xl font-bold">
-                  {
-                    planned.filter((item) =>
-                      ["returned", "deferred", "skipped"].includes(
-                        item.planItem?.execution_status ?? "",
-                      ),
-                    ).length
-                  }
+                <dd className="text-ink mt-3 text-lg font-bold">
+                  {plural(nextSelected.length, "item")} planned
                 </dd>
+                <p className="text-muted mt-2 text-xs">
+                  {nextPlanPieces.length
+                    ? nextPlanPieces.join(" · ")
+                    : "Ready whenever you return"}
+                </p>
               </div>
             </dl>
+
             {data.nextDayPlanning ? (
-              <div className="border-border mt-7 grid grid-cols-2 gap-6 border-t pt-6">
-                <div>
-                  <p className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
-                    First focus
-                  </p>
-                  <p className="text-ink mt-2 text-sm font-bold">
-                    {data.nextDayPlanning.items
-                      .filter((item) => item.planItem)
-                      .sort(
-                        (a, b) => a.planItem!.position - b.planItem!.position,
-                      )[0]?.title ?? "No focus selected"}
-                  </p>
+              <div className="border-border mt-9 grid gap-6 border-t pt-7 md:grid-cols-[1fr_240px]">
+                <div className="space-y-4">
+                  <h3 className="text-ink text-lg font-bold">
+                    {data.nextWorkDate ? fullDate(data.nextWorkDate) : "Next workday"}
+                  </h3>
+                  <dl className="grid gap-x-5 gap-y-3 text-sm sm:grid-cols-[96px_minmax(0,1fr)]">
+                    <dt className="text-muted">First focus</dt>
+                    <dd className="text-ink font-bold">
+                      {nextSelected[0]?.ticket_number
+                        ? `${formatTicketNumber(nextSelected[0].ticket_number)} · `
+                        : ""}
+                      {nextSelected[0]?.title ?? "No focus selected"}
+                    </dd>
+                    <dt className="text-muted">First meeting</dt>
+                    <dd className="text-ink font-bold">
+                      {data.nextDayPlanning.calendar.meetings[0]?.title ??
+                        "No meetings scheduled"}
+                    </dd>
+                  </dl>
+                  {data.nextWorkDate ? (
+                    <Link
+                      href={`/plan?date=${data.nextWorkDate}`}
+                      className="text-lavender-700 inline-block text-sm font-bold"
+                    >
+                      Review {fullDate(data.nextWorkDate).split(",")[0]}
+                      &apos;s plan
+                    </Link>
+                  ) : null}
                 </div>
-                <div>
-                  <p className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
-                    First meeting
-                  </p>
-                  <p className="text-ink mt-2 text-sm font-bold">
-                    {data.nextDayPlanning.calendar.meetings[0]?.title ??
-                      "No meetings scheduled"}
-                  </p>
-                </div>
+                <ReadyActions />
               </div>
-            ) : null}
+            ) : (
+              <div className="border-border mt-9 border-t pt-7">
+                <ReadyActions />
+              </div>
+            )}
             {data.dayNote?.body ? (
               <div className="border-border mt-7 border-t pt-6">
                 <p className="text-quiet text-xs font-bold tracking-[0.08em] uppercase">
@@ -221,12 +301,6 @@ export function EndOfDayFlow({
               </p>
             ) : null}
             <div className="mt-8 flex items-center justify-center gap-3">
-              <Link
-                href="/today"
-                className="bg-lavender-700 rounded-lg px-6 py-3 text-sm font-bold text-white"
-              >
-                Return to Today
-              </Link>
               {!confirmReopen ? (
                 <button
                   type="button"
@@ -237,6 +311,11 @@ export function EndOfDayFlow({
                 </button>
               ) : null}
             </div>
+            {closedAt ? (
+              <p className="text-muted mt-8 text-center text-xs">
+                End of Day completed at {closedAt}
+              </p>
+            ) : null}
             {confirmReopen ? (
               <div className="bg-blush-50 mt-6 rounded-xl p-5 text-center">
                 <p className="text-ink text-sm font-bold">
@@ -399,6 +478,22 @@ export function EndOfDayFlow({
         </section>
       </div>
     </>
+  );
+}
+
+function ReadyActions() {
+  return (
+    <div className="flex flex-col items-stretch justify-center gap-3 md:ml-auto md:w-[240px]">
+      <Link
+        href="/today"
+        className="bg-lavender-300 border-lavender-500 text-lavender-700 rounded-lg border px-6 py-3 text-center text-sm font-bold"
+      >
+        Return to Today
+      </Link>
+      <p className="text-muted text-center text-[11px]">
+        Changes remain editable at any time.
+      </p>
+    </div>
   );
 }
 

@@ -86,6 +86,9 @@ calendar never changes locally entered work or blocks End of Day.
 - The OOO message is informational and does not require confirmation.
 - Adding, editing, reordering, or marking a plan Ready does not remove or alter
   the Google event.
+- After a plan is marked Ready, the Plan screen keeps a visible confirmation
+  panel with the saved date, selected item count, meeting count, and intention
+  so the user does not have to infer that the save worked.
 - End of Day still skips OOO when proposing the next required workday plan.
 
 ## Capacity reminder

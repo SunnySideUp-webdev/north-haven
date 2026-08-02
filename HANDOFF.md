@@ -104,6 +104,8 @@ calendar.
 - Work logs and next-workday calculation that skips weekends/non-working dates
 - Separate Plan navigation that includes OOO weekdays while continuing to skip
   holidays and manually blocked dates
+- Plan Ready now shows a persistent calm confirmation panel with selected work
+  counts, meeting count, and intention after the plan is saved
 - Corrected Work search shortcut layout without overlap
 - Four-step, resumable End of Day flow with persistent progress and day notes
 - Explicit Done, Return, Deferred, Watching, and No Longer Needed outcomes
@@ -129,8 +131,11 @@ calendar.
   confirmed meeting, important-note, and OOO indicators
 - Planned-only dates show a mini summary inside the cell instead of relying on
   the detached Day Summary panel
-- OOO dates use a stronger lavender surface, and each in-month day exposes a
-  hover-only appearance menu with five saved pastel colors plus Default
+- OOO dates use the softer `#DDD5E6` planner lavender with muted purple text,
+  and each in-month day exposes a hover-only appearance menu with five saved
+  pastel colors plus Default
+- Calendar appearance menus align by weekday column and can overflow the grid
+  without being clipped near the month edges
 - Workspace-scoped day colors are RLS protected and included in backup/restore
 - In-place Day Summary with Plan vs Actual, outcomes, intention, and day note
 - RLS-protected editable monthly notes and persistent month navigation

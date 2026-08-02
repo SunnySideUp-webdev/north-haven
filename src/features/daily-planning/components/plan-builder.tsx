@@ -43,6 +43,21 @@ const pretty = (value: string | null | undefined) =>
     ?.replaceAll("_", " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase()) ?? "—";
 
+function dateFromKey(value: string) {
+  return new Date(`${value}T12:00:00Z`);
+}
+
+function fullDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "full",
+    timeZone: "UTC",
+  }).format(dateFromKey(value));
+}
+
+function plural(value: number, singular: string, pluralValue = `${singular}s`) {
+  return `${value} ${value === 1 ? singular : pluralValue}`;
+}
+
 export function PlanBuilder({
   data,
   workDate,
@@ -82,6 +97,17 @@ export function PlanBuilder({
   const selected = data.items
     .filter((item) => item.planItem)
     .sort((a, b) => a.planItem!.position - b.planItem!.position);
+  const selectedTickets = selected.filter((item) => item.kind === "ticket").length;
+  const selectedTasks = selected.filter((item) => item.kind === "task").length;
+  const selectedReminders = selected.filter(
+    (item) => item.kind === "reminder",
+  ).length;
+  const selectedPieces = [
+    selectedTickets ? plural(selectedTickets, "ticket") : null,
+    selectedTasks ? plural(selectedTasks, "task") : null,
+    selectedReminders ? plural(selectedReminders, "reminder") : null,
+    meetings.length ? plural(meetings.length, "meeting") : null,
+  ].filter(Boolean);
   const ticketTypes = useMemo(
     () =>
       Array.from(
@@ -349,6 +375,35 @@ export function PlanBuilder({
             >
               {message}
             </p>
+          ) : null}
+          {data.plan?.status === "ready" ? (
+            <section
+              role="status"
+              className="border-success-ink/20 bg-success-surface rounded-xl border px-6 py-5"
+            >
+              <div className="flex items-start gap-4">
+                <div
+                  aria-hidden="true"
+                  className="bg-paper/80 flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+                >
+                  <span className="border-success-ink h-5 w-2.5 rotate-45 border-r-[3px] border-b-[3px]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-ink text-base font-bold">
+                    {fullDate(workDate)} is ready
+                  </p>
+                  <p className="text-muted mt-1 text-sm">
+                    {plural(selected.length, "item")} planned
+                    {selectedPieces.length ? ` · ${selectedPieces.join(" · ")}` : ""}
+                  </p>
+                  {intention ? (
+                    <p className="text-muted mt-3 text-xs leading-5">
+                      {intention}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </section>
           ) : null}
           {shouldShowCapacityReminder(selected.length) ? (
             <div className="bg-waiting-surface text-waiting-ink rounded-xl px-6 py-5 text-sm">
