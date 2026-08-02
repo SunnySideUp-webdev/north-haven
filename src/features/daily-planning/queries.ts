@@ -1,6 +1,10 @@
 import "server-only";
 
 import { getCalendarDay } from "@/features/calendar-sync/queries";
+import {
+  buildPlanningItems,
+  type OtherPlanAssignment,
+} from "@/features/daily-planning/planning-items";
 import { getWorkInventory } from "@/features/work-items/queries";
 import { requireAuthenticatedContext } from "@/server/auth/session";
 
@@ -37,21 +41,26 @@ export async function getDailyPlanningData(workDate: string) {
 
   if (itemsError) throw new Error("We couldn't load planned work.");
 
-  const selectedByWorkId = new Map(
-    planItems.map((item) => [item.work_item_id, item]),
-  );
-  const items = inventory
-    .filter(
-      (item) =>
-        item.id &&
-        (selectedByWorkId.has(item.id) ||
-          item.tracking_state === "active" ||
-          item.tracking_state === "watching"),
-    )
-    .map((item) => ({
-      ...item,
-      planItem: selectedByWorkId.get(item.id!) ?? null,
-    }));
+  const { data: otherPlanAssignments, error: otherPlanAssignmentsError } =
+    await supabase
+      .from("daily_plan_items")
+      .select(
+        "work_item_id, execution_status, daily_plans!inner(work_date, status)",
+      )
+      .neq("daily_plans.work_date", workDate)
+      .neq("daily_plans.status", "closed")
+      .in("execution_status", ["planned", "in_progress", "done"]);
+
+  if (otherPlanAssignmentsError) {
+    throw new Error("We couldn't load planned work.");
+  }
+
+  const items = buildPlanningItems({
+    inventory,
+    otherPlanAssignments:
+      otherPlanAssignments as unknown as OtherPlanAssignment[],
+    planItems,
+  });
 
   const [
     { data: nextWorkDate },

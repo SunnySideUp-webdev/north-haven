@@ -22,6 +22,29 @@ export async function setPlanSelectionAction(input: {
     return { ok: false, message: "Invalid planning selection." };
 
   const { supabase } = await requireAuthenticatedContext();
+  if (result.data.selected) {
+    const { data: existingPlanItems, error: existingPlanItemsError } =
+      await supabase
+        .from("daily_plan_items")
+        .select("id, daily_plans!inner(work_date, status)")
+        .eq("work_item_id", result.data.workItemId)
+        .neq("daily_plans.work_date", result.data.workDate)
+        .neq("daily_plans.status", "closed")
+        .in("execution_status", ["planned", "in_progress", "done"])
+        .limit(1);
+
+    if (existingPlanItemsError) {
+      return { ok: false, message: "We couldn't update this plan." };
+    }
+
+    if (existingPlanItems.length > 0) {
+      return {
+        ok: false,
+        message: "This item is already planned for another day.",
+      };
+    }
+  }
+
   const { error } = await supabase.rpc("set_plan_item_selected", {
     chosen_selected: result.data.selected,
     chosen_work_date: result.data.workDate,

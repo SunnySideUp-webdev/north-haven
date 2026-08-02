@@ -1,7 +1,7 @@
 # Daily Planning implementation
 
-Status: Complete through Phase 7.5C
-Last updated: August 1, 2026
+Status: Complete through Phase 7.5C plus cross-day planning de-duplication
+Last updated: August 2, 2026
 
 ## Outcome
 
@@ -33,6 +33,9 @@ Plan now provides:
 
 - a safe date selector
 - manual add/remove selection from active or watching inventory
+- cross-day planning de-duplication: work already selected in another open
+  plan is hidden from available and Unplanned lists until that plan is closed
+  or the work is removed/resolved through an outcome
 - suggested ordering by priority and age
 - explicit up/down position controls
 - daily intention
@@ -46,6 +49,12 @@ Plan now provides:
 - additional type, ticket type, priority, operational, tracking, backup,
   received-date, and review-date filters retained for the browser session
 - Suggested, Oldest, Newest, Priority, and Recently Worked ordering
+
+The same availability rule is used by the embedded End of Day next-workday
+planner because both surfaces read through `getDailyPlanningData`. Server
+actions also guard against stale clients adding work that is already selected
+in another non-closed plan, returning a clear duplicate-planning message rather
+than silently creating a confusing second commitment.
 
 Today now reads only the selected plan for the user's local date. It provides a
 real empty state, hides unplanned inventory, separates Tickets from normal work,
@@ -61,6 +70,8 @@ sits inside the search field and no longer overlaps the `All types` selector.
 - Friday-to-Monday next-workday calculation
 - manual holiday correctly moves Monday to Tuesday
 - duplicate plan selection is prevented by the database
+- cross-day duplicate planning is filtered before rendering and guarded in the
+  selection action
 - plans and work logs remain isolated across workspaces
 - Mark Ready and completion create the expected persisted states
 - Chromium covers Work creation, Plan selection, Ready confirmation, Today, and

@@ -11,18 +11,9 @@ import {
   setPlanSelectionAction,
 } from "@/features/daily-planning/actions";
 import { shouldShowCapacityReminder } from "@/features/daily-planning/capacity";
-import type { WorkInventoryRow } from "@/features/work-items/types";
+import type { PlanningInventoryItem } from "@/features/daily-planning/planning-items";
 import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
-
-type PlanningItem = WorkInventoryRow & {
-  planItem: {
-    id: string;
-    position: number;
-    execution_status: string;
-    work_item_id: string;
-  } | null;
-};
 
 const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 } as const;
 type SavedFilter =
@@ -65,7 +56,7 @@ export function PlanBuilder({
   data: {
     calendar: CalendarDayView;
     dueFollowUps: number;
-    items: PlanningItem[];
+    items: PlanningInventoryItem[];
     nextPlanningDate: string | null;
     previousPlanningDate: string | null;
     plan: { id: string; status: string; intention: string | null } | null;
@@ -97,7 +88,9 @@ export function PlanBuilder({
   const selected = data.items
     .filter((item) => item.planItem)
     .sort((a, b) => a.planItem!.position - b.planItem!.position);
-  const selectedTickets = selected.filter((item) => item.kind === "ticket").length;
+  const selectedTickets = selected.filter(
+    (item) => item.kind === "ticket",
+  ).length;
   const selectedTasks = selected.filter((item) => item.kind === "task").length;
   const selectedReminders = selected.filter(
     (item) => item.kind === "reminder",
@@ -253,7 +246,7 @@ export function PlanBuilder({
     tracking,
   ]);
 
-  function itemNumber(item: PlanningItem) {
+  function itemNumber(item: PlanningInventoryItem) {
     return item.ticket_number?.trim().toLowerCase() ?? "";
   }
 
@@ -394,7 +387,9 @@ export function PlanBuilder({
                   </p>
                   <p className="text-muted mt-1 text-sm">
                     {plural(selected.length, "item")} planned
-                    {selectedPieces.length ? ` · ${selectedPieces.join(" · ")}` : ""}
+                    {selectedPieces.length
+                      ? ` · ${selectedPieces.join(" · ")}`
+                      : ""}
                   </p>
                   {intention ? (
                     <p className="text-muted mt-3 text-xs leading-5">

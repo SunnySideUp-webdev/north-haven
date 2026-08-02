@@ -1,6 +1,6 @@
 # North Haven project handoff
 
-Last updated: August 1, 2026
+Last updated: August 2, 2026
 
 This file is the safest starting point when continuing North Haven in a new
 chat or development session. It summarizes the approved product direction and
@@ -217,6 +217,10 @@ calendar.
   confirmations, RLS isolation, and open-plan archival guards remain intact
 - The owner account, initial setup, and corporate Google Calendar connection
   have been completed successfully on the stable production deployment
+- Plan availability now excludes work already selected in another non-closed
+  daily plan, so tickets and tasks chosen for one day no longer reappear as
+  Unplanned when planning a different day; the selection action also rejects
+  stale cross-day duplicate additions with a clear message
 
 ### Pending or not started
 
@@ -282,6 +286,9 @@ visually reviewed. They contain no customer information and can be removed with
   active tickets.
 - The user selects every daily item manually.
 - Nothing rolls into another date automatically.
+- Work manually selected for one open daily plan should not appear as available
+  or Unplanned while planning another day unless it is removed from that plan
+  or the source plan is closed.
 - No drag-and-drop is required.
 
 ### Ticket semantics
