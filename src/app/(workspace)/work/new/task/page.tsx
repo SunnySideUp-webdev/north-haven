@@ -13,6 +13,7 @@ export default async function NewTaskPage() {
   return (
     <>
       <PageHeader
+        backLink={{ href: "/work", label: "Work inventory" }}
         title="New task"
         description="Keep normal work distinct from tickets while planning both in one place."
       />

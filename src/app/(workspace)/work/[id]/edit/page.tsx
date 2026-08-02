@@ -23,6 +23,7 @@ export default async function EditWorkItemPage({
   return (
     <>
       <PageHeader
+        backLink={{ href: `/work/${id}`, label: "Work item" }}
         title={`Edit ${item.kind}`}
         description="Keep the record current without losing its history."
       />

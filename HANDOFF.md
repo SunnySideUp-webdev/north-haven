@@ -195,6 +195,9 @@ calendar.
 - Google Calendar client ID, client secret, and token-encryption key are stored
   as sensitive Vercel variables for Production and Preview; the production
   deployment has been rebuilt successfully with them
+- Shared page headers use collision-safe grid layout instead of absolutely
+  positioned actions; Work Detail uses a calmer compact title and explicit
+  return navigation to Work Inventory, with matching exits on Create and Edit
 
 ### Pending or not started
 

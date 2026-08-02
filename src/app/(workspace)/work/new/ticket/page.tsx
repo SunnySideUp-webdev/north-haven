@@ -22,6 +22,7 @@ export default async function NewTicketPage({
   return (
     <>
       <PageHeader
+        backLink={{ href: "/work", label: "Work inventory" }}
         title="New ticket"
         description="Capture only the context you will need to act and follow through."
       />

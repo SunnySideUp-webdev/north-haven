@@ -53,17 +53,19 @@ export default async function WorkItemPage({
   return (
     <>
       <PageHeader
+        backLink={{ href: "/work", label: "Work inventory" }}
         title={
           item.ticket_number
             ? `${item.ticket_number} · ${item.title}`
             : (item.title ?? "Work item")
         }
+        titleSize="compact"
         description={`${label(item.kind)} · ${label(item.tracking_state)}`}
         action={
           item.tracking_state === "archived" ? (
             <ArchivedRecovery workItemId={id} />
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-end gap-3">
               <AddToPlan defaultDate={defaultPlanDate} workItemId={id} />
               <Link
                 href={`/work/${id}/edit`}

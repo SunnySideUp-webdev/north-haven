@@ -13,6 +13,7 @@ export default async function NewReminderPage() {
   return (
     <>
       <PageHeader
+        backLink={{ href: "/work", label: "Work inventory" }}
         title="New reminder"
         description="Save a small prompt now so your future self does not have to remember it."
       />

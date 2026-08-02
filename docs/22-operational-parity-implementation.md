@@ -43,6 +43,11 @@ for explicit confirmation before downstream closure, archival, a future
 received date, or clearing an existing backup completion. Duplicate ticket
 capture offers a direct link to the existing record.
 
+Long Work Detail titles use a compact 34-pixel heading and wrap inside their own
+grid column. Header actions no longer use absolute positioning, so Add to Plan
+and Edit cannot overlap the title. Work Detail exposes a clear return to Work
+Inventory, and the Create/Edit screens provide matching contextual exits.
+
 ## End of Day
 
 Ticket capture entered from End of Day now offers Save Ticket, Save and Add
