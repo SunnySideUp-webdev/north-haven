@@ -61,7 +61,7 @@ const calendar: MonthlyCalendarView = {
       planIntention: "Finish the oldest requests first.",
       plannedItems: 6,
       planStatus: "closed",
-      remindersCompleted: 0,
+      remindersCompleted: 1,
       returnedItems: 0,
       skippedItems: 0,
       tasksCompleted: 1,
@@ -104,8 +104,10 @@ describe("MonthlyCalendar", () => {
   it("shows retrospective metrics and a selected Day Summary", () => {
     render(<MonthlyCalendar calendar={calendar} googleConnected />);
 
-    expect(screen.getByText("3 worked")).toBeInTheDocument();
-    expect(screen.getByText("1 resolved")).toBeInTheDocument();
+    expect(screen.getAllByText("3 tickets worked")).toHaveLength(2);
+    expect(screen.getAllByText("1 ticket resolved")).toHaveLength(2);
+    expect(screen.getAllByText("1 task completed")).toHaveLength(2);
+    expect(screen.getAllByText("1 reminder completed")).toHaveLength(2);
     expect(screen.getAllByText("6 planned")).toHaveLength(1);
     expect(screen.getAllByText("2 meetings attended")).toHaveLength(2);
     expect(
@@ -122,9 +124,11 @@ describe("MonthlyCalendar", () => {
   it("hides a metric without losing the selected summary", () => {
     render(<MonthlyCalendar calendar={calendar} googleConnected />);
 
+    expect(screen.getAllByText("3 tickets worked")).toHaveLength(2);
     fireEvent.click(screen.getByRole("checkbox", { name: "worked" }));
-    expect(screen.queryByText("3 worked")).not.toBeInTheDocument();
-    expect(screen.getByText("3 tickets worked")).toBeInTheDocument();
+    expect(screen.getAllByText("3 tickets worked")).toHaveLength(1);
+    expect(screen.getAllByText("1 task completed")).toHaveLength(1);
+    expect(screen.getAllByText("1 reminder completed")).toHaveLength(1);
   });
 
   it("shows a planned-only day inside its calendar cell", () => {

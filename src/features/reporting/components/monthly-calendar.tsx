@@ -98,6 +98,43 @@ function plural(value: number, singular: string, pluralValue = `${singular}s`) {
   return `${value} ${value === 1 ? singular : pluralValue}`;
 }
 
+function dailyActivityLines(
+  row: DailyMetric,
+  visible: VisibleMetrics,
+): string[] {
+  const lines: string[] = [];
+
+  if (visible.planned && row.plannedItems) {
+    lines.push(`${plural(row.plannedItems, "planned", "planned")}`);
+  }
+
+  if (visible.worked && row.ticketsWorked) {
+    lines.push(`${plural(row.ticketsWorked, "ticket")} worked`);
+  }
+
+  if (visible.resolved && row.ticketsResolved) {
+    lines.push(`${plural(row.ticketsResolved, "ticket")} resolved`);
+  }
+
+  if (visible.resolved && row.ticketsClosed) {
+    lines.push(`${plural(row.ticketsClosed, "ticket")} closed`);
+  }
+
+  if (visible.worked && row.tasksCompleted) {
+    lines.push(`${plural(row.tasksCompleted, "task")} completed`);
+  }
+
+  if (visible.worked && row.remindersCompleted) {
+    lines.push(`${plural(row.remindersCompleted, "reminder")} completed`);
+  }
+
+  if (visible.meetings && row.meetingsAttended) {
+    lines.push(`${plural(row.meetingsAttended, "meeting")} attended`);
+  }
+
+  return lines;
+}
+
 function hasRecordedActivity(row: DailyMetric) {
   return Boolean(
     row.ticketsWorked ||
@@ -406,6 +443,7 @@ export function MonthlyCalendar({
             const inMonth = date.startsWith(calendar.monthKey);
             const isSelected = selectedDate === date;
             const day = Number(date.slice(-2));
+            const activityLines = row ? dailyActivityLines(row, visible) : [];
             const savedColor = dayColors[date];
             const selectedColor: CalendarDayColor = savedColor ?? "default";
             const surface = !inMonth
@@ -449,24 +487,18 @@ export function MonthlyCalendar({
                           OOO
                         </span>
                       ) : null}
-                      {visible.planned && row.plannedItems ? (
-                        <p className="text-lavender-700 font-bold">
-                          {plural(row.plannedItems, "planned", "planned")}
+                      {activityLines.map((line) => (
+                        <p
+                          key={line}
+                          className={
+                            line.includes("planned")
+                              ? "text-lavender-700 font-bold"
+                              : undefined
+                          }
+                        >
+                          {line}
                         </p>
-                      ) : null}
-                      {visible.worked && row.ticketsWorked ? (
-                        <p>{plural(row.ticketsWorked, "worked", "worked")}</p>
-                      ) : null}
-                      {visible.resolved && row.ticketsResolved ? (
-                        <p>
-                          {plural(row.ticketsResolved, "resolved", "resolved")}
-                        </p>
-                      ) : null}
-                      {visible.meetings && row.meetingsAttended ? (
-                        <p>
-                          {plural(row.meetingsAttended, "meeting")} attended
-                        </p>
-                      ) : null}
+                      ))}
                       {visible.notes && row.hasImportantNote ? (
                         <p className="text-blush-600 font-bold">
                           • Important note
@@ -556,14 +588,22 @@ export function MonthlyCalendar({
                 {selected.isOutOfOffice ? (
                   <p className="text-lavender-700 font-bold">Out of Office</p>
                 ) : null}
-                {selected.ticketsWorked ? (
-                  <p>{plural(selected.ticketsWorked, "ticket")} worked</p>
-                ) : null}
-                {selected.ticketsResolved ? (
-                  <p>{plural(selected.ticketsResolved, "ticket")} resolved</p>
-                ) : null}
-                {selected.ticketsClosed ? (
-                  <p>{plural(selected.ticketsClosed, "ticket")} closed</p>
+                {selected.ticketsWorked ||
+                selected.ticketsResolved ||
+                selected.ticketsClosed ? (
+                  <div className="space-y-2">
+                    {selected.ticketsWorked ? (
+                      <p>{plural(selected.ticketsWorked, "ticket")} worked</p>
+                    ) : null}
+                    {selected.ticketsResolved ? (
+                      <p>
+                        {plural(selected.ticketsResolved, "ticket")} resolved
+                      </p>
+                    ) : null}
+                    {selected.ticketsClosed ? (
+                      <p>{plural(selected.ticketsClosed, "ticket")} closed</p>
+                    ) : null}
+                  </div>
                 ) : null}
                 {selected.tasksCompleted ? (
                   <p>{plural(selected.tasksCompleted, "task")} completed</p>
