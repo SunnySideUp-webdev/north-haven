@@ -269,6 +269,19 @@ This protected server-only queue preserves confirmed meeting outcomes when a
 backup is restored before the corresponding Google event has been synced. A
 later calendar sync applies and removes matching rows.
 
+### calendar_day_appearances
+
+- `id`
+- `workspace_id`
+- `work_date`
+- `color`: lavender, blush, rose, cream, sage
+- `created_at`
+- `updated_at`
+
+One optional row per workspace and date stores visual planner metadata. Absence
+of a row means Default. The color never changes plan status, OOO state, metrics,
+or calendar synchronization behavior.
+
 ## Derived behavior
 
 - `backup_done` is derived from `form_backup_completed_at IS NOT NULL`.
@@ -327,6 +340,8 @@ only through `claim_report_export_slot()`.
 - Hard deletion is restricted; normal user deletion archives records.
 - A workspace backup contains user-owned source data and history, not derived
   KPI snapshots, authentication secrets, OAuth tokens, or provider cache.
+- Calendar day appearance preferences are portable user-owned metadata and are
+  included in backup and restore.
 - Restore replaces user-owned workspace content atomically and remaps ownership
   to the authenticated profile while retaining stable business identifiers.
 - KPI snapshots are not stored in the MVP. Queries or protected database views

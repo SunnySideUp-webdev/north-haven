@@ -28,7 +28,7 @@ export default async function CalendarPage({
     <>
       <PageHeader
         title={monthLabel}
-        description="A monthly record of actual work."
+        description="A monthly view of planned and completed work."
         action={
           <Link
             href="/settings#calendar-connection"

@@ -1,3 +1,15 @@
+export const calendarDayColors = [
+  "default",
+  "lavender",
+  "blush",
+  "rose",
+  "cream",
+  "sage",
+] as const;
+
+export type CalendarDayColor = (typeof calendarDayColors)[number];
+export type SavedCalendarDayColor = Exclude<CalendarDayColor, "default">;
+
 export type DailyMetric = {
   completedItems: number;
   dayNote: string | null;
@@ -20,6 +32,7 @@ export type DailyMetric = {
 
 export type MonthlyCalendarView = {
   currentMonth: string;
+  dayColors: Partial<Record<string, SavedCalendarDayColor>>;
   gridEnd: string;
   gridStart: string;
   monthEnd: string;

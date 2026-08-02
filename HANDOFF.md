@@ -125,8 +125,13 @@ calendar.
 - Local password recovery verified end to end through Mailpit
 - Shared, workspace-scoped daily reporting projection for Calendar, Insights,
   and exports
-- Retrospective six-week monthly Calendar with actual work, resolution,
+- Six-week monthly Calendar with planned and completed work, resolution,
   confirmed meeting, important-note, and OOO indicators
+- Planned-only dates show a mini summary inside the cell instead of relying on
+  the detached Day Summary panel
+- OOO dates use a stronger lavender surface, and each in-month day exposes a
+  hover-only appearance menu with five saved pastel colors plus Default
+- Workspace-scoped day colors are RLS protected and included in backup/restore
 - In-place Day Summary with Plan vs Actual, outcomes, intention, and day note
 - RLS-protected editable monthly notes and persistent month navigation
 - Week, Month, Quarter, and Custom Range Insights with partial-period handling

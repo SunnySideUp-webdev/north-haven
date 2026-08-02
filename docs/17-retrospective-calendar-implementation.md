@@ -5,10 +5,10 @@ Last updated: August 1, 2026
 
 ## Outcome
 
-Calendar is now a monthly retrospective record of actual work rather than a
+Calendar is now a monthly view of planned and completed work rather than a
 traditional agenda. It remains useful when Google Calendar is disconnected and
-combines North Haven outcomes with confirmed read-only meeting attendance when
-the connection is available.
+combines North Haven plans and outcomes with confirmed read-only meeting
+attendance when the connection is available.
 
 Selecting a date opens Day Summary over the current month without navigating
 away. Month and year controls change the reporting period, while the display
@@ -44,15 +44,25 @@ The same migration adds `month_notes`, protected by RLS and keyed by workspace
 plus the first date of the month. The Calendar rail can create, update, or clear
 the note without placing its content in a URL.
 
+Migration `20260801002200_calendar_day_appearance.sql` adds RLS-protected,
+workspace-scoped day colors. Default removes the preference; Lavender, Blush,
+Rose, Cream, and Sage persist across sessions and are included in workspace
+backup and restore. The preference is visual only and never changes plan,
+Calendar, OOO, or reporting data.
+
 ## Interface behavior
 
 - fixed six-week, Sunday-first planner grid
 - blush weekday header and muted adjacent-month/weekend cells
-- non-zero Worked, Resolved, confirmed Meetings, and Important Note indicators
-- full-day OOO treatment without misleading zero productivity metrics
+- non-zero Planned, Worked, Resolved, confirmed Meetings, and Important Note
+  indicators
+- planned-only dates display their count directly in the cell
+- full-day OOO treatment with a stronger lavender surface and no misleading
+  zero-productivity metric
+- hover-only three-dot menu for Default, Lavender, Blush, Rose, Cream, and Sage
 - explicit current date and selected-date states
 - month/year selectors plus Previous and Next controls
-- independent display filters for Worked, Resolved, Meetings, and Notes
+- independent display filters for Planned, Worked, Resolved, Meetings, and Notes
 - Day Summary with outcomes, Plan vs Actual, intention, deferred/returned counts,
   and the private day note
 - editable monthly note with an explicit save state
@@ -65,7 +75,8 @@ the note without placing its content in a URL.
 - real workspace projection returned the complete requested date range and
   recognized synchronized OOO dates
 - unit coverage for month parsing, year boundaries, and the fixed 42-day grid
-- component coverage for metrics, Day Summary, filters, and month navigation
+- component coverage for planned-only cells, stronger OOO styling, saved color
+  selection, metrics, Day Summary, filters, and month navigation
 - opt-in integration coverage asserts workspace isolation for the
   security-definer reporting projection
 - TypeScript and ESLint pass

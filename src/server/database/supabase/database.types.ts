@@ -68,6 +68,41 @@ export type Database = {
           },
         ];
       };
+      calendar_day_appearances: {
+        Row: {
+          color: Database["public"]["Enums"]["calendar_day_color"];
+          created_at: string;
+          id: string;
+          updated_at: string;
+          work_date: string;
+          workspace_id: string;
+        };
+        Insert: {
+          color: Database["public"]["Enums"]["calendar_day_color"];
+          created_at?: string;
+          id?: string;
+          updated_at?: string;
+          work_date: string;
+          workspace_id: string;
+        };
+        Update: {
+          color?: Database["public"]["Enums"]["calendar_day_color"];
+          created_at?: string;
+          id?: string;
+          updated_at?: string;
+          work_date?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "calendar_day_appearances_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       calendar_outcome_recovery: {
         Row: {
           attendance_status: Database["public"]["Enums"]["meeting_attendance_status"];
@@ -1231,6 +1266,7 @@ export type Database = {
       };
       create_ticket_type: { Args: { chosen_name: string }; Returns: string };
       create_workspace_backup: { Args: never; Returns: Json };
+      create_workspace_backup_core: { Args: never; Returns: Json };
       current_personal_workspace_id: { Args: never; Returns: string };
       find_ticket_by_number: {
         Args: { chosen_ticket_number: string };
@@ -1362,6 +1398,10 @@ export type Database = {
         Args: { chosen_backup: Json; chosen_confirmation: string };
         Returns: Json;
       };
+      restore_workspace_backup_core: {
+        Args: { chosen_backup: Json; chosen_confirmation: string };
+        Returns: Json;
+      };
       save_day_note: {
         Args: {
           chosen_body: string;
@@ -1480,6 +1520,7 @@ export type Database = {
     Enums: {
       calendar_connection_status:
         "connected" | "stale" | "disconnected" | "error";
+      calendar_day_color: "lavender" | "blush" | "rose" | "cream" | "sage";
       daily_plan_status: "draft" | "ready" | "active" | "closed";
       external_calendar_event_type:
         "default" | "out_of_office" | "focus_time" | "other";
@@ -1646,6 +1687,7 @@ export const Constants = {
         "disconnected",
         "error",
       ],
+      calendar_day_color: ["lavender", "blush", "rose", "cream", "sage"],
       daily_plan_status: ["draft", "ready", "active", "closed"],
       external_calendar_event_type: [
         "default",

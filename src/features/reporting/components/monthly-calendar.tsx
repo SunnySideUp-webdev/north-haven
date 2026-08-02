@@ -4,12 +4,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
-import { saveMonthNoteAction } from "@/features/reporting/actions";
+import {
+  saveCalendarDayColorAction,
+  saveMonthNoteAction,
+} from "@/features/reporting/actions";
 import { datesInRange, shiftMonthKey } from "@/features/reporting/date";
 import type {
+  CalendarDayColor,
   DailyMetric,
   MonthlyCalendarView,
 } from "@/features/reporting/types";
+import { calendarDayColors } from "@/features/reporting/types";
 
 const weekdays = [
   "Sunday",
@@ -38,8 +43,36 @@ const monthNames = [
 type VisibleMetrics = {
   meetings: boolean;
   notes: boolean;
+  planned: boolean;
   resolved: boolean;
   worked: boolean;
+};
+
+const dayColorLabels: Record<CalendarDayColor, string> = {
+  default: "Default",
+  lavender: "Lavender",
+  blush: "Blush",
+  rose: "Rose",
+  cream: "Cream",
+  sage: "Sage",
+};
+
+const dayColorSwatches: Record<CalendarDayColor, string> = {
+  default: "bg-paper border-border",
+  lavender: "bg-lavender-100 border-lavender-300",
+  blush: "bg-blush-100 border-blush-300",
+  rose: "bg-urgent-surface border-blush-300",
+  cream: "bg-waiting-surface border-waiting-ink/25",
+  sage: "bg-success-surface border-success-ink/25",
+};
+
+const dayColorSurfaces: Record<CalendarDayColor, string> = {
+  default: "bg-paper hover:bg-lavender-50",
+  lavender: "bg-lavender-100 hover:bg-lavender-200",
+  blush: "bg-blush-100 hover:bg-blush-200",
+  rose: "bg-urgent-surface hover:bg-blush-200",
+  cream: "bg-waiting-surface hover:brightness-[0.98]",
+  sage: "bg-success-surface hover:brightness-[0.98]",
 };
 
 function dateFromKey(value: string) {
@@ -79,6 +112,17 @@ function hasRecordedActivity(row: DailyMetric) {
   );
 }
 
+function hasCompletedActivity(row: DailyMetric) {
+  return Boolean(
+    row.ticketsWorked ||
+    row.ticketsResolved ||
+    row.ticketsClosed ||
+    row.tasksCompleted ||
+    row.remindersCompleted ||
+    row.meetingsAttended,
+  );
+}
+
 export function MonthlyCalendar({
   calendar,
   googleConnected,
@@ -91,9 +135,18 @@ export function MonthlyCalendar({
   const [visible, setVisible] = useState<VisibleMetrics>({
     meetings: true,
     notes: true,
+    planned: true,
     resolved: true,
     worked: true,
   });
+  const [appearanceState, setAppearanceState] = useState({
+    colors: calendar.dayColors,
+    monthKey: calendar.monthKey,
+  });
+  const [openAppearanceDate, setOpenAppearanceDate] = useState<string | null>(
+    null,
+  );
+  const [appearanceMessage, setAppearanceMessage] = useState<string>();
   const [monthNoteDraft, setMonthNoteDraft] = useState({
     body: calendar.monthNote,
     monthKey: calendar.monthKey,
@@ -132,6 +185,10 @@ export function MonthlyCalendar({
     noteStatus.monthKey === calendar.monthKey ? noteStatus.message : undefined;
   const selectedDate =
     selection.monthKey === calendar.monthKey ? selection.date : defaultDate;
+  const dayColors =
+    appearanceState.monthKey === calendar.monthKey
+      ? appearanceState.colors
+      : calendar.dayColors;
 
   const selected = selectedDate ? rowByDate.get(selectedDate) : undefined;
   const [year, month] = calendar.monthKey.split("-").map(Number);
@@ -155,6 +212,28 @@ export function MonthlyCalendar({
         monthKey: calendar.monthKey,
       });
       if (result.ok) router.refresh();
+    });
+  }
+
+  function saveDayColor(workDate: string, color: CalendarDayColor) {
+    setAppearanceMessage(undefined);
+    startTransition(async () => {
+      const result = await saveCalendarDayColorAction({ color, workDate });
+      if (!result.ok) {
+        setAppearanceMessage(result.message);
+        return;
+      }
+      setAppearanceState((current) => {
+        const colors =
+          current.monthKey === calendar.monthKey
+            ? { ...current.colors }
+            : { ...calendar.dayColors };
+        if (color === "default") delete colors[workDate];
+        else colors[workDate] = color;
+        return { colors, monthKey: calendar.monthKey };
+      });
+      setOpenAppearanceDate(null);
+      router.refresh();
     });
   }
 
@@ -305,6 +384,14 @@ export function MonthlyCalendar({
         aria-label={`${monthNames[month - 1]} ${year} work history`}
         className="relative min-w-0"
       >
+        {appearanceMessage ? (
+          <p
+            role="alert"
+            className="bg-urgent-surface text-urgent-ink mb-3 rounded-lg px-4 py-3 text-sm"
+          >
+            {appearanceMessage}
+          </p>
+        ) : null}
         <div className="border-border bg-paper grid grid-cols-7 overflow-hidden rounded-xl border">
           {weekdays.map((weekday) => (
             <div
@@ -319,51 +406,118 @@ export function MonthlyCalendar({
             const inMonth = date.startsWith(calendar.monthKey);
             const isSelected = selectedDate === date;
             const day = Number(date.slice(-2));
+            const savedColor = dayColors[date];
+            const selectedColor: CalendarDayColor = savedColor ?? "default";
+            const surface = !inMonth
+              ? "bg-canvas text-quiet"
+              : savedColor
+                ? dayColorSurfaces[savedColor]
+                : row?.isOutOfOffice
+                  ? "bg-lavender-300 hover:bg-lavender-300"
+                  : dayColorSurfaces.default;
+            const appearanceOpen = openAppearanceDate === date;
             return (
-              <button
-                type="button"
+              <div
                 key={date}
-                onClick={() =>
-                  setSelection({ date, monthKey: calendar.monthKey })
-                }
-                aria-label={`Open summary for ${fullDate(date)}`}
-                aria-pressed={isSelected}
-                className={`border-border relative min-h-[130px] border-t border-r p-3 text-left align-top first:border-t-0 [&:nth-child(-n+14)]:border-t-0 [&:nth-child(7n)]:border-r-0 ${!inMonth ? "bg-canvas text-quiet" : "bg-paper text-ink hover:bg-lavender-50"} ${row?.isOutOfOffice && inMonth ? "bg-lavender-100" : ""} ${isSelected ? "ring-lavender-500 z-10 ring-2 ring-inset" : ""}`}
+                className={`group border-border relative border-t border-r ${index % 7 === 6 ? "border-r-0" : ""} ${surface} ${isSelected ? "ring-lavender-500 z-10 ring-2 ring-inset" : ""}`}
               >
-                <span
-                  className={`text-xs ${date === calendar.today ? "bg-lavender-700 inline-flex h-6 w-6 items-center justify-center rounded-full font-bold text-white" : "font-medium"}`}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenAppearanceDate(null);
+                    setSelection({ date, monthKey: calendar.monthKey });
+                  }}
+                  aria-label={`Open summary for ${fullDate(date)}`}
+                  aria-pressed={isSelected}
+                  className="relative z-0 min-h-[130px] w-full p-3 text-left align-top"
                 >
-                  {day}
-                </span>
-                {inMonth && row ? (
-                  <div className="mt-3 space-y-1.5 text-[11px] leading-4">
-                    {row.isOutOfOffice ? (
-                      <span className="bg-lavender-300 text-lavender-700 inline-block rounded-full px-2 py-1 text-[9px] font-bold tracking-[0.08em] uppercase">
-                        OOO
-                      </span>
-                    ) : null}
-                    {visible.worked && row.ticketsWorked ? (
-                      <p>{plural(row.ticketsWorked, "worked", "worked")}</p>
-                    ) : null}
-                    {visible.resolved && row.ticketsResolved ? (
-                      <p>
-                        {plural(row.ticketsResolved, "resolved", "resolved")}
-                      </p>
-                    ) : null}
-                    {visible.meetings && row.meetingsAttended ? (
-                      <p>{plural(row.meetingsAttended, "meeting")} attended</p>
-                    ) : null}
-                    {visible.notes && row.hasImportantNote ? (
-                      <p className="text-blush-600 font-bold">
-                        • Important note
-                      </p>
-                    ) : null}
+                  <span
+                    className={`text-xs ${date === calendar.today ? "bg-lavender-700 inline-flex h-6 w-6 items-center justify-center rounded-full font-bold text-white" : "font-medium"}`}
+                  >
+                    {day}
+                  </span>
+                  {inMonth && row ? (
+                    <div className="mt-3 space-y-1.5 text-[11px] leading-4">
+                      {row.isOutOfOffice ? (
+                        <span className="bg-lavender-700 inline-block rounded-full px-2 py-1 text-[9px] font-bold tracking-[0.08em] text-white uppercase">
+                          OOO
+                        </span>
+                      ) : null}
+                      {visible.planned && row.plannedItems ? (
+                        <p className="text-lavender-700 font-bold">
+                          {plural(row.plannedItems, "planned", "planned")}
+                        </p>
+                      ) : null}
+                      {visible.worked && row.ticketsWorked ? (
+                        <p>{plural(row.ticketsWorked, "worked", "worked")}</p>
+                      ) : null}
+                      {visible.resolved && row.ticketsResolved ? (
+                        <p>
+                          {plural(row.ticketsResolved, "resolved", "resolved")}
+                        </p>
+                      ) : null}
+                      {visible.meetings && row.meetingsAttended ? (
+                        <p>
+                          {plural(row.meetingsAttended, "meeting")} attended
+                        </p>
+                      ) : null}
+                      {visible.notes && row.hasImportantNote ? (
+                        <p className="text-blush-600 font-bold">
+                          • Important note
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  {index % 7 === 0 || index % 7 === 6 ? (
+                    <span className="sr-only">Weekend</span>
+                  ) : null}
+                </button>
+
+                {inMonth ? (
+                  <button
+                    type="button"
+                    aria-label={`Customize ${fullDate(date)}`}
+                    aria-expanded={appearanceOpen}
+                    onClick={() =>
+                      setOpenAppearanceDate(appearanceOpen ? null : date)
+                    }
+                    className={`bg-paper/90 text-muted hover:text-ink absolute top-2 right-2 z-20 rounded-md px-2 py-1 text-xs font-bold tracking-[0.08em] shadow-sm transition-opacity ${appearanceOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100 focus-visible:opacity-100"}`}
+                  >
+                    •••
+                  </button>
+                ) : null}
+
+                {appearanceOpen ? (
+                  <div
+                    role="dialog"
+                    aria-label={`Day color for ${fullDate(date)}`}
+                    className={`border-border bg-paper shadow-surface absolute right-2 z-30 w-[210px] rounded-xl border p-4 ${index >= 35 ? "bottom-10" : "top-10"}`}
+                  >
+                    <p className="text-quiet text-[10px] font-bold tracking-[0.12em] uppercase">
+                      Day color
+                    </p>
+                    <div className="mt-3 grid grid-cols-3 gap-2">
+                      {calendarDayColors.map((color) => (
+                        <button
+                          type="button"
+                          key={color}
+                          disabled={pending}
+                          aria-label={`Use ${dayColorLabels[color]} for ${fullDate(date)}`}
+                          title={dayColorLabels[color]}
+                          onClick={() => saveDayColor(date, color)}
+                          className={`flex flex-col items-center gap-1.5 rounded-lg px-1 py-2 text-[9px] font-bold ${selectedColor === color ? "bg-lavender-50 text-lavender-700" : "text-muted hover:bg-lavender-50"}`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`h-6 w-6 rounded-full border ${dayColorSwatches[color]}`}
+                          />
+                          {dayColorLabels[color]}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 ) : null}
-                {index % 7 === 0 || index % 7 === 6 ? (
-                  <span className="sr-only">Weekend</span>
-                ) : null}
-              </button>
+              </div>
             );
           })}
         </div>
@@ -391,7 +545,7 @@ export function MonthlyCalendar({
               </button>
             </div>
 
-            {hasRecordedActivity(selected) ? (
+            {hasCompletedActivity(selected) ? (
               <div className="mt-6 space-y-3 text-sm">
                 {selected.isOutOfOffice ? (
                   <p className="text-lavender-700 font-bold">Out of Office</p>
@@ -417,6 +571,10 @@ export function MonthlyCalendar({
                   <p>{plural(selected.meetingsAttended, "meeting")} attended</p>
                 ) : null}
               </div>
+            ) : selected.plannedItems ? (
+              <p className="text-muted mt-6 text-sm leading-6">
+                This day is planned, but no work has been completed yet.
+              </p>
             ) : (
               <p className="text-muted mt-6 text-sm leading-6">
                 No completed work or confirmed outcomes were recorded for this

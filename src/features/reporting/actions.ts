@@ -9,6 +9,10 @@ import {
   reportConfigSchema,
   type ReportView,
 } from "@/features/reporting/reports";
+import {
+  calendarDayColors,
+  type SavedCalendarDayColor,
+} from "@/features/reporting/types";
 import { requireAuthenticatedContext } from "@/server/auth/session";
 
 export type ReportingActionResult = { message?: string; ok: boolean };
@@ -79,4 +83,46 @@ export async function saveMonthNoteAction(input: {
 
   revalidatePath("/calendar");
   return { message: "Monthly note saved.", ok: true };
+}
+
+export async function saveCalendarDayColorAction(input: {
+  color: unknown;
+  workDate: unknown;
+}): Promise<ReportingActionResult> {
+  const result = z
+    .object({
+      color: z.enum(calendarDayColors),
+      workDate: z.string().date(),
+    })
+    .safeParse(input);
+  if (!result.success)
+    return { message: "Choose a valid day color.", ok: false };
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { data: workspaceId, error: workspaceError } = await supabase.rpc(
+    "current_personal_workspace_id",
+  );
+  if (workspaceError || !workspaceId)
+    return { message: "We couldn't find your workspace.", ok: false };
+
+  const operation =
+    result.data.color === "default"
+      ? supabase
+          .from("calendar_day_appearances")
+          .delete()
+          .eq("workspace_id", workspaceId)
+          .eq("work_date", result.data.workDate)
+      : supabase.from("calendar_day_appearances").upsert(
+          {
+            color: result.data.color as SavedCalendarDayColor,
+            work_date: result.data.workDate,
+            workspace_id: workspaceId,
+          },
+          { onConflict: "workspace_id,work_date" },
+        );
+  const { error } = await operation;
+  if (error) return { message: "We couldn't save this day color.", ok: false };
+
+  revalidatePath("/calendar");
+  return { message: "Day color saved.", ok: true };
 }

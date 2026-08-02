@@ -24,6 +24,7 @@ import type {
   InventoryMetric,
   MonthlyCalendarView,
   PeriodTotals,
+  SavedCalendarDayColor,
 } from "@/features/reporting/types";
 import { requireAuthenticatedContext } from "@/server/auth/session";
 
@@ -112,25 +113,41 @@ export async function getMonthlyCalendar(
   const monthKey = normalizeMonthKey(requestedMonth, currentMonth);
   const range = getMonthRange(monthKey);
 
-  const [{ data: rows, error }, { data: monthNote, error: noteError }] =
-    await Promise.all([
-      supabase.rpc("reporting_daily_metrics", {
-        chosen_end_date: range.gridEnd,
-        chosen_start_date: range.gridStart,
-      }),
-      supabase
-        .from("month_notes")
-        .select("body")
-        .eq("month_start", range.monthStart)
-        .maybeSingle(),
-    ]);
+  const [
+    { data: rows, error },
+    { data: monthNote, error: noteError },
+    { data: dayAppearances, error: appearanceError },
+  ] = await Promise.all([
+    supabase.rpc("reporting_daily_metrics", {
+      chosen_end_date: range.gridEnd,
+      chosen_start_date: range.gridStart,
+    }),
+    supabase
+      .from("month_notes")
+      .select("body")
+      .eq("month_start", range.monthStart)
+      .maybeSingle(),
+    supabase
+      .from("calendar_day_appearances")
+      .select("work_date, color")
+      .gte("work_date", range.gridStart)
+      .lte("work_date", range.gridEnd),
+  ]);
 
   if (error) throw new Error("We couldn't load this month's work history.");
   if (noteError) throw new Error("We couldn't load the monthly note.");
+  if (appearanceError)
+    throw new Error("We couldn't load the calendar appearance.");
 
   return {
     ...range,
     currentMonth,
+    dayColors: Object.fromEntries(
+      (dayAppearances ?? []).map((appearance) => [
+        appearance.work_date,
+        appearance.color as SavedCalendarDayColor,
+      ]),
+    ),
     monthKey,
     monthNote: monthNote?.body ?? "",
     rows: (rows ?? []).map(mapDailyMetric),

@@ -17,6 +17,7 @@ export const workspaceBackupSchema = z.object({
   }),
   source_workspace_id: z.string().uuid(),
   tables: z.object({
+    calendar_day_appearances: backupRowsSchema.default([]),
     calendar_outcomes: backupRowsSchema,
     daily_plan_items: backupRowsSchema,
     daily_plans: backupRowsSchema,

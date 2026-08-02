@@ -39,6 +39,10 @@
 - Google Calendar remains the only meeting source for the personal launch.
   Manual meeting entry is deferred to avoid duplicate records and unclear
   source semantics; Calendar failure never blocks manual work planning.
+- Calendar cells show planned work before the date is worked, so future plans
+  are visible without opening Day Summary.
+- A hover-only appearance menu stores optional pastel day colors. These colors
+  are presentation metadata and never change the meaning of OOO or work data.
 
 ## Experience
 

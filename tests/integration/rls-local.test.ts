@@ -777,6 +777,27 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     expect(afterOooPlanningDate).toBe("2026-08-10");
     expect(beforeTuesdayPlanningDate).toBe("2026-08-10");
 
+    const { data: savedDayAppearance, error: dayAppearanceError } =
+      await clientA
+        .from("calendar_day_appearances")
+        .insert({
+          color: "blush",
+          work_date: "2026-08-10",
+          workspace_id: workspacesA![0].id,
+        })
+        .select("id, color, work_date")
+        .single();
+    const { data: isolatedDayAppearances } = await clientB
+      .from("calendar_day_appearances")
+      .select("id")
+      .eq("work_date", "2026-08-10");
+    expect(dayAppearanceError).toBeNull();
+    expect(savedDayAppearance).toMatchObject({
+      color: "blush",
+      work_date: "2026-08-10",
+    });
+    expect(isolatedDayAppearances).toEqual([]);
+
     const { error: oooPlanSelectionError } = await clientA.rpc(
       "set_plan_item_selected",
       {
@@ -841,21 +862,30 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     );
     expect(restoreError).toBeNull();
     expect(restoreResult).toMatchObject({
+      calendar_day_appearances: 1,
       calendar_outcomes_applied: 1,
       calendar_outcomes_waiting: 0,
       daily_plans: 4,
       work_items: 3,
     });
 
-    const [{ data: restoredProfile }, { data: restoredReminder }] =
-      await Promise.all([
-        clientA.from("profiles").select("display_name").single(),
-        clientA
-          .from("work_inventory_rows")
-          .select("title, tracking_state")
-          .eq("id", reminderId!)
-          .single(),
-      ]);
+    const [
+      { data: restoredProfile },
+      { data: restoredReminder },
+      { data: restoredDayAppearance },
+    ] = await Promise.all([
+      clientA.from("profiles").select("display_name").single(),
+      clientA
+        .from("work_inventory_rows")
+        .select("title, tracking_state")
+        .eq("id", reminderId!)
+        .single(),
+      clientA
+        .from("calendar_day_appearances")
+        .select("color, work_date")
+        .eq("work_date", "2026-08-10")
+        .single(),
+    ]);
     const { data: restoredMeetingOutcome } = await admin
       .from("meeting_outcomes")
       .select("attendance_status, local_note")
@@ -871,6 +901,10 @@ describe.skipIf(!runLocalIntegration)("local workspace RLS", () => {
     expect(restoredReminder).toEqual({
       title: "Check the form changes",
       tracking_state: "active",
+    });
+    expect(restoredDayAppearance).toEqual({
+      color: "blush",
+      work_date: "2026-08-10",
     });
     expect(restoredMeetingOutcome).toEqual({
       attendance_status: "attended",

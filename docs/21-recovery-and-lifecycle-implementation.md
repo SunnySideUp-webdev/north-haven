@@ -23,7 +23,8 @@ private, no-store JSON attachment. The contract is identified by:
 
 It contains Profile and Work schedule settings, Ticket Types, Tickets, Tasks,
 Reminders, notes, follow-ups, status history, Daily Plans and items, work logs,
-day and month notes, manual non-working days, and confirmed meeting outcomes.
+day and month notes, calendar day colors, manual non-working days, and confirmed
+meeting outcomes.
 
 It never contains a password, Supabase session, Google OAuth token, sync token,
 or provider calendar cache. These are authentication or reproducible integration
@@ -67,14 +68,15 @@ trigger records the recovery.
 ## Demonstrated recovery
 
 The local integration test creates a related workspace graph, including a
-closed plan, logs, notes, a Google meeting outcome, manual non-working time, and
-Google OOO. It then:
+closed plan, logs, notes, a saved calendar day color, a Google meeting outcome,
+manual non-working time, and Google OOO. It then:
 
 1. creates and validates a secret-free backup;
 2. changes profile and work-item data;
 3. proves an incorrect confirmation is rejected;
 4. restores the backup;
-5. verifies content, history, meeting outcome, and Google OOO integrity;
+5. verifies content, history, day color, meeting outcome, and Google OOO
+   integrity;
 6. reopens and closes a day again; and
 7. archives and restores a work item.
 
