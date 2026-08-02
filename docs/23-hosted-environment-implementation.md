@@ -80,6 +80,12 @@ The Tokki Vercel project is connected to the GitHub `main` branch. Its stable
 production domain is `https://north-haven-steel.vercel.app`; generated deployment
 URLs are not used for OAuth configuration.
 
+All seven application variables, including the three Google Calendar values,
+are now stored by Vercel for Production and Preview. Google values use Sensitive
+visibility. The production deployment was rebuilt successfully after adding
+them; the remaining Calendar step is registering the stable production origin
+and callback in the existing Google OAuth web client.
+
 ## Protected environment variables
 
 Configure these names in Vercel; values stay in the provider dashboards and

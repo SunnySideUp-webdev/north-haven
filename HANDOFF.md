@@ -192,6 +192,9 @@ calendar.
   hour allowance rather than invalid user credentials or a database failure
 - Account creation now translates the Supabase email-rate-limit code into a
   calm, actionable message instead of a generic signup error
+- Google Calendar client ID, client secret, and token-encryption key are stored
+  as sensitive Vercel variables for Production and Preview; the production
+  deployment has been rebuilt successfully with them
 
 ### Pending or not started
 
@@ -200,8 +203,8 @@ calendar.
 - Confirm the owner's production signup email, finish first-time setup, and
   verify hosted session restoration
 - Verify hosted password recovery in a separate email-rate-limit window
-- Validate the production Google Calendar callback and one read-only corporate
-  calendar sync
+- Add the stable Vercel origin and callback to the existing Google OAuth web
+  client, then validate one read-only corporate calendar sync
 - Phase 8 hardening and personal launch
 
 Application code, local real-calendar validation, the hosted database schema,
@@ -211,12 +214,12 @@ remain to be completed.
 
 ### Next step
 
-Continue Phase 7.5D after the Supabase email allowance refills: create and
-confirm the owner's account at the stable production URL, complete setup, then
-run the remaining cleanup-safe hosted acceptance checks without consuming the
-signup and password-recovery emails in the same one-hour window. Production
-Google Calendar consent is verified only after its stable Vercel origin and
-callback are registered. The exact sequence is in
+Continue Phase 7.5D by registering
+`https://north-haven-steel.vercel.app` and its exact Google Calendar callback in
+the existing Google OAuth web client, then connect the corporate Calendar from
+production and verify one read-only sync. Run the remaining cleanup-safe hosted
+acceptance checks without consuming signup and password-recovery emails in the
+same one-hour window. The exact sequence is in
 `docs/23-hosted-environment-implementation.md`. The completed reporting, Settings, and recovery
 implementations are documented in
 `docs/17-retrospective-calendar-implementation.md`,
