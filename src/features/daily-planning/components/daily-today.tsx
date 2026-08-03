@@ -246,7 +246,7 @@ export function DailyToday({
                     return (
                       <article
                         key={item.id}
-                        className="border-border flex items-center gap-5 border-t py-5 first:border-t-0"
+                        className="border-border hover:bg-lavender-50 group flex items-center gap-5 border-t py-5 first:border-t-0"
                       >
                         <button
                           disabled={pending}
@@ -260,7 +260,10 @@ export function DailyToday({
                         >
                           {done ? "✓" : ""}
                         </button>
-                        <div className="min-w-0 flex-1">
+                        <Link
+                          href={`/work/${item.id}?from=today`}
+                          className="focus-visible:ring-lavender-500 block min-w-0 flex-1 rounded-md py-1 outline-none focus-visible:ring-2"
+                        >
                           <h3 className={titleClassName}>
                             {item.ticket_number
                               ? formatTicketNumber(item.ticket_number) + " · "
@@ -271,12 +274,6 @@ export function DailyToday({
                             {item.kind} ·{" "}
                             {item.system_priority ?? item.tracking_state}
                           </p>
-                        </div>
-                        <Link
-                          href={"/work/" + item.id}
-                          className="text-lavender-700 text-xs font-bold"
-                        >
-                          Details
                         </Link>
                       </article>
                     );

@@ -59,7 +59,9 @@ than silently creating a confusing second commitment.
 Today now reads only the selected plan for the user's local date. It provides a
 real empty state, hides unplanned inventory, separates Tickets from normal work,
 shows progress, and records reversible Done decisions without changing Ticket
-workflow status.
+workflow status. Planned work rows in Today now match the Work Inventory's
+hover-open rhythm: the item content opens Work Detail without a separate
+Details action, and Work Detail returns to Today when it was opened from Today.
 
 The Work search regression reported during review is fixed. The `/` hint now
 sits inside the search field and no longer overlaps the `All types` selector.

@@ -10,10 +10,12 @@ export const metadata: Metadata = { title: "Edit work" };
 
 export default async function EditWorkItemPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
-  const { id } = await params;
+  const [{ id }, { from }] = await Promise.all([params, searchParams]);
   const [item, { profile }] = await Promise.all([
     getWorkItem(id),
     requireAuthenticatedContext(),
@@ -23,7 +25,10 @@ export default async function EditWorkItemPage({
   return (
     <>
       <PageHeader
-        backLink={{ href: `/work/${id}`, label: "Work item" }}
+        backLink={{
+          href: from === "today" ? `/work/${id}?from=today` : `/work/${id}`,
+          label: "Work item",
+        }}
         title={`Edit ${item.kind}`}
         description="Keep the record current without losing its history."
       />

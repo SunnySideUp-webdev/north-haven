@@ -39,15 +39,21 @@ function Detail({ title, value }: { title: string; value: React.ReactNode }) {
 
 export default async function WorkItemPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
-  const { id } = await params;
+  const [{ id }, { from }] = await Promise.all([params, searchParams]);
   const [item, activity, defaultPlanDate] = await Promise.all([
     getWorkItem(id),
     getWorkItemActivity(id),
     getDefaultPlanDate(),
   ]);
+  const backLink =
+    from === "today"
+      ? { href: "/today", label: "Today" }
+      : { href: "/work", label: "Work inventory" };
   const openFollowUp = activity.followUps.find(
     (followUp) => followUp.state === "open",
   );
@@ -55,7 +61,7 @@ export default async function WorkItemPage({
   return (
     <>
       <PageHeader
-        backLink={{ href: "/work", label: "Work inventory" }}
+        backLink={backLink}
         title={
           item.ticket_number
             ? `${formatTicketNumber(item.ticket_number)} · ${item.title}`
@@ -70,7 +76,11 @@ export default async function WorkItemPage({
             <div className="flex flex-wrap items-center justify-end gap-3">
               <AddToPlan defaultDate={defaultPlanDate} workItemId={id} />
               <Link
-                href={`/work/${id}/edit`}
+                href={
+                  from === "today"
+                    ? `/work/${id}/edit?from=today`
+                    : `/work/${id}/edit`
+                }
                 className="bg-lavender-700 hover:bg-lavender-500 rounded-lg px-5 py-3 text-sm font-bold text-white"
               >
                 Edit

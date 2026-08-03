@@ -221,6 +221,9 @@ calendar.
   daily plan, so tickets and tasks chosen for one day no longer reappear as
   Unplanned when planning a different day; the selection action also rejects
   stale cross-day duplicate additions with a clear message
+- Today planned work rows open Work Detail directly from the item content with
+  hover feedback, and Work Detail returns to Today when opened from Today while
+  preserving the Work Inventory return path for Work-originated visits
 
 ### Pending or not started
 
