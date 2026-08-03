@@ -184,6 +184,14 @@ const styles = StyleSheet.create({
   },
   detailTitle: { fontSize: 8, fontWeight: 700 },
   detailMeta: { color: color.muted, fontSize: 7, marginTop: 3 },
+  emptyDetail: {
+    backgroundColor: color.lavender,
+    borderRadius: 5,
+    color: color.muted,
+    fontSize: 7,
+    marginTop: 8,
+    padding: 10,
+  },
   note: {
     backgroundColor: color.blush,
     borderRadius: 5,
@@ -397,6 +405,10 @@ function DailyOutcome({ report }: { report: ReportView }) {
   );
 }
 
+function EmptyDetail({ children }: { children: string }) {
+  return <Text style={styles.emptyDetail}>{children}</Text>;
+}
+
 export function ReportPdfDocument({ report }: { report: ReportView }) {
   const completion = planCompletion(report.totals);
   const detailsIncluded =
@@ -541,64 +553,82 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
           </View>
         ) : null}
 
-        {report.config.includeTicketDetails && report.ticketDetails.length ? (
+        {report.config.includeTicketDetails ? (
           <View style={styles.detailSection}>
             <Text style={styles.sectionTitle}>Tickets worked</Text>
-            {report.ticketDetails.map((ticket) => (
-              <View
-                key={ticket.ticketNumber}
-                style={styles.detailRow}
-                wrap={false}
-              >
-                <Text style={styles.detailTitle}>
-                  {formatTicketNumber(ticket.ticketNumber)} · {ticket.title}
-                </Text>
-                <Text style={styles.detailMeta}>
-                  Worked {ticket.workDates.map(shortDate).join(", ")}
-                </Text>
-              </View>
-            ))}
+            {report.ticketDetails.length ? (
+              report.ticketDetails.map((ticket) => (
+                <View
+                  key={ticket.ticketNumber}
+                  style={styles.detailRow}
+                  wrap={false}
+                >
+                  <Text style={styles.detailTitle}>
+                    {formatTicketNumber(ticket.ticketNumber)} · {ticket.title}
+                  </Text>
+                  <Text style={styles.detailMeta}>
+                    Worked {ticket.workDates.map(shortDate).join(", ")}
+                  </Text>
+                </View>
+              ))
+            ) : (
+              <EmptyDetail>
+                No ticket numbers or titles matched this report period.
+              </EmptyDetail>
+            )}
           </View>
         ) : null}
 
-        {report.config.includeDayNotes && report.dayNotes.length ? (
+        {report.config.includeDayNotes ? (
           <View style={styles.detailSection}>
             <Text style={styles.sectionTitle}>Day notes</Text>
-            {report.dayNotes.map((note) => (
-              <View key={note.workDate} style={styles.note} wrap={false}>
-                <Text style={styles.detailTitle}>
-                  {shortDate(note.workDate)}
-                  {note.isImportant ? " · Important" : ""}
-                </Text>
-                <Text style={styles.detailMeta}>{note.body}</Text>
-              </View>
-            ))}
+            {report.dayNotes.length ? (
+              report.dayNotes.map((note) => (
+                <View key={note.workDate} style={styles.note} wrap={false}>
+                  <Text style={styles.detailTitle}>
+                    {shortDate(note.workDate)}
+                    {note.isImportant ? " · Important" : ""}
+                  </Text>
+                  <Text style={styles.detailMeta}>{note.body}</Text>
+                </View>
+              ))
+            ) : (
+              <EmptyDetail>
+                No day notes were recorded for this period.
+              </EmptyDetail>
+            )}
           </View>
         ) : null}
 
-        {report.config.includeFollowUpReasons && report.followUps.length ? (
+        {report.config.includeFollowUpReasons ? (
           <View style={styles.detailSection}>
             <Text style={styles.sectionTitle}>Upcoming follow-ups</Text>
-            {report.followUps.map((followUp, index) => (
-              <View
-                key={`${followUp.reviewOn}-${index}`}
-                style={styles.detailRow}
-                wrap={false}
-              >
-                <Text style={styles.detailTitle}>
-                  {followUp.ticketNumber
-                    ? `${formatTicketNumber(followUp.ticketNumber)} · `
-                    : ""}
-                  {followUp.title}
-                </Text>
-                <Text style={styles.detailMeta}>
-                  Review {shortDate(followUp.reviewOn)} · {followUp.reason}
-                  {followUp.waitingOn
-                    ? ` · Waiting on ${followUp.waitingOn}`
-                    : ""}
-                </Text>
-              </View>
-            ))}
+            {report.followUps.length ? (
+              report.followUps.map((followUp, index) => (
+                <View
+                  key={`${followUp.reviewOn}-${index}`}
+                  style={styles.detailRow}
+                  wrap={false}
+                >
+                  <Text style={styles.detailTitle}>
+                    {followUp.ticketNumber
+                      ? `${formatTicketNumber(followUp.ticketNumber)} · `
+                      : ""}
+                    {followUp.title}
+                  </Text>
+                  <Text style={styles.detailMeta}>
+                    Review {shortDate(followUp.reviewOn)} · {followUp.reason}
+                    {followUp.waitingOn
+                      ? ` · Waiting on ${followUp.waitingOn}`
+                      : ""}
+                  </Text>
+                </View>
+              ))
+            ) : (
+              <EmptyDetail>
+                No follow-up reviews are due in the next workweek.
+              </EmptyDetail>
+            )}
           </View>
         ) : null}
 

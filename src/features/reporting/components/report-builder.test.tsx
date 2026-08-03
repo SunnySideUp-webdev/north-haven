@@ -48,4 +48,27 @@ describe("Report Builder", () => {
       ).toBeEnabled(),
     );
   });
+
+  it("shows selected detail sections even when the period has no matching rows", () => {
+    render(<ReportBuilder initialReport={reportFixture()} />);
+
+    fireEvent.click(screen.getByLabelText(/Ticket numbers and titles/));
+    fireEvent.click(screen.getByLabelText(/Day notes/));
+    fireEvent.click(screen.getByLabelText(/Follow-up reasons/));
+
+    expect(screen.getByRole("heading", { name: "Tickets worked" }));
+    expect(
+      screen.getByText(
+        "No ticket numbers or titles matched this report period.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Day notes" }));
+    expect(
+      screen.getByText("No day notes were recorded for this period."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Upcoming follow-ups" }));
+    expect(
+      screen.getByText("No follow-up reviews are due in the next workweek."),
+    ).toBeInTheDocument();
+  });
 });

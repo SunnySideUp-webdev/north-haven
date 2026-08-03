@@ -53,6 +53,14 @@ function Metric({
   );
 }
 
+function EmptyDetail({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="bg-lavender-50 text-muted mt-3 rounded-lg px-4 py-3 text-xs leading-5">
+      {children}
+    </p>
+  );
+}
+
 function TrendPreview({ report }: { report: ReportView }) {
   if (report.config.period === "daily") {
     return (
@@ -371,62 +379,80 @@ function PdfPreview({ report }: { report: ReportView }) {
         </section>
       ) : null}
 
-      {report.config.includeTicketDetails && report.ticketDetails.length ? (
+      {report.config.includeTicketDetails ? (
         <section className="mt-7">
           <h3 className="text-ink text-sm font-bold">Tickets worked</h3>
-          <ul className="mt-3 divide-y">
-            {report.ticketDetails.map((ticket) => (
-              <li key={ticket.ticketNumber} className="py-3 text-xs">
-                <strong>{formatTicketNumber(ticket.ticketNumber)}</strong> ·{" "}
-                {ticket.title}
-                <span className="text-muted mt-1 block">
-                  Worked {ticket.workDates.map(shortDate).join(", ")}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {report.ticketDetails.length ? (
+            <ul className="mt-3 divide-y">
+              {report.ticketDetails.map((ticket) => (
+                <li key={ticket.ticketNumber} className="py-3 text-xs">
+                  <strong>{formatTicketNumber(ticket.ticketNumber)}</strong> ·{" "}
+                  {ticket.title}
+                  <span className="text-muted mt-1 block">
+                    Worked {ticket.workDates.map(shortDate).join(", ")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyDetail>
+              No ticket numbers or titles matched this report period.
+            </EmptyDetail>
+          )}
         </section>
       ) : null}
 
-      {report.config.includeDayNotes && report.dayNotes.length ? (
+      {report.config.includeDayNotes ? (
         <section className="mt-7">
           <h3 className="text-ink text-sm font-bold">Day notes</h3>
-          {report.dayNotes.map((note) => (
-            <div
-              key={note.workDate}
-              className="bg-blush-50 mt-3 rounded-lg p-4 text-xs leading-5"
-            >
-              <strong>
-                {shortDate(note.workDate)}
-                {note.isImportant ? " · Important" : ""}
-              </strong>
-              <p className="text-muted mt-1">{note.body}</p>
-            </div>
-          ))}
+          {report.dayNotes.length ? (
+            report.dayNotes.map((note) => (
+              <div
+                key={note.workDate}
+                className="bg-blush-50 mt-3 rounded-lg p-4 text-xs leading-5"
+              >
+                <strong>
+                  {shortDate(note.workDate)}
+                  {note.isImportant ? " · Important" : ""}
+                </strong>
+                <p className="text-muted mt-1">{note.body}</p>
+              </div>
+            ))
+          ) : (
+            <EmptyDetail>
+              No day notes were recorded for this period.
+            </EmptyDetail>
+          )}
         </section>
       ) : null}
 
-      {report.config.includeFollowUpReasons && report.followUps.length ? (
+      {report.config.includeFollowUpReasons ? (
         <section className="mt-7">
           <h3 className="text-ink text-sm font-bold">Upcoming follow-ups</h3>
-          <ul className="mt-3 divide-y">
-            {report.followUps.map((followUp, index) => (
-              <li
-                key={`${followUp.reviewOn}-${index}`}
-                className="py-3 text-xs"
-              >
-                <strong>
-                  {followUp.ticketNumber
-                    ? `${formatTicketNumber(followUp.ticketNumber)} · `
-                    : ""}
-                  {followUp.title}
-                </strong>
-                <span className="text-muted mt-1 block">
-                  Review {shortDate(followUp.reviewOn)} · {followUp.reason}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {report.followUps.length ? (
+            <ul className="mt-3 divide-y">
+              {report.followUps.map((followUp, index) => (
+                <li
+                  key={`${followUp.reviewOn}-${index}`}
+                  className="py-3 text-xs"
+                >
+                  <strong>
+                    {followUp.ticketNumber
+                      ? `${formatTicketNumber(followUp.ticketNumber)} · `
+                      : ""}
+                    {followUp.title}
+                  </strong>
+                  <span className="text-muted mt-1 block">
+                    Review {shortDate(followUp.reviewOn)} · {followUp.reason}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyDetail>
+              No follow-up reviews are due in the next workweek.
+            </EmptyDetail>
+          )}
         </section>
       ) : null}
 

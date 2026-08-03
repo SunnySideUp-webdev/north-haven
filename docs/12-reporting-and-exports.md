@@ -74,6 +74,10 @@ When detailed work content is enabled, the preview displays `This report may
 contain customer information.` before generation. Notes are never included in
 CSV unless explicitly selected.
 
+Selected detail sections remain visible in the PDF preview and generated PDF
+even when the selected period has no matching rows. In that case, the section
+shows an empty-state sentence instead of disappearing.
+
 ## Formats
 
 ### Designed PDF

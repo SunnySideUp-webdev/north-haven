@@ -74,6 +74,11 @@ All content remains selectable text. The weekly chart uses weekday labels plus
 per-day Worked/Resolved totals with matching color swatches beneath each bar, so
 the PDF does not rely on color alone or a dense paragraph legend.
 
+Optional detail sections are explicit when selected. Ticket numbers and titles,
+Day notes, and Follow-up reasons render matching rows when available, and render
+a short empty-state sentence when no rows match the report period or upcoming
+review window.
+
 ## Data CSV
 
 The CSV is UTF-8 with a byte-order mark for spreadsheet compatibility. It uses
