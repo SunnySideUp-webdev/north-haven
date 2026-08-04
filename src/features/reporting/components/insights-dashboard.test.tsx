@@ -107,6 +107,8 @@ describe("Insights", () => {
     expect(
       screen.getByRole("heading", { name: "Ticket flow" }),
     ).toBeInTheDocument();
+    expect(screen.getByLabelText("Aug 3 flow totals")).toHaveTextContent("2");
+    expect(screen.getByLabelText("Aug 3 flow totals")).toHaveTextContent("1");
     expect(
       screen.getByRole("img", {
         name: "Ticket status: 8 tracked tickets total; 3 pending, 2 in progress, 2 waiting, 1 resolved.",

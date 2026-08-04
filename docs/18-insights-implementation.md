@@ -80,6 +80,9 @@ status because it better reflects actionable ticket state.
 - Five primary metrics are followed by a quieter status and average band.
 - The primary analysis surface compares Received versus Resolved ticket flow on
   the left and shows an operational status donut on the right.
+- Ticket flow bars show the bucket label plus color-keyed Received and Resolved
+  totals beneath each interval, so the user does not have to infer counts from
+  bar height alone.
 - Work activity appears separately as a single Worked series, because Worked is
   activity-log volume while Resolved is a status event.
 - Work Completed, Received versus Resolved, Active Inventory, Ticket Age, and

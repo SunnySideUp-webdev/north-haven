@@ -115,7 +115,7 @@ function ComparisonBars({
           <span className="bg-blush-200 h-3 w-3 rounded-sm" /> {secondLabel}
         </span>
       </div>
-      <div className="border-border mt-5 overflow-x-auto border-b pb-1">
+      <div className="mt-5 overflow-x-auto">
         <div
           className="flex w-full items-end gap-5"
           style={{ minWidth: `${Math.max(560, buckets.length * 84)}px` }}
@@ -125,7 +125,10 @@ function ComparisonBars({
               key={bucket.start}
               className="flex min-w-16 flex-1 flex-col items-center"
             >
-              <div className="flex h-40 items-end gap-1.5" aria-hidden="true">
+              <div
+                className="border-border flex h-40 w-full items-end justify-center gap-1.5 border-b"
+                aria-hidden="true"
+              >
                 <div
                   className="bg-lavender-300 w-5 rounded-t-sm"
                   style={{
@@ -142,6 +145,31 @@ function ComparisonBars({
               <span className="text-quiet mt-3 text-center text-[11px]">
                 {bucket.label}
               </span>
+              <dl
+                className="mt-2 grid gap-1 text-[11px]"
+                aria-label={`${bucket.label} flow totals`}
+              >
+                <div className="flex justify-center">
+                  <dt className="sr-only">{firstLabel}</dt>
+                  <dd className="text-muted flex min-w-9 items-center gap-1.5">
+                    <span
+                      className="bg-lavender-300 h-2.5 w-2.5 rounded-sm"
+                      aria-hidden="true"
+                    />
+                    {bucket[first]}
+                  </dd>
+                </div>
+                <div className="flex justify-center">
+                  <dt className="sr-only">{secondLabel}</dt>
+                  <dd className="text-muted flex min-w-9 items-center gap-1.5">
+                    <span
+                      className="bg-blush-200 h-2.5 w-2.5 rounded-sm"
+                      aria-hidden="true"
+                    />
+                    {bucket[second]}
+                  </dd>
+                </div>
+              </dl>
             </div>
           ))}
         </div>
