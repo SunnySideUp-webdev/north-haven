@@ -227,6 +227,9 @@ calendar.
 - Google Calendar sync is still optional and non-blocking; provider requests
   now have an explicit timeout so a slow Google response fails with the calm
   sync error instead of leaving Settings pending indefinitely
+- The planned-work date controls experiment was reverted. Work Inventory now
+  has an icon-only permanent Delete action with confirmation for mistaken or
+  nonexistent work records; this is separate from recoverable Archive
 
 ### Pending or not started
 

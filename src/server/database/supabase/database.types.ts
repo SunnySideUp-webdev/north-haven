@@ -1268,6 +1268,10 @@ export type Database = {
       create_workspace_backup: { Args: never; Returns: Json };
       create_workspace_backup_core: { Args: never; Returns: Json };
       current_personal_workspace_id: { Args: never; Returns: string };
+      delete_work_item_permanently: {
+        Args: { target_work_item_id: string };
+        Returns: undefined;
+      };
       find_ticket_by_number: {
         Args: { chosen_ticket_number: string };
         Returns: string;

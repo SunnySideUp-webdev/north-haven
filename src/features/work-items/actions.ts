@@ -446,6 +446,28 @@ export async function bulkArchiveWorkItemsAction(input: {
   };
 }
 
+export async function deleteWorkItemAction(input: {
+  workItemId: string;
+}): Promise<{ ok: boolean; message: string }> {
+  const result = z.object({ workItemId: z.string().uuid() }).safeParse(input);
+  if (!result.success) return { ok: false, message: "Invalid work item." };
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { error } = await supabase.rpc("delete_work_item_permanently", {
+    target_work_item_id: result.data.workItemId,
+  });
+  if (error) {
+    return { ok: false, message: "We couldn't delete this item." };
+  }
+
+  revalidatePath("/work");
+  revalidatePath("/plan");
+  revalidatePath("/today");
+  revalidatePath("/calendar");
+  revalidatePath("/insights");
+  return { ok: true, message: "Item deleted." };
+}
+
 export async function addWorkItemNoteAction(
   _previousState: WorkFormState,
   formData: FormData,

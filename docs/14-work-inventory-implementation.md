@@ -1,7 +1,7 @@
 # Work Inventory implementation
 
-Status: Complete through Phase 7.5C
-Last updated: August 1, 2026
+Status: Complete through Phase 7.5C plus permanent delete
+Last updated: August 3, 2026
 
 ## Outcome
 
@@ -70,12 +70,20 @@ Phase 7.5C completes the approved operational surface with:
 - the complete operational table context: received date, age, priority,
   operational status, tracking state, next review, backup, and last worked date
 - multi-selection with Add to Plan, Set Review Date, and recoverable Archive
+- per-row permanent Delete from Work Inventory, exposed as an icon-only trash
+  action with browser confirmation for records entered by mistake or work that
+  no longer exists
 - database guards that prevent archiving work still present in an open plan
 - direct Add to Plan and Days Worked sections on Work Detail
 - confirmations for downstream closure, archival, future received dates, and
   clearing an existing backup completion
 - duplicate capture recovery with a direct Open Existing action
 - private Global Search across number, title, type, notes, and secure link
+
+Permanent Delete is intentionally separate from Archive. Archive remains the
+recoverable lifecycle state for normal work cleanup; Delete removes the
+underlying Ticket, Task, or Reminder and its dependent local records from North
+Haven after confirmation.
 
 ## Security and verification
 

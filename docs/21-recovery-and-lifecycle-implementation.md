@@ -65,6 +65,11 @@ shows `Restore to Active`; the protected function verifies workspace ownership
 and only accepts an item that is currently archived. The normal tracking-event
 trigger records the recovery.
 
+Work Inventory also has a separate permanent Delete action for records entered
+by mistake or work that no longer exists. It is not part of archived recovery:
+the icon-only trash action asks for browser confirmation and then deletes the
+work item and dependent local records from North Haven.
+
 ## Demonstrated recovery
 
 The local integration test creates a related workspace graph, including a

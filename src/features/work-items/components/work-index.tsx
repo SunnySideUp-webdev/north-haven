@@ -8,6 +8,7 @@ import {
   bulkAddToPlanAction,
   bulkArchiveWorkItemsAction,
   bulkSetReviewDateAction,
+  deleteWorkItemAction,
 } from "@/features/work-items/actions";
 import { formatDate, formatDateTime } from "@/features/work-items/date";
 import type { WorkInventoryRow } from "@/features/work-items/types";
@@ -444,6 +445,9 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
                     <th className="px-4 py-4 font-bold">Next review</th>
                     <th className="px-4 py-4 font-bold">Backup</th>
                     <th className="px-4 py-4 font-bold">Last worked</th>
+                    <th className="px-4 py-4 font-bold">
+                      <span className="sr-only">Delete</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -530,6 +534,43 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
                         </td>
                         <td className="text-muted px-4 py-4 text-sm">
                           {formatDate(item.last_worked_on)}
+                        </td>
+                        <td className="px-4 py-4">
+                          <button
+                            type="button"
+                            disabled={pending}
+                            aria-label={`Delete ${item.title}`}
+                            title="Delete"
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `Delete "${item.title}" permanently? This cannot be undone.`,
+                                )
+                              ) {
+                                run(() =>
+                                  deleteWorkItemAction({ workItemId: id }),
+                                );
+                              }
+                            }}
+                            className="text-quiet hover:text-urgent-ink focus-visible:ring-urgent-ink rounded p-1.5 outline-none focus-visible:ring-2 disabled:opacity-40"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              viewBox="0 0 24 24"
+                              className="h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                            >
+                              <path d="M3 6h18" />
+                              <path d="M8 6V4h8v2" />
+                              <path d="M19 6l-1 14H6L5 6" />
+                              <path d="M10 11v5" />
+                              <path d="M14 11v5" />
+                            </svg>
+                          </button>
                         </td>
                       </tr>
                     );
