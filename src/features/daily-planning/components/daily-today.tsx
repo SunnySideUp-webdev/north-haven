@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import type { CalendarDayView } from "@/features/calendar-sync/types";
-import { setPlanItemDoneAction } from "@/features/daily-planning/actions";
+import {
+  movePlanItemToDateAction,
+  removePlanItemAction,
+  setPlanItemDoneAction,
+} from "@/features/daily-planning/actions";
 import type { WorkInventoryRow } from "@/features/work-items/types";
 import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
@@ -35,6 +39,7 @@ export function DailyToday({
     calendar: CalendarDayView;
     dueFollowUps: number;
     items: TodayItem[];
+    nextPlanningDate: string | null;
     plan: { id: string; status: string; intention: string | null } | null;
     timeZone: string;
   };
@@ -42,6 +47,8 @@ export function DailyToday({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [moveDates, setMoveDates] = useState<Record<string, string>>({});
+  const [message, setMessage] = useState<string>();
   const items = data.items
     .filter((item) => item.planItem)
     .sort((a, b) => a.planItem!.position - b.planItem!.position);
@@ -58,6 +65,19 @@ export function DailyToday({
         done: item.planItem?.execution_status !== "done",
         planItemId: item.planItem!.id,
       });
+      router.refresh();
+    });
+  }
+
+  function moveDateFor(planItemId: string) {
+    return moveDates[planItemId] ?? data.nextPlanningDate ?? workDate;
+  }
+
+  function run(action: () => Promise<{ ok: boolean; message?: string }>) {
+    setMessage(undefined);
+    startTransition(async () => {
+      const result = await action();
+      if (!result.ok) setMessage(result.message);
       router.refresh();
     });
   }
@@ -176,6 +196,14 @@ export function DailyToday({
                 </Link>
               </div>
             ) : null}
+            {message ? (
+              <p
+                role="alert"
+                className="bg-urgent-surface text-urgent-ink rounded-lg px-4 py-3 text-sm"
+              >
+                {message}
+              </p>
+            ) : null}
             {meetings.length ? (
               <section className="border-blush-200 bg-paper shadow-surface rounded-xl border p-8">
                 <div className="flex items-center justify-between">
@@ -246,7 +274,7 @@ export function DailyToday({
                     return (
                       <article
                         key={item.id}
-                        className="border-border hover:bg-lavender-50 group flex items-center gap-5 border-t py-5 first:border-t-0"
+                        className="border-border hover:bg-lavender-50 group flex flex-wrap items-center gap-5 border-t py-5 first:border-t-0"
                       >
                         <button
                           disabled={pending}
@@ -276,6 +304,58 @@ export function DailyToday({
                             {item.system_priority ?? item.tracking_state}
                           </p>
                         </Link>
+                        <div className="ml-auto flex items-center gap-2">
+                          <label
+                            className="sr-only"
+                            htmlFor={`today-move-${item.id}`}
+                          >
+                            Move {item.title} to date
+                          </label>
+                          <input
+                            id={`today-move-${item.id}`}
+                            type="date"
+                            value={moveDateFor(item.planItem!.id)}
+                            disabled={done}
+                            onChange={(event) =>
+                              setMoveDates((current) => ({
+                                ...current,
+                                [item.planItem!.id]: event.target.value,
+                              }))
+                            }
+                            className="border-border text-ink h-9 rounded-lg border px-2 text-xs disabled:opacity-40"
+                          />
+                          <button
+                            disabled={
+                              pending ||
+                              done ||
+                              moveDateFor(item.planItem!.id) === workDate
+                            }
+                            onClick={() =>
+                              run(() =>
+                                movePlanItemToDateAction({
+                                  planItemId: item.planItem!.id,
+                                  targetDate: moveDateFor(item.planItem!.id),
+                                }),
+                              )
+                            }
+                            className="border-lavender-300 text-lavender-700 h-9 rounded-lg border px-3 text-xs font-bold disabled:opacity-40"
+                          >
+                            Move
+                          </button>
+                          <button
+                            disabled={pending || done}
+                            onClick={() =>
+                              run(() =>
+                                removePlanItemAction({
+                                  planItemId: item.planItem!.id,
+                                }),
+                              )
+                            }
+                            className="border-border text-muted h-9 rounded-lg border px-3 text-xs font-bold disabled:opacity-40"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </article>
                     );
                   })

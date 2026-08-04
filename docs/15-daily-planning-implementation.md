@@ -36,6 +36,9 @@ Plan now provides:
 - cross-day planning de-duplication: work already selected in another open
   plan is hidden from available and Unplanned lists until that plan is closed
   or the work is removed/resolved through an outcome
+- planned item date management: planned Tickets, Tasks, and Reminders can be
+  moved to a different work date or removed from the current plan without
+  deleting the underlying work item from inventory
 - suggested ordering by priority and age
 - explicit up/down position controls
 - daily intention
@@ -62,6 +65,8 @@ shows progress, and records reversible Done decisions without changing Ticket
 workflow status. Planned work rows in Today now match the Work Inventory's
 hover-open rhythm: the item content opens Work Detail without a separate
 Details action, and Work Detail returns to Today when it was opened from Today.
+Today also exposes the same planned-work date move and Remove controls for work
+that has not yet been marked Done.
 
 The Work search regression reported during review is fixed. The `/` hint now
 sits inside the search field and no longer overlaps the `All types` selector.
@@ -74,6 +79,8 @@ sits inside the search field and no longer overlaps the `All types` selector.
 - duplicate plan selection is prevented by the database
 - cross-day duplicate planning is filtered before rendering and guarded in the
   selection action
+- moving planned work across dates and removing planned work are transactional
+  database operations, with source-plan reordering and Draft state restoration
 - plans and work logs remain isolated across workspaces
 - Mark Ready and completion create the expected persisted states
 - Chromium covers Work creation, Plan selection, Ready confirmation, Today, and
