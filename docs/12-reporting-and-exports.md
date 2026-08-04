@@ -91,6 +91,11 @@ shows an empty-state sentence instead of disappearing.
   show weekday labels and per-day color-keyed Resolved/Not resolved totals
   beneath each interval. `Not resolved` means planned tickets that did not
   reach Resolved during that day.
+- Daily ticket detail rows omit the worked-date meta because the report date is
+  already shown in the header. Weekly and monthly detail rows keep the worked
+  dates.
+- Day notes with multiple non-empty lines render as bullet lists in the designed
+  PDF and preview.
 - Fits the common summary on one page; detail lists may add pages
 
 ### Data CSV

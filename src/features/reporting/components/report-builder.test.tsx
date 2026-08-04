@@ -75,4 +75,43 @@ describe("Report Builder", () => {
       screen.getByText("No follow-up reviews are due in the next workweek."),
     ).toBeInTheDocument();
   });
+
+  it("keeps daily ticket details compact and renders multiline day notes", () => {
+    const base = reportFixture();
+    render(
+      <ReportBuilder
+        initialReport={{
+          ...base,
+          config: {
+            ...base.config,
+            includeDayNotes: true,
+            includeTicketDetails: true,
+            period: "daily",
+          },
+          dayNotes: [
+            {
+              body: "Confirmed Call Vision payloads.\nPrepared the PDF export.",
+              isImportant: false,
+              workDate: "2026-07-27",
+            },
+          ],
+          end: "2026-07-27",
+          start: "2026-07-27",
+          ticketDetails: [
+            {
+              ticketNumber: "1909",
+              title: "Update customer address",
+              workDates: ["2026-07-27"],
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.queryByText("Worked Jul 27")).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Confirmed Call Vision payloads."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Prepared the PDF export.")).toBeInTheDocument();
+  });
 });

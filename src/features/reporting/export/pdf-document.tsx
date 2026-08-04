@@ -203,6 +203,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 10,
   },
+  noteBullet: { color: color.muted, fontSize: 7, width: 8 },
+  noteBulletRow: {
+    flexDirection: "row",
+    gap: 4,
+    marginTop: 3,
+  },
   footer: {
     borderTopColor: color.border,
     borderTopWidth: 1,
@@ -250,6 +256,13 @@ function notResolvedPlannedTickets({
   ticketsResolved: number;
 }) {
   return Math.max(0, plannedTickets - ticketsResolved);
+}
+
+function noteLines(body: string) {
+  return body
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
 }
 
 function generatedLabel(report: ReportView) {
@@ -594,9 +607,11 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
                   <Text style={styles.detailTitle}>
                     {formatTicketNumber(ticket.ticketNumber)} · {ticket.title}
                   </Text>
-                  <Text style={styles.detailMeta}>
-                    Worked {ticket.workDates.map(shortDate).join(", ")}
-                  </Text>
+                  {report.config.period === "daily" ? null : (
+                    <Text style={styles.detailMeta}>
+                      Worked {ticket.workDates.map(shortDate).join(", ")}
+                    </Text>
+                  )}
                 </View>
               ))
             ) : (
@@ -617,7 +632,19 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
                     {shortDate(note.workDate)}
                     {note.isImportant ? " · Important" : ""}
                   </Text>
-                  <Text style={styles.detailMeta}>{note.body}</Text>
+                  {noteLines(note.body).length > 1 ? (
+                    noteLines(note.body).map((line, index) => (
+                      <View
+                        key={`${note.workDate}-${index}`}
+                        style={styles.noteBulletRow}
+                      >
+                        <Text style={styles.noteBullet}>•</Text>
+                        <Text style={styles.detailMeta}>{line}</Text>
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={styles.detailMeta}>{note.body}</Text>
+                  )}
                 </View>
               ))
             ) : (

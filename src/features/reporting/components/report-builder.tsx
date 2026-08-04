@@ -40,6 +40,13 @@ function notResolvedPlannedTickets({
   return Math.max(0, plannedTickets - ticketsResolved);
 }
 
+function noteLines(body: string) {
+  return body
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 function Metric({
   blush = false,
   label,
@@ -398,9 +405,11 @@ function PdfPreview({ report }: { report: ReportView }) {
                 <li key={ticket.ticketNumber} className="py-3 text-xs">
                   <strong>{formatTicketNumber(ticket.ticketNumber)}</strong> ·{" "}
                   {ticket.title}
-                  <span className="text-muted mt-1 block">
-                    Worked {ticket.workDates.map(shortDate).join(", ")}
-                  </span>
+                  {report.config.period === "daily" ? null : (
+                    <span className="text-muted mt-1 block">
+                      Worked {ticket.workDates.map(shortDate).join(", ")}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -425,7 +434,15 @@ function PdfPreview({ report }: { report: ReportView }) {
                   {shortDate(note.workDate)}
                   {note.isImportant ? " · Important" : ""}
                 </strong>
-                <p className="text-muted mt-1">{note.body}</p>
+                {noteLines(note.body).length > 1 ? (
+                  <ul className="text-muted mt-1 list-disc space-y-1 pl-4">
+                    {noteLines(note.body).map((line, index) => (
+                      <li key={`${note.workDate}-${index}`}>{line}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-muted mt-1">{note.body}</p>
+                )}
               </div>
             ))
           ) : (
