@@ -373,18 +373,19 @@ Only non-zero metrics render.
 - Tickets worked
 - Tickets resolved
 - Tickets closed
-- Active tickets
 - Waiting for Response
-- Watching
+- Pending tickets
+- In progress tickets
+- Resolved status tickets
 - Average daily worked tickets
 - Plan completion rate
 - Average active ticket age
 
 ### Charts
 
-- Work completed by day with stacked Worked/Resolved bars, weekday labels, and
-  per-day color-keyed totals
+- Work activity by day or interval
 - Received versus resolved tickets
+- Operational ticket status: Pending, In progress, Waiting, Resolved
 - Active inventory trend
 - Ticket age distribution
 - Weekly and monthly plan completion

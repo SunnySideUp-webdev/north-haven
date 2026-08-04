@@ -32,9 +32,10 @@ meeting instances distinct by local date while still deduplicating the same
 event if it appears through more than one selected calendar.
 
 Migration `20260801001100_reporting_work_status.sql` adds an exact historical
-snapshot for the status donut. Its Active, Watching, and Waiting categories are
-mutually exclusive and always add up to the Active Tickets total shown in the
-center.
+snapshot for the status donut. Migration
+`20260803173000_reporting_operational_status_snapshot.sql` extends that
+snapshot with operational Pending, In Progress, Waiting, and Resolved counts for
+Insights.
 
 Both functions accept ranges of at most 371 days, derive the personal workspace
 from the authenticated session, use an empty search path, and accept no
@@ -43,8 +44,8 @@ the source for date-level activity and plan trends.
 
 Historical inventory uses the latest tracking and operational status event known
 on each local date. A ticket closed today therefore remains visible in an older
-period where it was still Active. `Waiting for Response` and `Watching` are
-subsets of Active rather than additional inventory totals.
+period where it was still Active. The Insights status donut uses operational
+status because it better reflects actionable ticket state.
 
 ## Metric semantics
 
@@ -56,12 +57,14 @@ subsets of Active rather than additional inventory totals.
   prior resolution.
 - **Closed:** historical transitions into Closed after downstream work is
   confirmed.
-- **Active:** Tickets whose historical tracking state is Active or Watching at
+- **Pending:** Tickets whose historical operational status is Pending at period
+  end.
+- **In Progress:** Tickets whose historical operational status is In Progress at
   period end.
 - **Waiting for Response:** Active Tickets whose historical operational status
   is Waiting for Response at period end.
-- **Watching:** Active Tickets intentionally retained for downstream follow-up at
-  period end.
+- **Resolved status:** Tickets whose historical operational status is Resolved
+  at period end. This status snapshot is separate from period Resolution events.
 - **Average daily worked:** daily ticket activity divided by configured working
   dates in the selected period; weekends and full-day OOO dates are excluded
   from both numerator and denominator.
@@ -75,11 +78,10 @@ subsets of Active rather than additional inventory totals.
 - Week, Month, Quarter, and Custom range controls use dates only in the URL.
 - Current partial periods are labeled `Current period through today`.
 - Five primary metrics are followed by a quieter status and average band.
-- The primary analysis surface mirrors the approved high-fidelity direction:
-  stacked Worked/Resolved bars on the left and a Work Status donut on the right.
-- Stacked activity bars show the weekday or bucket label below each bar, then
-  color-keyed Worked and Resolved totals below the label to avoid ambiguous
-  paragraph summaries.
+- The primary analysis surface compares Received versus Resolved ticket flow on
+  the left and shows an operational status donut on the right.
+- Work activity appears separately as a single Worked series, because Worked is
+  activity-log volume while Resolved is a status event.
 - Work Completed, Received versus Resolved, Active Inventory, Ticket Age, and
   Plan Completion charts include visible plain-language summaries.
 - Every visual chart includes a semantic text or table alternative.

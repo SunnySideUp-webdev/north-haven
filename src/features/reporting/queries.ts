@@ -247,6 +247,9 @@ export async function getInsights(request: {
     totals: mapPeriodTotals(totalsResult.data?.[0]),
     workStatus: {
       active: number(workStatusResult.data?.[0]?.active_work ?? 0),
+      inProgress: number(workStatusResult.data?.[0]?.in_progress ?? 0),
+      pending: number(workStatusResult.data?.[0]?.pending ?? 0),
+      resolved: number(workStatusResult.data?.[0]?.resolved ?? 0),
       total: number(workStatusResult.data?.[0]?.total_active ?? 0),
       waiting: number(workStatusResult.data?.[0]?.waiting ?? 0),
       watching: number(workStatusResult.data?.[0]?.watching ?? 0),
@@ -345,6 +348,9 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
   const totals = mapPeriodTotals(totalsResult.data?.[0]);
   const workStatus = {
     active: number(statusResult.data?.[0]?.active_work ?? 0),
+    inProgress: number(statusResult.data?.[0]?.in_progress ?? 0),
+    pending: number(statusResult.data?.[0]?.pending ?? 0),
+    resolved: number(statusResult.data?.[0]?.resolved ?? 0),
     total: number(statusResult.data?.[0]?.total_active ?? 0),
     waiting: number(statusResult.data?.[0]?.waiting ?? 0),
     watching: number(statusResult.data?.[0]?.watching ?? 0),

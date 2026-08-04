@@ -120,7 +120,15 @@ export function reportFixture(overrides: Partial<ReportView> = {}): ReportView {
       ticketsResolved: 3,
       ticketsWorked: 5,
     },
-    workStatus: { active: 6, total: 11, waiting: 3, watching: 2 },
+    workStatus: {
+      active: 6,
+      inProgress: 4,
+      pending: 3,
+      resolved: 1,
+      total: 11,
+      waiting: 3,
+      watching: 2,
+    },
     ...overrides,
   };
 }

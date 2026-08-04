@@ -169,11 +169,8 @@ function ComparisonBars({
   );
 }
 
-function StackedActivityBars({ buckets }: { buckets: InsightBucket[] }) {
-  const max = Math.max(
-    0,
-    ...buckets.map((bucket) => bucket.worked + bucket.resolved),
-  );
+function WorkActivityBars({ buckets }: { buckets: InsightBucket[] }) {
+  const max = Math.max(0, ...buckets.map((bucket) => bucket.worked));
   if (!max) {
     return (
       <NoChart>
@@ -184,97 +181,54 @@ function StackedActivityBars({ buckets }: { buckets: InsightBucket[] }) {
 
   return (
     <>
-      <div className="mt-6 flex items-center justify-end gap-5 text-xs">
-        <span className="text-muted flex items-center gap-2">
-          <span className="bg-lavender-300 h-3 w-3 rounded-sm" /> Worked
-        </span>
-        <span className="text-muted flex items-center gap-2">
-          <span className="bg-blush-200 h-3 w-3 rounded-sm" /> Resolved
-        </span>
-      </div>
       <div className="mt-5 overflow-x-auto">
         <div
           className="flex w-full items-end gap-7 px-3"
           style={{ minWidth: `${Math.max(540, buckets.length * 92)}px` }}
         >
-          {buckets.map((bucket) => {
-            const total = bucket.worked + bucket.resolved;
-            return (
-              <div
-                key={bucket.start}
-                className="flex min-w-16 flex-1 flex-col items-center"
-              >
-                <div className="border-border relative flex h-52 w-full items-end justify-center border-b">
-                  <div
-                    className="pointer-events-none absolute inset-0 flex flex-col justify-between"
-                    aria-hidden="true"
-                  >
-                    <span className="border-border border-t" />
-                    <span className="border-border border-t" />
-                    <span className="border-border border-t" />
-                    <span className="border-border border-t" />
-                  </div>
-                  <div
-                    className="relative flex w-11 flex-col justify-end overflow-hidden rounded-t-sm"
-                    style={{
-                      height: `${Math.max(total ? 5 : 0, (total / max) * 78)}%`,
-                    }}
-                    aria-hidden="true"
-                  >
-                    <div
-                      className="bg-lavender-300"
-                      style={{
-                        height: `${total ? (bucket.worked / total) * 100 : 0}%`,
-                      }}
-                    />
-                    <div
-                      className="bg-blush-200"
-                      style={{
-                        height: `${total ? (bucket.resolved / total) * 100 : 0}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-                <span className="text-quiet mt-3 text-center text-[11px] font-bold">
-                  {bucket.label}
-                </span>
-                <dl
-                  className="mt-2 grid gap-1 text-[11px]"
-                  aria-label={`${bucket.label} activity totals`}
+          {buckets.map((bucket) => (
+            <div
+              key={bucket.start}
+              className="flex min-w-16 flex-1 flex-col items-center"
+            >
+              <div className="border-border relative flex h-52 w-full items-end justify-center border-b">
+                <div
+                  className="pointer-events-none absolute inset-0 flex flex-col justify-between"
+                  aria-hidden="true"
                 >
-                  <div className="flex items-center justify-center gap-1.5">
-                    <dt className="sr-only">Worked</dt>
-                    <dd className="text-muted flex min-w-9 items-center gap-1.5">
-                      <span
-                        className="bg-lavender-300 h-2.5 w-2.5 rounded-sm"
-                        aria-hidden="true"
-                      />
-                      {bucket.worked}
-                    </dd>
-                  </div>
-                  <div className="flex items-center justify-center gap-1.5">
-                    <dt className="sr-only">Resolved</dt>
-                    <dd className="text-muted flex min-w-9 items-center gap-1.5">
-                      <span
-                        className="bg-blush-200 h-2.5 w-2.5 rounded-sm"
-                        aria-hidden="true"
-                      />
-                      {bucket.resolved}
-                    </dd>
-                  </div>
-                </dl>
+                  <span className="border-border border-t" />
+                  <span className="border-border border-t" />
+                  <span className="border-border border-t" />
+                  <span className="border-border border-t" />
+                </div>
+                <div
+                  className="bg-lavender-300 relative w-11 rounded-t-sm"
+                  style={{
+                    height: `${Math.max(bucket.worked ? 5 : 0, (bucket.worked / max) * 78)}%`,
+                  }}
+                  aria-hidden="true"
+                />
               </div>
-            );
-          })}
+              <span className="text-quiet mt-3 text-center text-[11px] font-bold">
+                {bucket.label}
+              </span>
+              <p className="text-muted mt-2 flex items-center gap-1.5 text-[11px]">
+                <span
+                  className="bg-lavender-300 h-2.5 w-2.5 rounded-sm"
+                  aria-hidden="true"
+                />
+                {bucket.worked}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
       <table className="sr-only">
-        <caption>Worked and resolved ticket activity</caption>
+        <caption>Worked ticket activity</caption>
         <thead>
           <tr>
             <th>Period</th>
             <th>Worked</th>
-            <th>Resolved</th>
           </tr>
         </thead>
         <tbody>
@@ -282,7 +236,6 @@ function StackedActivityBars({ buckets }: { buckets: InsightBucket[] }) {
             <tr key={bucket.start}>
               <th>{bucket.label}</th>
               <td>{bucket.worked}</td>
-              <td>{bucket.resolved}</td>
             </tr>
           ))}
         </tbody>
@@ -362,24 +315,26 @@ function WorkStatusDonut({ status }: { status: InsightsView["workStatus"] }) {
   if (!status.total) {
     return (
       <NoChart>
-        Work status will appear when active tickets exist for this date.
+        Ticket status will appear when tracked tickets exist for this date.
       </NoChart>
     );
   }
 
-  const activeEnd = (status.active / status.total) * 100;
-  const watchingEnd = activeEnd + (status.watching / status.total) * 100;
+  const pendingEnd = (status.pending / status.total) * 100;
+  const progressEnd = pendingEnd + (status.inProgress / status.total) * 100;
+  const waitingEnd = progressEnd + (status.waiting / status.total) * 100;
   const background = `conic-gradient(
-    var(--nh-lavender-300) 0% ${activeEnd}%,
-    var(--nh-blush-200) ${activeEnd}% ${watchingEnd}%,
-    var(--nh-waiting-surface) ${watchingEnd}% 100%
+    var(--nh-lavender-300) 0% ${pendingEnd}%,
+    var(--nh-blush-200) ${pendingEnd}% ${progressEnd}%,
+    var(--nh-waiting-surface) ${progressEnd}% ${waitingEnd}%,
+    var(--nh-success-surface) ${waitingEnd}% 100%
   )`;
 
   return (
     <div className="mt-6 grid grid-cols-[230px_1fr] items-center gap-7">
       <div
         role="img"
-        aria-label={`Work status: ${status.total} active tickets total; ${status.active} active, ${status.watching} watching, ${status.waiting} waiting.`}
+        aria-label={`Ticket status: ${status.total} tracked tickets total; ${status.pending} pending, ${status.inProgress} in progress, ${status.waiting} waiting, ${status.resolved} resolved.`}
         className="relative h-[230px] w-[230px] rounded-full"
         style={{ background }}
       >
@@ -387,17 +342,26 @@ function WorkStatusDonut({ status }: { status: InsightsView["workStatus"] }) {
           <strong className="text-ink text-[36px] leading-none tracking-[-0.05em]">
             {status.total}
           </strong>
-          <span className="text-muted mt-2 text-xs">active tickets</span>
+          <span className="text-muted mt-2 text-xs">tracked tickets</span>
         </div>
       </div>
       <dl className="space-y-5">
         {[
-          { color: "bg-lavender-300", label: "Active", value: status.active },
-          { color: "bg-blush-200", label: "Watching", value: status.watching },
+          { color: "bg-lavender-300", label: "Pending", value: status.pending },
+          {
+            color: "bg-blush-200",
+            label: "In progress",
+            value: status.inProgress,
+          },
           {
             color: "bg-waiting-surface",
             label: "Waiting",
             value: status.waiting,
+          },
+          {
+            color: "bg-success-surface",
+            label: "Resolved",
+            value: status.resolved,
           },
         ].map((item) => (
           <div
@@ -645,8 +609,8 @@ export function InsightsDashboard({ insights }: { insights: InsightsView }) {
   );
   const summary = getInsightSummary(insights);
   const inventory = summary.inventoryEnd;
-  const activityTop = buckets.reduce<InsightBucket | null>(
-    (top, bucket) => (!top || bucket.worked > top.worked ? bucket : top),
+  const flowTop = buckets.reduce<InsightBucket | null>(
+    (top, bucket) => (!top || bucket.received > top.received ? bucket : top),
     null,
   );
   const activeStart = insights.inventory[0]?.activeTickets ?? 0;
@@ -707,9 +671,9 @@ export function InsightsDashboard({ insights }: { insights: InsightsView }) {
           />
           <Metric
             tone="blush"
-            label="Active tickets"
-            value={activeEnd}
-            definition="Tickets not Closed or Archived as of the end of this period. Waiting and Watching are included."
+            label="Pending tickets"
+            value={insights.workStatus.pending}
+            definition="Tracked tickets whose latest operational status is Pending at the end of this period."
             detail={`Snapshot on ${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(`${insights.end}T12:00:00Z`))}`}
           />
           <Metric
@@ -736,12 +700,12 @@ export function InsightsDashboard({ insights }: { insights: InsightsView }) {
             </p>
           </div>
           <div className="px-5">
-            <dt className="text-muted text-xs">Watching</dt>
+            <dt className="text-muted text-xs">In progress</dt>
             <dd className="text-ink mt-1 text-lg font-bold">
-              {inventory?.watchingTickets ?? 0}
+              {insights.workStatus.inProgress}
             </dd>
             <p className="sr-only">
-              Active tickets kept visible while downstream work is pending.
+              Tracked tickets whose latest operational status is In Progress.
             </p>
           </div>
           <div className="px-5">
@@ -777,25 +741,31 @@ export function InsightsDashboard({ insights }: { insights: InsightsView }) {
         <div className="divide-border grid grid-cols-[minmax(0,1.18fr)_minmax(430px,0.82fr)] divide-x">
           <div className="pr-8">
             <ChartHeading
-              id="weekly-rhythm-title"
-              title="Weekly rhythm"
-              description="Tickets worked and resolved across the selected period"
+              id="ticket-flow-title"
+              title="Ticket flow"
+              description="New ticket demand compared with resolution events"
             />
-            <StackedActivityBars buckets={buckets} />
+            <ComparisonBars
+              buckets={buckets}
+              first="received"
+              firstLabel="Received"
+              second="resolved"
+              secondLabel="Resolved"
+            />
           </div>
           <div className="pl-8">
             <ChartHeading
               id="work-status-title"
-              title="Work status"
-              description="Active inventory at the end of this period"
+              title="Ticket status"
+              description="Operational status at the end of this period"
             />
             <WorkStatusDonut status={insights.workStatus} />
             <p className="bg-lavender-50 text-muted mt-6 rounded-lg p-4 text-sm leading-6">
-              <strong className="text-ink block">A steady pattern</strong>
+              <strong className="text-ink block">Status snapshot</strong>
               <span className="mt-1 block">
-                {activityTop && activityTop.worked
-                  ? `${activityTop.label} had the most worked activity; `
-                  : "No ticket work was recorded; "}
+                {flowTop && flowTop.received
+                  ? `${flowTop.label} had the most incoming tickets; `
+                  : "No new tickets were received; "}
                 {insights.workStatus.waiting === 1
                   ? "1 ticket is waiting for a response."
                   : `${insights.workStatus.waiting} tickets are waiting for a response.`}
@@ -807,25 +777,18 @@ export function InsightsDashboard({ insights }: { insights: InsightsView }) {
 
       <div className="mt-6 grid grid-cols-2 gap-6">
         <section
-          aria-labelledby="flow-title"
+          aria-labelledby="work-activity-title"
           className="border-border bg-paper shadow-surface rounded-xl border p-7"
         >
           <ChartHeading
-            id="flow-title"
-            title="Received versus resolved"
-            description="New ticket demand compared with resolution events"
+            id="work-activity-title"
+            title="Work activity"
+            description="Tickets with confirmed work activity by interval"
           />
-          <ComparisonBars
-            buckets={buckets}
-            first="received"
-            firstLabel="Received"
-            second="resolved"
-            secondLabel="Resolved"
-          />
+          <WorkActivityBars buckets={buckets} />
           <p className="bg-blush-50 text-muted mt-6 rounded-lg p-4 text-sm leading-6">
-            {plural(summary.totalReceived, "ticket")} received and{" "}
-            {plural(insights.totals.ticketsResolved, "resolution")} recorded in
-            this period.
+            {plural(insights.totals.ticketsWorked, "ticket")} had confirmed work
+            activity in this period.
           </p>
         </section>
 

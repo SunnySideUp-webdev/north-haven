@@ -80,7 +80,15 @@ const insights: InsightsView = {
     ticketsResolved: 1,
     ticketsWorked: 2,
   },
-  workStatus: { active: 5, total: 8, waiting: 2, watching: 1 },
+  workStatus: {
+    active: 5,
+    inProgress: 2,
+    pending: 3,
+    resolved: 1,
+    total: 8,
+    waiting: 2,
+    watching: 1,
+  },
   workingWeekdays: [1, 2, 3, 4, 5],
 };
 
@@ -94,14 +102,14 @@ describe("Insights", () => {
     expect(screen.getByLabelText(/Tickets worked: 2/)).toHaveTextContent(
       "1 more than the previous period",
     );
-    expect(screen.getByLabelText(/Active tickets: 8/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Pending tickets: 3/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Plan completion: 75%/)).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Weekly rhythm" }),
+      screen.getByRole("heading", { name: "Ticket flow" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("img", {
-        name: "Work status: 8 active tickets total; 5 active, 1 watching, 2 waiting.",
+        name: "Ticket status: 8 tracked tickets total; 3 pending, 2 in progress, 2 waiting, 1 resolved.",
       }),
     ).toBeInTheDocument();
     expect(

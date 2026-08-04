@@ -1385,6 +1385,9 @@ export type Database = {
         Args: { chosen_as_of_date: string };
         Returns: {
           active_work: number;
+          in_progress: number;
+          pending: number;
+          resolved: number;
           total_active: number;
           waiting: number;
           watching: number;

@@ -74,6 +74,9 @@ export type PeriodTotals = {
 
 export type WorkStatusSnapshot = {
   active: number;
+  inProgress: number;
+  pending: number;
+  resolved: number;
   total: number;
   waiting: number;
   watching: number;
