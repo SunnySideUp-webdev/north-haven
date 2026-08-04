@@ -1,7 +1,7 @@
 # Reporting and exports
 
 Status: Implemented
-Last updated: August 1, 2026
+Last updated: August 3, 2026
 
 ## Product role
 
@@ -32,14 +32,14 @@ status, or Calendar events.
 - Tickets Worked, Resolved, Closed, and Plan Completion
 - Tasks and reminders completed
 - Meetings attended or confirmed
-- Waiting/Watching follow-up decisions made
+- Waiting follow-up decisions made
 - Optional day note, excluded by default
 
 ### Weekly
 
 - Monday through Friday by default, respecting the configured working week
-- Summary metrics and ticket-flow-by-day chart
-- End-of-week Active, Waiting for Response, and Watching counts
+- Summary metrics and resolution-outcome-by-day chart
+- End-of-week Pending, In Progress, Waiting for Response, and Resolved counts
 - Follow-up reviews due in the next workweek
 - Plain-language pattern summary
 
@@ -49,7 +49,7 @@ status, or Calendar events.
 - Same core metrics as Insights
 - Weekly ticket flow and active-inventory trend
 - Received versus Resolved totals
-- End-of-month status snapshot
+- End-of-month operational status snapshot
 - Plain-language pattern summary
 
 The user can export a completed period or the current partial period. Partial
@@ -87,9 +87,10 @@ shows an empty-state sentence instead of disappearing.
 - Removes application navigation and interactive controls
 - Includes report period, generation time, time zone, and page number
 - Includes a `Private work summary` label
-- Uses text labels in addition to color in every chart. Weekly ticket-flow bars
-  show weekday labels and per-day color-keyed Received/Resolved totals beneath
-  each interval.
+- Uses text labels in addition to color in every chart. Weekly resolution bars
+  show weekday labels and per-day color-keyed Resolved/Not resolved totals
+  beneath each interval. `Not resolved` means planned tickets that did not
+  reach Resolved during that day.
 - Fits the common summary on one page; detail lists may add pages
 
 ### Data CSV
@@ -98,6 +99,8 @@ shows an empty-state sentence instead of disappearing.
 - Uses stable English column names
 - Exports one metric row per date plus a period-total row
 - Uses ISO `YYYY-MM-DD` dates
+- Exposes operational status as Pending, In Progress, Waiting for Response, and
+  Resolved instead of Active/Watching
 - Does not include visual styling or formulas
 - Neutral filename suitable for spreadsheet tools
 

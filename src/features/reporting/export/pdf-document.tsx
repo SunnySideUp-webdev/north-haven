@@ -242,6 +242,16 @@ function localTime(value: string) {
   }).format(new Date(Date.UTC(2026, 0, 1, hours, minutes)));
 }
 
+function notResolvedPlannedTickets({
+  plannedTickets,
+  ticketsResolved,
+}: {
+  plannedTickets: number;
+  ticketsResolved: number;
+}) {
+  return Math.max(0, plannedTickets - ticketsResolved);
+}
+
 function generatedLabel(report: ReportView) {
   return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
@@ -275,38 +285,34 @@ function Metric({
   );
 }
 
-function TicketFlowBars({ report }: { report: ReportView }) {
-  const inventoryByDate = new Map(
-    report.inventory.map((row) => [row.workDate, row]),
-  );
+function ResolutionOutcomeBars({ report }: { report: ReportView }) {
   const max = Math.max(
     1,
     ...report.daily.flatMap((day) => [
-      inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0,
       day.ticketsResolved,
+      notResolvedPlannedTickets(day),
     ]),
   );
   return (
     <>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendSwatch, styles.workedBar]} />
-          <Text style={styles.legendText}>Received</Text>
-        </View>
-        <View style={styles.legendItem}>
           <View style={[styles.legendSwatch, styles.resolvedBar]} />
           <Text style={styles.legendText}>Resolved</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendSwatch, styles.workedBar]} />
+          <Text style={styles.legendText}>Not resolved</Text>
         </View>
       </View>
       <View style={styles.bars}>
         {report.daily.map((day) => {
-          const received =
-            inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0;
-          const receivedHeight = received
-            ? Math.max(10, (received / max) * 90)
-            : 2;
+          const notResolved = notResolvedPlannedTickets(day);
           const resolvedHeight = day.ticketsResolved
             ? Math.max(10, (day.ticketsResolved / max) * 90)
+            : 2;
+          const notResolvedHeight = notResolved
+            ? Math.max(10, (notResolved / max) * 90)
             : 2;
           return (
             <View key={day.workDate} style={styles.barColumn}>
@@ -314,14 +320,14 @@ function TicketFlowBars({ report }: { report: ReportView }) {
                 <View style={styles.barPair}>
                   <View
                     style={[
-                      styles.workedBar,
-                      { height: receivedHeight, width: 11 },
+                      styles.resolvedBar,
+                      { height: resolvedHeight, width: 11 },
                     ]}
                   />
                   <View
                     style={[
-                      styles.resolvedBar,
-                      { height: resolvedHeight, width: 11 },
+                      styles.workedBar,
+                      { height: notResolvedHeight, width: 11 },
                     ]}
                   />
                 </View>
@@ -329,12 +335,12 @@ function TicketFlowBars({ report }: { report: ReportView }) {
               <Text style={styles.barLabel}>{weekday(day.workDate)}</Text>
               <View style={styles.barTotals}>
                 <View style={styles.barTotalRow}>
-                  <View style={[styles.barTotalSwatch, styles.workedBar]} />
-                  <Text style={styles.barTotalText}>{received}</Text>
-                </View>
-                <View style={styles.barTotalRow}>
                   <View style={[styles.barTotalSwatch, styles.resolvedBar]} />
                   <Text style={styles.barTotalText}>{day.ticketsResolved}</Text>
+                </View>
+                <View style={styles.barTotalRow}>
+                  <View style={[styles.barTotalSwatch, styles.workedBar]} />
+                  <Text style={styles.barTotalText}>{notResolved}</Text>
                 </View>
               </View>
             </View>
@@ -499,21 +505,21 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
                     ? "Day outcome"
                     : report.config.period === "monthly"
                       ? "Active inventory trend"
-                      : "Ticket flow by day"}
+                      : "Resolution outcome by day"}
                 </Text>
                 <Text style={styles.sectionDescription}>
                   {report.config.period === "monthly"
                     ? "Active tickets across the report period"
                     : report.config.period === "daily"
                       ? "Tickets with confirmed work activity"
-                      : "New ticket demand compared with resolution events"}
+                      : "Planned tickets resolved vs still open"}
                 </Text>
                 {report.config.period === "daily" ? (
                   <DailyOutcome report={report} />
                 ) : report.config.period === "monthly" ? (
                   <InventoryTrend report={report} />
                 ) : (
-                  <TicketFlowBars report={report} />
+                  <ResolutionOutcomeBars report={report} />
                 )}
               </View>
             ) : null}
@@ -521,7 +527,7 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
               <View style={styles.status}>
                 <Text style={styles.sectionTitle}>{statusHeading}</Text>
                 <Text style={styles.sectionDescription}>
-                  Active inventory on {shortDate(report.end)}
+                  Operational status on {shortDate(report.end)}
                 </Text>
                 {[
                   ...(report.config.period === "monthly"
@@ -535,9 +541,10 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
                         ],
                       ]
                     : []),
-                  ["Active tickets", report.workStatus.total],
-                  ["Watching", report.workStatus.watching],
+                  ["Pending", report.workStatus.pending],
+                  ["In progress", report.workStatus.inProgress],
                   ["Waiting for Response", report.workStatus.waiting],
+                  ["Resolved", report.workStatus.resolved],
                   ["Follow-up reviews due next week", report.followUpDueCount],
                 ].map(([label, value]) => (
                   <View key={label} style={styles.statusRow}>

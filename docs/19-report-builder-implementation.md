@@ -63,7 +63,7 @@ The PDF includes:
 - North Haven and `Private work summary`
 - exact report dates and partial-period label
 - core metric cards
-- a period-appropriate Daily outcome, Weekly ticket-flow chart, or Monthly
+- a period-appropriate Daily outcome, Weekly resolution-outcome chart, or Monthly
   inventory trend
 - end-of-period status and upcoming review count
 - a plain-language summary
@@ -71,8 +71,10 @@ The PDF includes:
 - optional detail sections that wrap onto additional pages
 
 All content remains selectable text. The weekly chart uses weekday labels plus
-per-day Received/Resolved totals with matching color swatches beneath each
+per-day Resolved/Not resolved totals with matching color swatches beneath each
 interval, so the PDF does not rely on color alone or a dense paragraph legend.
+`Not resolved` means planned tickets that did not reach Resolved during that
+day.
 
 Optional detail sections are explicit when selected. Ticket numbers and titles,
 Day notes, and Follow-up reasons render matching rows when available, and render

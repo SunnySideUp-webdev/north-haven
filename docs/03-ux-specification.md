@@ -429,9 +429,9 @@ plain-text summary.
 - North Haven wordmark and `Private work summary`
 - Period name, exact date range, workspace time zone, and generation time
 - Worked, Resolved, Closed, and Plan Completion
-- Period-appropriate trend chart and status snapshot. Weekly ticket-flow charts
-  show weekday labels and per-day color-keyed Received/Resolved totals beneath
-  each interval.
+- Period-appropriate trend chart and status snapshot. Weekly resolution charts
+  show weekday labels and per-day color-keyed Resolved/Not resolved totals
+  beneath each interval.
 - Plain-language summary
 - Optional detailed item list on additional pages
 

@@ -30,6 +30,16 @@ function weekday(value: string) {
   }).format(new Date(`${value}T12:00:00Z`));
 }
 
+function notResolvedPlannedTickets({
+  plannedTickets,
+  ticketsResolved,
+}: {
+  plannedTickets: number;
+  ticketsResolved: number;
+}) {
+  return Math.max(0, plannedTickets - ticketsResolved);
+}
+
 function Metric({
   blush = false,
   label,
@@ -135,30 +145,26 @@ function TrendPreview({ report }: { report: ReportView }) {
     );
   }
 
-  const inventoryByDate = new Map(
-    report.inventory.map((row) => [row.workDate, row]),
-  );
   const max = Math.max(
     1,
     ...report.daily.flatMap((day) => [
-      inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0,
       day.ticketsResolved,
+      notResolvedPlannedTickets(day),
     ]),
   );
   return (
     <>
       <div className="text-muted mt-3 flex justify-end gap-4 text-[10px]">
         <span className="flex items-center gap-1.5">
-          <span className="bg-lavender-300 h-2.5 w-2.5" /> Received
+          <span className="bg-blush-200 h-2.5 w-2.5" /> Resolved
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="bg-blush-200 h-2.5 w-2.5" /> Resolved
+          <span className="bg-lavender-300 h-2.5 w-2.5" /> Not resolved
         </span>
       </div>
       <div className="mt-4 flex items-end gap-5 px-3">
         {report.daily.map((day) => {
-          const received =
-            inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0;
+          const notResolved = notResolvedPlannedTickets(day);
           return (
             <div
               key={day.workDate}
@@ -166,16 +172,16 @@ function TrendPreview({ report }: { report: ReportView }) {
             >
               <div className="border-border flex h-40 w-full items-end justify-center gap-1.5 border-b">
                 <span
-                  className="bg-lavender-300 w-5 rounded-t-sm"
+                  className="bg-blush-200 w-5 rounded-t-sm"
                   style={{
-                    height: `${Math.max(received ? 8 : 1, (received / max) * 75)}%`,
+                    height: `${Math.max(day.ticketsResolved ? 8 : 1, (day.ticketsResolved / max) * 75)}%`,
                   }}
                   aria-hidden="true"
                 />
                 <span
-                  className="bg-blush-200 w-5 rounded-t-sm"
+                  className="bg-lavender-300 w-5 rounded-t-sm"
                   style={{
-                    height: `${Math.max(day.ticketsResolved ? 8 : 1, (day.ticketsResolved / max) * 75)}%`,
+                    height: `${Math.max(notResolved ? 8 : 1, (notResolved / max) * 75)}%`,
                   }}
                   aria-hidden="true"
                 />
@@ -185,23 +191,23 @@ function TrendPreview({ report }: { report: ReportView }) {
               </span>
               <dl
                 className="mt-1.5 grid gap-1 text-[10px]"
-                aria-label={`${weekday(day.workDate)} activity totals`}
+                aria-label={`${weekday(day.workDate)} resolution totals`}
               >
-                <div className="flex justify-center">
-                  <dt className="sr-only">Received</dt>
-                  <dd className="text-muted flex min-w-7 items-center gap-1">
-                    <span
-                      className="bg-lavender-300 h-2 w-2"
-                      aria-hidden="true"
-                    />
-                    {received}
-                  </dd>
-                </div>
                 <div className="flex justify-center">
                   <dt className="sr-only">Resolved</dt>
                   <dd className="text-muted flex min-w-7 items-center gap-1">
                     <span className="bg-blush-200 h-2 w-2" aria-hidden="true" />
                     {day.ticketsResolved}
+                  </dd>
+                </div>
+                <div className="flex justify-center">
+                  <dt className="sr-only">Not resolved</dt>
+                  <dd className="text-muted flex min-w-7 items-center gap-1">
+                    <span
+                      className="bg-lavender-300 h-2 w-2"
+                      aria-hidden="true"
+                    />
+                    {notResolved}
                   </dd>
                 </div>
               </dl>
@@ -210,20 +216,20 @@ function TrendPreview({ report }: { report: ReportView }) {
         })}
       </div>
       <table className="sr-only">
-        <caption>Ticket flow by day</caption>
+        <caption>Resolution outcome by day</caption>
         <thead>
           <tr>
             <th>Date</th>
-            <th>Received</th>
             <th>Resolved</th>
+            <th>Not resolved</th>
           </tr>
         </thead>
         <tbody>
           {report.daily.map((day) => (
             <tr key={day.workDate}>
               <th>{day.workDate}</th>
-              <td>{inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0}</td>
               <td>{day.ticketsResolved}</td>
+              <td>{notResolvedPlannedTickets(day)}</td>
             </tr>
           ))}
         </tbody>
@@ -306,14 +312,14 @@ function PdfPreview({ report }: { report: ReportView }) {
                   ? "Day outcome"
                   : report.config.period === "monthly"
                     ? "Active inventory trend"
-                    : "Ticket flow by day"}
+                    : "Resolution outcome by day"}
               </h3>
               <p className="text-muted mt-1 text-xs">
                 {report.config.period === "monthly"
                   ? "Active tickets across the report period"
                   : report.config.period === "daily"
                     ? "Tickets with confirmed work activity"
-                    : "New ticket demand compared with resolution events"}
+                    : "Planned tickets resolved vs still open"}
               </p>
               <TrendPreview report={report} />
             </section>
@@ -324,7 +330,7 @@ function PdfPreview({ report }: { report: ReportView }) {
             <section className="pl-7">
               <h3 className="text-ink text-sm font-bold">{statusTitle}</h3>
               <p className="text-muted mt-1 text-xs">
-                Snapshot on {shortDate(report.end)}
+                Operational status on {shortDate(report.end)}
               </p>
               <dl className="mt-4 divide-y">
                 {[
@@ -339,9 +345,10 @@ function PdfPreview({ report }: { report: ReportView }) {
                         ],
                       ]
                     : []),
-                  ["Active tickets", report.workStatus.total],
-                  ["Watching", report.workStatus.watching],
+                  ["Pending", report.workStatus.pending],
+                  ["In progress", report.workStatus.inProgress],
                   ["Waiting for Response", report.workStatus.waiting],
+                  ["Resolved", report.workStatus.resolved],
                   ["Reviews due next week", report.followUpDueCount],
                 ].map(([label, value]) => (
                   <div

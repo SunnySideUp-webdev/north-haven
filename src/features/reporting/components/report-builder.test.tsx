@@ -26,8 +26,9 @@ describe("Report Builder", () => {
       screen.getByRole("heading", { name: "Weekly work summary" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Ticket flow by day" }),
+      screen.getByRole("heading", { name: "Resolution outcome by day" }),
     ).toBeInTheDocument();
+    expect(screen.getAllByText("Not resolved").length).toBeGreaterThan(0);
     expect(screen.getByText("PDF · selectable text")).toBeInTheDocument();
     expect(
       screen.queryByText("This report may contain customer information."),
