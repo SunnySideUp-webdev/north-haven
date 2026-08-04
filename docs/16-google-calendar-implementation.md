@@ -58,6 +58,9 @@ attendees, attachments, and conference metadata are not retained.
 - Deleted events are removed locally.
 - An invalidated Google sync token triggers a safe full refresh.
 - Access tokens refresh server-side using the encrypted refresh token.
+- Google network calls are explicitly time-bounded so a slow provider request
+  returns the existing non-blocking sync error instead of leaving Settings in an
+  indefinite pending state.
 - Google outOfOffice is recognized by provider event type, never title matching.
 - Only full-local-day OOO events create non-working dates. Google all-day
   records use an exclusive end date, while timed records qualify only when they

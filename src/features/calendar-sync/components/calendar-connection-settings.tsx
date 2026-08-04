@@ -140,7 +140,7 @@ export function CalendarConnectionSettings({
               onClick={() => run(syncCalendarAction)}
               className="border-lavender-500 text-lavender-700 rounded-lg border px-5 py-2.5 text-sm font-bold disabled:opacity-50"
             >
-              {pending ? "Checking…" : "Sync now"}
+              {pending ? "Syncing…" : "Sync now"}
             </button>
           </div>
 

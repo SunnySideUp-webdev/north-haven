@@ -224,6 +224,9 @@ calendar.
 - Today planned work rows open Work Detail directly from the item content with
   hover feedback, and Work Detail returns to Today when opened from Today while
   preserving the Work Inventory return path for Work-originated visits
+- Google Calendar sync is still optional and non-blocking; provider requests
+  now have an explicit timeout so a slow Google response fails with the calm
+  sync error instead of leaving Settings pending indefinitely
 
 ### Pending or not started
 

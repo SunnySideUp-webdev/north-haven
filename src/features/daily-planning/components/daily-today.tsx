@@ -262,6 +262,7 @@ export function DailyToday({
                         </button>
                         <Link
                           href={`/work/${item.id}?from=today`}
+                          prefetch={false}
                           className="focus-visible:ring-lavender-500 block min-w-0 flex-1 rounded-md py-1 outline-none focus-visible:ring-2"
                         >
                           <h3 className={titleClassName}>

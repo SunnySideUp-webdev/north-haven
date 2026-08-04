@@ -12,10 +12,30 @@ export class GoogleCalendarError extends Error {
   }
 }
 
+const googleRequestTimeoutMs = 15_000;
+
 function requireEnvironment() {
   const environment = getGoogleCalendarEnvironment();
   if (!environment) throw new Error("Google Calendar is not configured.");
   return environment;
+}
+
+async function fetchGoogle(
+  input: Parameters<typeof fetch>[0],
+  init?: Parameters<typeof fetch>[1],
+) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), googleRequestTimeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new GoogleCalendarError("timeout", 408);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function readGoogleResponse<T>(response: Response): Promise<T> {
@@ -63,7 +83,7 @@ export type GoogleTokenResponse = {
 
 export async function exchangeGoogleCode(code: string, redirectUri: string) {
   const environment = requireEnvironment();
-  const response = await fetch("https://oauth2.googleapis.com/token", {
+  const response = await fetchGoogle("https://oauth2.googleapis.com/token", {
     body: new URLSearchParams({
       client_id: environment.GOOGLE_CALENDAR_CLIENT_ID,
       client_secret: environment.GOOGLE_CALENDAR_CLIENT_SECRET,
@@ -80,7 +100,7 @@ export async function exchangeGoogleCode(code: string, redirectUri: string) {
 
 export async function refreshGoogleAccessToken(refreshToken: string) {
   const environment = requireEnvironment();
-  const response = await fetch("https://oauth2.googleapis.com/token", {
+  const response = await fetchGoogle("https://oauth2.googleapis.com/token", {
     body: new URLSearchParams({
       client_id: environment.GOOGLE_CALENDAR_CLIENT_ID,
       client_secret: environment.GOOGLE_CALENDAR_CLIENT_SECRET,
@@ -95,7 +115,7 @@ export async function refreshGoogleAccessToken(refreshToken: string) {
 }
 
 export async function revokeGoogleToken(token: string) {
-  await fetch("https://oauth2.googleapis.com/revoke", {
+  await fetchGoogle("https://oauth2.googleapis.com/revoke", {
     body: new URLSearchParams({ token }),
     cache: "no-store",
     headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -104,7 +124,7 @@ export async function revokeGoogleToken(token: string) {
 }
 
 export async function getGoogleAccount(accessToken: string) {
-  const response = await fetch(
+  const response = await fetchGoogle(
     "https://openidconnect.googleapis.com/v1/userinfo",
     {
       cache: "no-store",
@@ -135,7 +155,7 @@ export async function getGoogleCalendars(accessToken: string) {
     url.searchParams.set("maxResults", "250");
     url.searchParams.set("minAccessRole", "reader");
     if (pageToken) url.searchParams.set("pageToken", pageToken);
-    const response = await fetch(url, {
+    const response = await fetchGoogle(url, {
       cache: "no-store",
       headers: { authorization: `Bearer ${accessToken}` },
     });
@@ -198,7 +218,7 @@ export async function getGoogleEventChanges({
     }
     if (pageToken) url.searchParams.set("pageToken", pageToken);
 
-    const response = await fetch(url, {
+    const response = await fetchGoogle(url, {
       cache: "no-store",
       headers: { authorization: `Bearer ${accessToken}` },
     });
