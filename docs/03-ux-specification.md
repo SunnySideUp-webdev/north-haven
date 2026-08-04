@@ -67,6 +67,7 @@ Answer what to do now without exposing the full inventory.
 - Progress as `n of m`
 - Next meeting with `Open in Google Calendar`
 - Waiting/Watching count and count due for review
+- Day note capture with optional Important marker
 - End of Day action after the configured afternoon threshold; always available
   from the overflow menu
 

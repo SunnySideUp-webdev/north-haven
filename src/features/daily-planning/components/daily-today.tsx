@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import type { CalendarDayView } from "@/features/calendar-sync/types";
-import { setPlanItemDoneAction } from "@/features/daily-planning/actions";
+import {
+  saveDayNoteAction,
+  setPlanItemDoneAction,
+} from "@/features/daily-planning/actions";
 import type { WorkInventoryRow } from "@/features/work-items/types";
 import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
@@ -33,6 +36,7 @@ export function DailyToday({
 }: {
   data: {
     calendar: CalendarDayView;
+    dayNote: { body: string; is_important: boolean } | null;
     dueFollowUps: number;
     items: TodayItem[];
     plan: { id: string; status: string; intention: string | null } | null;
@@ -42,6 +46,11 @@ export function DailyToday({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [note, setNote] = useState(data.dayNote?.body ?? "");
+  const [important, setImportant] = useState(
+    data.dayNote?.is_important ?? false,
+  );
+  const [noteMessage, setNoteMessage] = useState<string>();
   const items = data.items
     .filter((item) => item.planItem)
     .sort((a, b) => a.planItem!.position - b.planItem!.position);
@@ -59,6 +68,18 @@ export function DailyToday({
         planItemId: item.planItem!.id,
       });
       router.refresh();
+    });
+  }
+
+  function saveNote() {
+    startTransition(async () => {
+      const result = await saveDayNoteAction({
+        body: note,
+        important,
+        workDate,
+      });
+      setNoteMessage(result.message ?? (result.ok ? "Day note saved." : ""));
+      if (result.ok) router.refresh();
     });
   }
 
@@ -147,6 +168,41 @@ export function DailyToday({
                 </div>
               ) : null}
             </div>
+            <section className="border-border mt-8 border-t pt-7">
+              <h2 className="text-quiet text-xs font-bold uppercase">
+                Day note
+              </h2>
+              <textarea
+                aria-label="Day note"
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                rows={5}
+                className="border-border bg-paper text-ink placeholder:text-quiet mt-3 w-full resize-none rounded-lg border px-3 py-2 text-sm leading-5"
+                placeholder="A private note for today..."
+              />
+              <label className="text-muted mt-3 flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={important}
+                  onChange={(event) => setImportant(event.target.checked)}
+                  className="accent-lavender-700 h-4 w-4"
+                />
+                Important note
+              </label>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={saveNote}
+                className="border-lavender-500 text-lavender-700 mt-4 w-full rounded-lg border px-4 py-2 text-sm font-bold disabled:opacity-50"
+              >
+                Save note
+              </button>
+              {noteMessage ? (
+                <p className="text-muted mt-3 text-xs" role="status">
+                  {noteMessage}
+                </p>
+              ) : null}
+            </section>
             <div className="mt-auto space-y-3">
               <Link
                 href={"/end-of-day?date=" + workDate}

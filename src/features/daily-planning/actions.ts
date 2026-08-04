@@ -173,6 +173,7 @@ export async function saveDayNoteAction(input: {
   });
   if (error) return { ok: false, message: "We couldn't save the day note." };
   revalidatePath("/end-of-day");
+  revalidatePath("/today");
   return { ok: true };
 }
 

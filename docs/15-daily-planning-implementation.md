@@ -62,6 +62,9 @@ shows progress, and records reversible Done decisions without changing Ticket
 workflow status. Planned work rows in Today now match the Work Inventory's
 hover-open rhythm: the item content opens Work Detail without a separate
 Details action, and Work Detail returns to Today when it was opened from Today.
+The Today overview rail also loads and saves the private day note plus its
+Important marker, reusing the same persisted `day_notes` record consumed by End
+of Day, Calendar, and report exports.
 
 The Work search regression reported during review is fixed. The `/` hint now
 sits inside the search field and no longer overlaps the `All types` selector.
@@ -95,7 +98,8 @@ default.
 
 Due follow-ups can remain waiting with a future review date, return a work item
 to Active, close it after an external change, or become no longer relevant.
-Day notes and their important marker persist for Calendar and reporting.
+Day notes and their important marker can be edited from Today or End of Day and
+persist for Calendar and reporting.
 
 Finish End of Day is transactional and remains unavailable until:
 
