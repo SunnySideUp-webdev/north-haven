@@ -1302,10 +1302,6 @@ export type Database = {
         Args: { chosen_direction: number; target_daily_plan_item_id: string };
         Returns: undefined;
       };
-      move_daily_plan_item_to_date: {
-        Args: { chosen_work_date: string; target_daily_plan_item_id: string };
-        Returns: string;
-      };
       move_ticket_type: {
         Args: { chosen_direction: number; target_ticket_type_id: string };
         Returns: undefined;
@@ -1326,10 +1322,6 @@ export type Database = {
       reopen_closed_day: {
         Args: { chosen_work_date: string };
         Returns: string;
-      };
-      remove_daily_plan_item: {
-        Args: { target_daily_plan_item_id: string };
-        Returns: undefined;
       };
       reporting_daily_metrics: {
         Args: { chosen_end_date: string; chosen_start_date: string };

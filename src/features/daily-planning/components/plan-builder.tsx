@@ -7,8 +7,6 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import type { CalendarDayView } from "@/features/calendar-sync/types";
 import {
   movePlanItemAction,
-  movePlanItemToDateAction,
-  removePlanItemAction,
   savePlanDetailsAction,
   setPlanSelectionAction,
 } from "@/features/daily-planning/actions";
@@ -85,7 +83,6 @@ export function PlanBuilder({
   const [receivedBefore, setReceivedBefore] = useState("");
   const [reviewBefore, setReviewBefore] = useState("");
   const [intention, setIntention] = useState(data.plan?.intention ?? "");
-  const [moveDates, setMoveDates] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string>();
   const meetings = data.calendar.meetings;
   const selected = data.items
@@ -251,10 +248,6 @@ export function PlanBuilder({
 
   function itemNumber(item: PlanningInventoryItem) {
     return item.ticket_number?.trim().toLowerCase() ?? "";
-  }
-
-  function moveDateFor(planItemId: string) {
-    return moveDates[planItemId] ?? data.nextPlanningDate ?? workDate;
   }
 
   function run(action: () => Promise<{ ok: boolean; message?: string }>) {
@@ -497,11 +490,23 @@ export function PlanBuilder({
                 selected.map((item, index) => (
                   <div
                     key={item.id}
-                    className="border-border flex flex-wrap items-center gap-4 border-t py-4 first:border-t-0"
+                    className="border-border flex items-center gap-4 border-t py-4 first:border-t-0"
                   >
-                    <span className="border-lavender-500 bg-lavender-100 text-lavender-700 flex h-6 w-6 items-center justify-center rounded border text-xs">
+                    <button
+                      aria-label={`Remove ${item.title}`}
+                      onClick={() =>
+                        run(() =>
+                          setPlanSelectionAction({
+                            selected: false,
+                            workDate,
+                            workItemId: item.id!,
+                          }),
+                        )
+                      }
+                      className="border-lavender-500 bg-lavender-100 text-lavender-700 h-6 w-6 rounded border text-xs"
+                    >
                       ✓
-                    </span>
+                    </button>
                     <div className="min-w-0 flex-1">
                       <p className="text-ink truncate text-sm font-bold">
                         {item.ticket_number
@@ -541,52 +546,6 @@ export function PlanBuilder({
                     >
                       ↓
                     </button>
-                    <div className="ml-auto flex items-center gap-2">
-                      <label className="sr-only" htmlFor={`move-${item.id}`}>
-                        Move {item.title} to date
-                      </label>
-                      <input
-                        id={`move-${item.id}`}
-                        type="date"
-                        value={moveDateFor(item.planItem!.id)}
-                        onChange={(event) =>
-                          setMoveDates((current) => ({
-                            ...current,
-                            [item.planItem!.id]: event.target.value,
-                          }))
-                        }
-                        className="border-border text-ink h-9 rounded-lg border px-2 text-xs"
-                      />
-                      <button
-                        disabled={
-                          pending || moveDateFor(item.planItem!.id) === workDate
-                        }
-                        onClick={() =>
-                          run(() =>
-                            movePlanItemToDateAction({
-                              planItemId: item.planItem!.id,
-                              targetDate: moveDateFor(item.planItem!.id),
-                            }),
-                          )
-                        }
-                        className="border-lavender-300 text-lavender-700 h-9 rounded-lg border px-3 text-xs font-bold disabled:opacity-40"
-                      >
-                        Move
-                      </button>
-                      <button
-                        disabled={pending}
-                        onClick={() =>
-                          run(() =>
-                            removePlanItemAction({
-                              planItemId: item.planItem!.id,
-                            }),
-                          )
-                        }
-                        className="border-border text-muted h-9 rounded-lg border px-3 text-xs font-bold disabled:opacity-40"
-                      >
-                        Remove
-                      </button>
-                    </div>
                   </div>
                 ))
               ) : (

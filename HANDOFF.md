@@ -227,9 +227,6 @@ calendar.
 - Google Calendar sync is still optional and non-blocking; provider requests
   now have an explicit timeout so a slow Google response fails with the calm
   sync error instead of leaving Settings pending indefinitely
-- Planned Tickets, Tasks, and Reminders can now be moved to another work date
-  or removed from Plan/Today without deleting the underlying inventory item;
-  completed items remain protected from move/remove until reopened
 
 ### Pending or not started
 
@@ -298,8 +295,6 @@ visually reviewed. They contain no customer information and can be removed with
 - Work manually selected for one open daily plan should not appear as available
   or Unplanned while planning another day unless it is removed from that plan
   or the source plan is closed.
-- Moving work from one planned date to another is explicit and manual; removing
-  planned work only removes the plan commitment, not the inventory record.
 - No drag-and-drop is required.
 
 ### Ticket semantics

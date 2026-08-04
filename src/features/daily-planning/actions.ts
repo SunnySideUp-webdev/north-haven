@@ -80,59 +80,6 @@ export async function movePlanItemAction(input: {
   return { ok: true };
 }
 
-export async function movePlanItemToDateAction(input: {
-  targetDate: string;
-  planItemId: string;
-}): Promise<PlanningActionResult> {
-  const result = z
-    .object({ planItemId: uuid, targetDate: date })
-    .safeParse(input);
-  if (!result.success)
-    return { ok: false, message: "Choose a valid move date." };
-
-  const { supabase } = await requireAuthenticatedContext();
-  const { error } = await supabase.rpc("move_daily_plan_item_to_date", {
-    chosen_work_date: result.data.targetDate,
-    target_daily_plan_item_id: result.data.planItemId,
-  });
-  if (error)
-    return {
-      ok: false,
-      message: error.message.includes("planned work")
-        ? "Only planned work can be moved. Reopen it first if needed."
-        : "We couldn't move this item.",
-    };
-  revalidatePath("/plan");
-  revalidatePath("/today");
-  revalidatePath("/calendar");
-  revalidatePath("/end-of-day");
-  return { ok: true };
-}
-
-export async function removePlanItemAction(input: {
-  planItemId: string;
-}): Promise<PlanningActionResult> {
-  const result = z.object({ planItemId: uuid }).safeParse(input);
-  if (!result.success) return { ok: false, message: "Invalid plan item." };
-
-  const { supabase } = await requireAuthenticatedContext();
-  const { error } = await supabase.rpc("remove_daily_plan_item", {
-    target_daily_plan_item_id: result.data.planItemId,
-  });
-  if (error)
-    return {
-      ok: false,
-      message: error.message.includes("planned work")
-        ? "Only planned work can be removed. Reopen it first if needed."
-        : "We couldn't remove this item.",
-    };
-  revalidatePath("/plan");
-  revalidatePath("/today");
-  revalidatePath("/calendar");
-  revalidatePath("/end-of-day");
-  return { ok: true };
-}
-
 export async function savePlanDetailsAction(input: {
   intention: string;
   markReady: boolean;
