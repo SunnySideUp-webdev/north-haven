@@ -38,7 +38,7 @@ status, or Calendar events.
 ### Weekly
 
 - Monday through Friday by default, respecting the configured working week
-- Summary metrics and work-completed-by-day chart
+- Summary metrics and ticket-flow-by-day chart
 - End-of-week Active, Waiting for Response, and Watching counts
 - Follow-up reviews due in the next workweek
 - Plain-language pattern summary
@@ -47,7 +47,7 @@ status, or Calendar events.
 
 - One calendar month in the workspace time zone
 - Same core metrics as Insights
-- Weekly rhythm and active-inventory trend
+- Weekly ticket flow and active-inventory trend
 - Received versus Resolved totals
 - End-of-month status snapshot
 - Plain-language pattern summary
@@ -87,9 +87,9 @@ shows an empty-state sentence instead of disappearing.
 - Removes application navigation and interactive controls
 - Includes report period, generation time, time zone, and page number
 - Includes a `Private work summary` label
-- Uses text labels in addition to color in every chart. Weekly stacked bars show
-  weekday labels and per-day color-keyed Worked/Resolved totals beneath each
-  bar.
+- Uses text labels in addition to color in every chart. Weekly ticket-flow bars
+  show weekday labels and per-day color-keyed Received/Resolved totals beneath
+  each interval.
 - Fits the common summary on one page; detail lists may add pages
 
 ### Data CSV

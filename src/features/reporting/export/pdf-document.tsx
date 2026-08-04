@@ -132,7 +132,12 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     width: "100%",
   },
-  barStack: { justifyContent: "flex-end", width: 25 },
+  barPair: {
+    alignItems: "flex-end",
+    flexDirection: "row",
+    gap: 3,
+    justifyContent: "center",
+  },
   workedBar: { backgroundColor: color.lavenderStrong },
   resolvedBar: { backgroundColor: color.blushStrong },
   barLabel: {
@@ -270,17 +275,23 @@ function Metric({
   );
 }
 
-function TrendBars({ report }: { report: ReportView }) {
+function TicketFlowBars({ report }: { report: ReportView }) {
+  const inventoryByDate = new Map(
+    report.inventory.map((row) => [row.workDate, row]),
+  );
   const max = Math.max(
     1,
-    ...report.daily.map((day) => day.ticketsWorked + day.ticketsResolved),
+    ...report.daily.flatMap((day) => [
+      inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0,
+      day.ticketsResolved,
+    ]),
   );
   return (
     <>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendSwatch, styles.workedBar]} />
-          <Text style={styles.legendText}>Worked</Text>
+          <Text style={styles.legendText}>Received</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendSwatch, styles.resolvedBar]} />
@@ -289,21 +300,29 @@ function TrendBars({ report }: { report: ReportView }) {
       </View>
       <View style={styles.bars}>
         {report.daily.map((day) => {
-          const total = day.ticketsWorked + day.ticketsResolved;
-          const height = total ? Math.max(10, (total / max) * 90) : 2;
-          const workedHeight = total
-            ? (day.ticketsWorked / total) * height
-            : height;
-          const resolvedHeight = total
-            ? (day.ticketsResolved / total) * height
-            : 0;
+          const received =
+            inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0;
+          const receivedHeight = received
+            ? Math.max(10, (received / max) * 90)
+            : 2;
+          const resolvedHeight = day.ticketsResolved
+            ? Math.max(10, (day.ticketsResolved / max) * 90)
+            : 2;
           return (
             <View key={day.workDate} style={styles.barColumn}>
               <View style={styles.barPlot}>
-                <View style={[styles.barStack, { height }]}>
-                  <View style={[styles.workedBar, { height: workedHeight }]} />
+                <View style={styles.barPair}>
                   <View
-                    style={[styles.resolvedBar, { height: resolvedHeight }]}
+                    style={[
+                      styles.workedBar,
+                      { height: receivedHeight, width: 11 },
+                    ]}
+                  />
+                  <View
+                    style={[
+                      styles.resolvedBar,
+                      { height: resolvedHeight, width: 11 },
+                    ]}
                   />
                 </View>
               </View>
@@ -311,7 +330,7 @@ function TrendBars({ report }: { report: ReportView }) {
               <View style={styles.barTotals}>
                 <View style={styles.barTotalRow}>
                   <View style={[styles.barTotalSwatch, styles.workedBar]} />
-                  <Text style={styles.barTotalText}>{day.ticketsWorked}</Text>
+                  <Text style={styles.barTotalText}>{received}</Text>
                 </View>
                 <View style={styles.barTotalRow}>
                   <View style={[styles.barTotalSwatch, styles.resolvedBar]} />
@@ -480,19 +499,21 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
                     ? "Day outcome"
                     : report.config.period === "monthly"
                       ? "Active inventory trend"
-                      : "Work completed by day"}
+                      : "Ticket flow by day"}
                 </Text>
                 <Text style={styles.sectionDescription}>
                   {report.config.period === "monthly"
                     ? "Active tickets across the report period"
-                    : "Tickets with confirmed work activity"}
+                    : report.config.period === "daily"
+                      ? "Tickets with confirmed work activity"
+                      : "New ticket demand compared with resolution events"}
                 </Text>
                 {report.config.period === "daily" ? (
                   <DailyOutcome report={report} />
                 ) : report.config.period === "monthly" ? (
                   <InventoryTrend report={report} />
                 ) : (
-                  <TrendBars report={report} />
+                  <TicketFlowBars report={report} />
                 )}
               </View>
             ) : null}

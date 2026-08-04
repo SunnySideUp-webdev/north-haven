@@ -135,15 +135,21 @@ function TrendPreview({ report }: { report: ReportView }) {
     );
   }
 
+  const inventoryByDate = new Map(
+    report.inventory.map((row) => [row.workDate, row]),
+  );
   const max = Math.max(
     1,
-    ...report.daily.map((day) => day.ticketsWorked + day.ticketsResolved),
+    ...report.daily.flatMap((day) => [
+      inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0,
+      day.ticketsResolved,
+    ]),
   );
   return (
     <>
       <div className="text-muted mt-3 flex justify-end gap-4 text-[10px]">
         <span className="flex items-center gap-1.5">
-          <span className="bg-lavender-300 h-2.5 w-2.5" /> Worked
+          <span className="bg-lavender-300 h-2.5 w-2.5" /> Received
         </span>
         <span className="flex items-center gap-1.5">
           <span className="bg-blush-200 h-2.5 w-2.5" /> Resolved
@@ -151,33 +157,28 @@ function TrendPreview({ report }: { report: ReportView }) {
       </div>
       <div className="mt-4 flex items-end gap-5 px-3">
         {report.daily.map((day) => {
-          const total = day.ticketsWorked + day.ticketsResolved;
+          const received =
+            inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0;
           return (
             <div
               key={day.workDate}
               className="flex min-w-8 flex-1 flex-col items-center"
             >
-              <div className="border-border flex h-40 w-full items-end justify-center border-b">
+              <div className="border-border flex h-40 w-full items-end justify-center gap-1.5 border-b">
                 <span
-                  className="flex w-8 flex-col justify-end overflow-hidden rounded-t-sm"
+                  className="bg-lavender-300 w-5 rounded-t-sm"
                   style={{
-                    height: `${Math.max(total ? 8 : 1, (total / max) * 75)}%`,
+                    height: `${Math.max(received ? 8 : 1, (received / max) * 75)}%`,
                   }}
                   aria-hidden="true"
-                >
-                  <span
-                    className="bg-lavender-300"
-                    style={{
-                      height: `${total ? (day.ticketsWorked / total) * 100 : 100}%`,
-                    }}
-                  />
-                  <span
-                    className="bg-blush-200"
-                    style={{
-                      height: `${total ? (day.ticketsResolved / total) * 100 : 0}%`,
-                    }}
-                  />
-                </span>
+                />
+                <span
+                  className="bg-blush-200 w-5 rounded-t-sm"
+                  style={{
+                    height: `${Math.max(day.ticketsResolved ? 8 : 1, (day.ticketsResolved / max) * 75)}%`,
+                  }}
+                  aria-hidden="true"
+                />
               </div>
               <span className="text-quiet mt-2 text-[10px] font-bold">
                 {weekday(day.workDate)}
@@ -187,13 +188,13 @@ function TrendPreview({ report }: { report: ReportView }) {
                 aria-label={`${weekday(day.workDate)} activity totals`}
               >
                 <div className="flex justify-center">
-                  <dt className="sr-only">Worked</dt>
+                  <dt className="sr-only">Received</dt>
                   <dd className="text-muted flex min-w-7 items-center gap-1">
                     <span
                       className="bg-lavender-300 h-2 w-2"
                       aria-hidden="true"
                     />
-                    {day.ticketsWorked}
+                    {received}
                   </dd>
                 </div>
                 <div className="flex justify-center">
@@ -209,11 +210,11 @@ function TrendPreview({ report }: { report: ReportView }) {
         })}
       </div>
       <table className="sr-only">
-        <caption>Work completed by day</caption>
+        <caption>Ticket flow by day</caption>
         <thead>
           <tr>
             <th>Date</th>
-            <th>Worked</th>
+            <th>Received</th>
             <th>Resolved</th>
           </tr>
         </thead>
@@ -221,7 +222,7 @@ function TrendPreview({ report }: { report: ReportView }) {
           {report.daily.map((day) => (
             <tr key={day.workDate}>
               <th>{day.workDate}</th>
-              <td>{day.ticketsWorked}</td>
+              <td>{inventoryByDate.get(day.workDate)?.ticketsReceived ?? 0}</td>
               <td>{day.ticketsResolved}</td>
             </tr>
           ))}
@@ -305,12 +306,14 @@ function PdfPreview({ report }: { report: ReportView }) {
                   ? "Day outcome"
                   : report.config.period === "monthly"
                     ? "Active inventory trend"
-                    : "Work completed by day"}
+                    : "Ticket flow by day"}
               </h3>
               <p className="text-muted mt-1 text-xs">
                 {report.config.period === "monthly"
                   ? "Active tickets across the report period"
-                  : "Tickets with confirmed work activity"}
+                  : report.config.period === "daily"
+                    ? "Tickets with confirmed work activity"
+                    : "New ticket demand compared with resolution events"}
               </p>
               <TrendPreview report={report} />
             </section>
