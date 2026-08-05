@@ -13,20 +13,26 @@ export default async function EditWorkItemPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ from?: string }>;
+  searchParams: Promise<{ date?: string; from?: string }>;
 }) {
-  const [{ id }, { from }] = await Promise.all([params, searchParams]);
+  const [{ id }, { date, from }] = await Promise.all([params, searchParams]);
   const [item, { profile }] = await Promise.all([
     getWorkItem(id),
     requireAuthenticatedContext(),
   ]);
   const ticketTypes = item.kind === "ticket" ? await getTicketTypes() : [];
+  const todayDate = /^\d{4}-\d{2}-\d{2}$/.test(date ?? "")
+    ? `&date=${date}`
+    : "";
 
   return (
     <>
       <PageHeader
         backLink={{
-          href: from === "today" ? `/work/${id}?from=today` : `/work/${id}`,
+          href:
+            from === "today"
+              ? `/work/${id}?from=today${todayDate}`
+              : `/work/${id}`,
           label: "Work item",
         }}
         title={`Edit ${item.kind}`}

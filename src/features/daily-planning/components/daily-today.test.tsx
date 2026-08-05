@@ -10,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DailyToday } from "@/features/daily-planning/components/daily-today";
 
 const refresh = vi.fn();
+const push = vi.fn();
 const saveDayNote = vi.fn().mockResolvedValue({
   message: "Day note saved.",
   ok: true,
@@ -17,7 +18,7 @@ const saveDayNote = vi.fn().mockResolvedValue({
 const setPlanItemDone = vi.fn().mockResolvedValue({ ok: true });
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ refresh }),
+  useRouter: () => ({ push, refresh }),
 }));
 
 vi.mock("@/features/daily-planning/actions", () => ({
@@ -47,17 +48,20 @@ const todayData = {
       tracking_state: "active",
     },
   ],
+  nextWorkDate: "2026-08-04",
   plan: {
     id: "plan-1",
     intention: "Finish the oldest tickets first.",
     status: "active",
   },
+  previousWorkDate: "2026-07-31",
   timeZone: "America/Guatemala",
 } as unknown as Parameters<typeof DailyToday>[0]["data"];
 
 describe("DailyToday", () => {
   beforeEach(() => {
     refresh.mockClear();
+    push.mockClear();
     saveDayNote.mockClear();
     setPlanItemDone.mockClear();
   });
@@ -87,5 +91,23 @@ describe("DailyToday", () => {
       "Day note saved.",
     );
     expect(refresh).toHaveBeenCalled();
+  });
+
+  it("opens another Today date from the work date selector", () => {
+    render(<DailyToday data={todayData} workDate="2026-08-03" />);
+
+    fireEvent.change(screen.getByLabelText("Work date"), {
+      target: { value: "2026-08-04" },
+    });
+
+    expect(push).toHaveBeenCalledWith("/today?date=2026-08-04");
+  });
+
+  it("keeps the Today date when opening a planned work item", () => {
+    render(<DailyToday data={todayData} workDate="2026-08-03" />);
+
+    expect(
+      screen.getByRole("link", { name: /update customer address/i }),
+    ).toHaveAttribute("href", "/work/item-1?from=today&date=2026-08-03");
   });
 });

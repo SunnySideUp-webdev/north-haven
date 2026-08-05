@@ -42,17 +42,20 @@ export default async function WorkItemPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ from?: string }>;
+  searchParams: Promise<{ date?: string; from?: string }>;
 }) {
-  const [{ id }, { from }] = await Promise.all([params, searchParams]);
+  const [{ id }, { date, from }] = await Promise.all([params, searchParams]);
   const [item, activity, defaultPlanDate] = await Promise.all([
     getWorkItem(id),
     getWorkItemActivity(id),
     getDefaultPlanDate(),
   ]);
+  const isTodayDate = /^\d{4}-\d{2}-\d{2}$/.test(date ?? "");
+  const todayDate = isTodayDate ? `?date=${date}` : "";
+  const editTodayDate = isTodayDate ? `&date=${date}` : "";
   const backLink =
     from === "today"
-      ? { href: "/today", label: "Today" }
+      ? { href: `/today${todayDate}`, label: "Today" }
       : { href: "/work", label: "Work inventory" };
   const openFollowUp = activity.followUps.find(
     (followUp) => followUp.state === "open",
@@ -78,7 +81,7 @@ export default async function WorkItemPage({
               <Link
                 href={
                   from === "today"
-                    ? `/work/${id}/edit?from=today`
+                    ? `/work/${id}/edit?from=today${editTodayDate}`
                     : `/work/${id}/edit`
                 }
                 className="bg-lavender-700 hover:bg-lavender-500 rounded-lg px-5 py-3 text-sm font-bold text-white"

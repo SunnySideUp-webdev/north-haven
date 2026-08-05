@@ -230,6 +230,9 @@ calendar.
 - The planned-work date controls experiment was reverted. Work Inventory now
   has an icon-only permanent Delete action with confirmation for mistaken or
   nonexistent work records; this is separate from recoverable Archive
+- Today supports explicit date navigation through `/today?date=YYYY-MM-DD`, so
+  unfinished prior workdays can be reopened to mark progress, save notes, run
+  End of Day, or review the dated plan
 
 ### Pending or not started
 
@@ -314,6 +317,8 @@ visually reviewed. They contain no customer information and can be removed with
 
 - Today is the default destination.
 - Today shows only deliberately planned work.
+- Today can reopen previous work dates; it is not limited to the current local
+  date when a specific date is requested.
 - The full inventory remains available through Work and a secondary action.
 - End of Day has four steps:
   1. Update Tickets

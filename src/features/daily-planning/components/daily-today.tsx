@@ -39,7 +39,9 @@ export function DailyToday({
     dayNote: { body: string; is_important: boolean } | null;
     dueFollowUps: number;
     items: TodayItem[];
+    nextWorkDate: string | null;
     plan: { id: string; status: string; intention: string | null } | null;
+    previousWorkDate: string | null;
     timeZone: string;
   };
   workDate: string;
@@ -92,6 +94,39 @@ export function DailyToday({
   const planLabel = data.plan
     ? data.plan.status[0].toUpperCase() + data.plan.status.slice(1) + " plan"
     : "No plan yet";
+  const dateControls = (
+    <section>
+      <label className="text-ink block text-sm font-bold">
+        Work date
+        <input
+          type="date"
+          value={workDate}
+          onChange={(event) => router.push(`/today?date=${event.target.value}`)}
+          className="border-border bg-paper mt-2 w-full rounded-lg border px-3 py-2.5"
+        />
+      </label>
+      <div className="mt-4 flex items-center justify-between text-sm font-bold">
+        {data.previousWorkDate ? (
+          <Link
+            href={`/today?date=${data.previousWorkDate}`}
+            className="text-lavender-700"
+          >
+            ← Previous
+          </Link>
+        ) : (
+          <span />
+        )}
+        {data.nextWorkDate ? (
+          <Link
+            href={`/today?date=${data.nextWorkDate}`}
+            className="text-lavender-700"
+          >
+            Next →
+          </Link>
+        ) : null}
+      </div>
+    </section>
+  );
 
   return (
     <>
@@ -102,7 +137,10 @@ export function DailyToday({
         intention={data.plan?.intention ?? undefined}
       />
       {!items.length && !meetings.length ? (
-        <div className="mx-auto max-w-[980px] p-8">
+        <div className="mx-auto max-w-[980px] space-y-6 p-8">
+          <div className="border-border/70 bg-paper shadow-surface rounded-xl border p-6">
+            {dateControls}
+          </div>
           <section className="border-border/70 bg-paper shadow-surface flex min-h-[520px] flex-col items-center justify-center rounded-xl border px-10 text-center">
             {data.calendar.isOutOfOffice ? (
               <span className="bg-lavender-100 text-lavender-700 mb-5 rounded-full px-3 py-1.5 text-xs font-bold">
@@ -138,7 +176,8 @@ export function DailyToday({
       ) : (
         <div className="mx-auto grid max-w-[1440px] grid-cols-[270px_minmax(0,1fr)] gap-8 p-8">
           <aside className="bg-lavender-50 flex min-h-[650px] flex-col rounded-xl p-7">
-            <h2 className="text-ink text-lg font-bold">Overview</h2>
+            <div className="border-border border-b pb-6">{dateControls}</div>
+            <h2 className="text-ink mt-7 text-lg font-bold">Overview</h2>
             {data.calendar.isOutOfOffice ? (
               <div className="bg-lavender-100 text-lavender-700 mt-5 rounded-lg px-4 py-3 text-sm font-bold">
                 OOO today
@@ -317,7 +356,7 @@ export function DailyToday({
                           {done ? "✓" : ""}
                         </button>
                         <Link
-                          href={`/work/${item.id}?from=today`}
+                          href={`/work/${item.id}?from=today&date=${workDate}`}
                           prefetch={false}
                           className="focus-visible:ring-lavender-500 block min-w-0 flex-1 rounded-md py-1 outline-none focus-visible:ring-2"
                         >

@@ -6,14 +6,28 @@ import { requireAuthenticatedContext } from "@/server/auth/session";
 
 export const metadata: Metadata = { title: "Today" };
 
-export default async function TodayPage() {
-  const { profile } = await requireAuthenticatedContext();
-  const workDate = new Intl.DateTimeFormat("en-CA", {
-    timeZone: profile?.time_zone ?? "America/Guatemala",
+function localDate(timeZone: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
+}
+
+export default async function TodayPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string }>;
+}) {
+  const [{ date }, { profile }] = await Promise.all([
+    searchParams,
+    requireAuthenticatedContext(),
+  ]);
+  const requestedDate = /^\d{4}-\d{2}-\d{2}$/.test(date ?? "")
+    ? date!
+    : localDate(profile?.time_zone ?? "America/Guatemala");
+  const workDate = requestedDate;
   const data = await getDailyPlanningData(workDate);
   return <DailyToday data={data} workDate={workDate} />;
 }

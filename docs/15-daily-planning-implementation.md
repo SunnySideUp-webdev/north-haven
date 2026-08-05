@@ -62,6 +62,9 @@ shows progress, and records reversible Done decisions without changing Ticket
 workflow status. Planned work rows in Today now match the Work Inventory's
 hover-open rhythm: the item content opens Work Detail without a separate
 Details action, and Work Detail returns to Today when it was opened from Today.
+Today can also open a specific work date with `/today?date=YYYY-MM-DD`, making
+unfinished prior days reachable for progress updates, notes, End of Day, and
+Plan review.
 The Today overview rail also loads and saves the private day note plus its
 Important marker, reusing the same persisted `day_notes` record consumed by End
 of Day, Calendar, and report exports.
