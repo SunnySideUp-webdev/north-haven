@@ -278,8 +278,10 @@ Columns can be hidden, but the MVP does not require arbitrary reordering.
 
 ### Bulk actions
 
-Limited to archive, set review date, and add to a selected day. Bulk deletion is
-not available.
+Supports add to a selected day, set review date, recoverable archive, and
+permanent delete. Archive and delete use North Haven's in-app confirmation
+dialog instead of the browser confirmation UI; delete clearly states that
+related notes, plans, and history are permanently removed.
 
 ### Acceptance criteria
 
@@ -287,6 +289,8 @@ not available.
 - Exact ticket number search is ranked first.
 - The table supports at least several thousand items with server-side paging.
 - Archive is recoverable from the Archived filter.
+- Delete is available for tickets, tasks, and reminders when the user needs to
+  permanently clean up Work Inventory.
 
 ## Ticket detail
 

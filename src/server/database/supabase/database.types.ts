@@ -1218,6 +1218,10 @@ export type Database = {
         Args: { target_work_item_ids: string[] };
         Returns: number;
       };
+      bulk_delete_work_items_permanently: {
+        Args: { target_work_item_ids: string[] };
+        Returns: number;
+      };
       bulk_set_follow_up_review: {
         Args: { chosen_review_on: string; target_work_item_ids: string[] };
         Returns: number;

@@ -468,6 +468,36 @@ export async function deleteWorkItemAction(input: {
   return { ok: true, message: "Item deleted." };
 }
 
+export async function bulkDeleteWorkItemsAction(input: {
+  workItemIds: string[];
+}): Promise<{ ok: boolean; message: string }> {
+  const result = z
+    .object({ workItemIds: z.array(z.string().uuid()).min(1).max(100) })
+    .safeParse(input);
+  if (!result.success) return { ok: false, message: "Choose valid items." };
+
+  const { supabase } = await requireAuthenticatedContext();
+  const { data, error } = await supabase.rpc(
+    "bulk_delete_work_items_permanently",
+    {
+      target_work_item_ids: result.data.workItemIds,
+    },
+  );
+  if (error) {
+    return { ok: false, message: "We couldn't delete those items." };
+  }
+
+  revalidatePath("/work");
+  revalidatePath("/plan");
+  revalidatePath("/today");
+  revalidatePath("/calendar");
+  revalidatePath("/insights");
+  return {
+    ok: true,
+    message: `${data ?? 0} ${data === 1 ? "item" : "items"} deleted.`,
+  };
+}
+
 export async function addWorkItemNoteAction(
   _previousState: WorkFormState,
   formData: FormData,

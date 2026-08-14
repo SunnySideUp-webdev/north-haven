@@ -177,7 +177,8 @@ calendar.
 - Previous/next workday Plan navigation, complete saved and advanced filters,
   session persistence, schedule context, and recently-worked ordering
 - Operational Work Inventory columns plus multi-select Add to Plan, Set Review,
-  and guarded recoverable Archive actions
+  guarded recoverable Archive actions, and permanent Delete for tickets, tasks,
+  and reminders using an in-app confirmation dialog
 - Direct Work Detail planning, Days Worked history, duplicate recovery, and
   confirmations for sensitive lifecycle changes
 - End of Day multi-ticket capture actions and embedded next-workday planning

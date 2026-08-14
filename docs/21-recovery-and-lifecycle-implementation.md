@@ -67,8 +67,9 @@ trigger records the recovery.
 
 Work Inventory also has a separate permanent Delete action for records entered
 by mistake or work that no longer exists. It is not part of archived recovery:
-the icon-only trash action asks for browser confirmation and then deletes the
-work item and dependent local records from North Haven.
+row-level and bulk Delete actions open an in-app confirmation dialog, clearly
+warn that the action cannot be undone, and then delete the work item and
+dependent local records from North Haven.
 
 ## Demonstrated recovery
 

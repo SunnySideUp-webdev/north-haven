@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   bulkAddToPlanAction,
   bulkArchiveWorkItemsAction,
+  bulkDeleteWorkItemsAction,
   bulkSetReviewDateAction,
   deleteWorkItemAction,
 } from "@/features/work-items/actions";
@@ -34,6 +35,18 @@ const label = (value: string | null | undefined) =>
         .replaceAll("_", " ")
         .replace(/\b\w/g, (letter) => letter.toUpperCase())
     : "—";
+
+type ConfirmationRequest =
+  | {
+      action: "archive";
+      ids: string[];
+      title: string;
+    }
+  | {
+      action: "delete";
+      ids: string[];
+      title: string;
+    };
 
 function matchesView(item: WorkInventoryRow, view: SavedView) {
   if (view === "active")
@@ -84,6 +97,8 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
     tone: "success" | "error";
     text: string;
   }>();
+  const [confirmation, setConfirmation] =
+    useState<ConfirmationRequest | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -187,6 +202,23 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
       if (result.ok) setSelected([]);
       router.refresh();
     });
+  }
+
+  function confirmPendingAction() {
+    if (!confirmation) return;
+    const request = confirmation;
+    setConfirmation(null);
+    run(() =>
+      request.action === "archive"
+        ? bulkArchiveWorkItemsAction({ workItemIds: request.ids })
+        : request.ids.length === 1
+          ? deleteWorkItemAction({ workItemId: request.ids[0]! })
+          : bulkDeleteWorkItemsAction({ workItemIds: request.ids }),
+    );
+  }
+
+  function itemDisplayName(item: WorkInventoryRow) {
+    return `${item.ticket_number ? `${formatTicketNumber(item.ticket_number)} · ` : ""}${item.title}`;
   }
 
   function clearFilters() {
@@ -397,19 +429,29 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
               </button>
               <button
                 disabled={pending}
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      `Archive ${selected.length} selected ${selected.length === 1 ? "item" : "items"}? They remain recoverable.`,
-                    )
-                  )
-                    run(() =>
-                      bulkArchiveWorkItemsAction({ workItemIds: selected }),
-                    );
-                }}
+                onClick={() =>
+                  setConfirmation({
+                    action: "archive",
+                    ids: selected,
+                    title: `${selected.length} selected ${selected.length === 1 ? "item" : "items"}`,
+                  })
+                }
                 className="text-urgent-ink border-urgent-ink/20 bg-paper rounded-lg border px-4 py-2.5 text-sm font-bold disabled:opacity-50"
               >
                 Archive
+              </button>
+              <button
+                disabled={pending}
+                onClick={() =>
+                  setConfirmation({
+                    action: "delete",
+                    ids: selected,
+                    title: `${selected.length} selected ${selected.length === 1 ? "item" : "items"}`,
+                  })
+                }
+                className="bg-urgent-surface text-urgent-ink border-urgent-ink/20 rounded-lg border px-4 py-2.5 text-sm font-bold disabled:opacity-50"
+              >
+                Delete
               </button>
             </div>
           ) : null}
@@ -446,7 +488,7 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
                     <th className="px-4 py-4 font-bold">Backup</th>
                     <th className="px-4 py-4 font-bold">Last worked</th>
                     <th className="px-4 py-4 font-bold">
-                      <span className="sr-only">Delete</span>
+                      <span className="sr-only">Actions</span>
                     </th>
                   </tr>
                 </thead>
@@ -536,22 +578,37 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
                           {formatDate(item.last_worked_on)}
                         </td>
                         <td className="px-4 py-4">
+                          <div className="flex items-center justify-end gap-1">
+                            {item.tracking_state !== "archived" ? (
+                              <button
+                                type="button"
+                                disabled={pending}
+                                aria-label={`Archive ${item.title}`}
+                                title="Archive"
+                                onClick={() =>
+                                  setConfirmation({
+                                    action: "archive",
+                                    ids: [id],
+                                    title: itemDisplayName(item),
+                                  })
+                                }
+                                className="text-quiet hover:text-lavender-700 focus-visible:ring-lavender-500 rounded p-1.5 text-xs font-bold outline-none focus-visible:ring-2 disabled:opacity-40"
+                              >
+                                Archive
+                              </button>
+                            ) : null}
                           <button
                             type="button"
                             disabled={pending}
                             aria-label={`Delete ${item.title}`}
                             title="Delete"
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  `Delete "${item.title}" permanently? This cannot be undone.`,
-                                )
-                              ) {
-                                run(() =>
-                                  deleteWorkItemAction({ workItemId: id }),
-                                );
-                              }
-                            }}
+                            onClick={() =>
+                              setConfirmation({
+                                action: "delete",
+                                ids: [id],
+                                title: itemDisplayName(item),
+                              })
+                            }
                             className="text-quiet hover:text-urgent-ink focus-visible:ring-urgent-ink rounded p-1.5 outline-none focus-visible:ring-2 disabled:opacity-40"
                           >
                             <svg
@@ -571,6 +628,7 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
                               <path d="M14 11v5" />
                             </svg>
                           </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -598,6 +656,76 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
           )}
         </section>
       </div>
+
+      {confirmation ? (
+        <div
+          role="presentation"
+          className="bg-ink/25 fixed inset-0 z-50 flex items-center justify-center p-6 backdrop-blur-[2px]"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setConfirmation(null);
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="work-confirm-title"
+            className="border-border bg-paper shadow-surface w-full max-w-[560px] overflow-hidden rounded-2xl border"
+          >
+            <div className="border-blush-200 bg-lavender-100 border-b-2 px-7 py-6">
+              <p className="text-quiet text-xs font-bold tracking-[0.12em] uppercase">
+                {confirmation.action === "archive"
+                  ? "Archive work"
+                  : "Permanent delete"}
+              </p>
+              <h2
+                id="work-confirm-title"
+                className="text-ink mt-2 text-2xl font-bold tracking-[-0.03em]"
+              >
+                {confirmation.action === "archive"
+                  ? "Move this out of active work?"
+                  : "Delete this forever?"}
+              </h2>
+            </div>
+            <div className="space-y-4 px-7 py-6">
+              <p className="text-muted text-sm leading-6">
+                <span className="text-ink font-bold">{confirmation.title}</span>
+                {confirmation.action === "archive"
+                  ? " will leave active views, but stays recoverable from Archived."
+                  : " will be permanently removed from North Haven, including related notes, plans, and history. This cannot be undone."}
+              </p>
+              {confirmation.action === "delete" ? (
+                <div className="bg-urgent-surface text-urgent-ink rounded-xl px-4 py-3 text-sm font-bold">
+                  Delete is permanent. Use Archive if you might need this work
+                  item later.
+                </div>
+              ) : null}
+            </div>
+            <div className="border-border bg-canvas flex justify-end gap-3 border-t px-7 py-5">
+              <button
+                type="button"
+                onClick={() => setConfirmation(null)}
+                className="border-border bg-paper text-muted hover:text-ink rounded-lg border px-4 py-2.5 text-sm font-bold"
+              >
+                Keep it
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={confirmPendingAction}
+                className={`rounded-lg px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50 ${
+                  confirmation.action === "archive"
+                    ? "bg-lavender-700 hover:bg-lavender-500"
+                    : "bg-urgent-ink hover:opacity-90"
+                }`}
+              >
+                {confirmation.action === "archive"
+                  ? "Archive"
+                  : "Delete permanently"}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </>
   );
 }
