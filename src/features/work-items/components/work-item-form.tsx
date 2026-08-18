@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import {
   createReminderAction,
@@ -69,6 +69,10 @@ export function WorkItemForm({
   );
   const localDateTimeRef = useRef<HTMLInputElement>(null);
   const isoDateTimeRef = useRef<HTMLInputElement>(null);
+  const [isTrackingTicket, setIsTrackingTicket] = useState(
+    Boolean(item?.is_tracking_ticket),
+  );
+  const [ticketNumber, setTicketNumber] = useState(item?.ticket_number ?? "");
 
   useEffect(() => {
     if (localDateTimeRef.current) {
@@ -183,12 +187,28 @@ export function WorkItemForm({
               <input
                 name="ticketNumber"
                 autoFocus
-                required
+                required={!isTrackingTicket}
+                readOnly={isTrackingTicket}
                 maxLength={80}
-                defaultValue={item?.ticket_number ?? ""}
+                value={isTrackingTicket ? "Tracking Ticket" : ticketNumber}
+                onChange={(event) => setTicketNumber(event.target.value)}
                 className={workFieldClassName}
-                placeholder="e.g. 123456"
+                placeholder={
+                  isTrackingTicket ? "Tracking Ticket" : "e.g. 123456"
+                }
               />
+              <span className="mt-3 flex items-center gap-2 text-sm font-bold">
+                <input
+                  type="checkbox"
+                  name="isTrackingTicket"
+                  checked={isTrackingTicket}
+                  onChange={(event) =>
+                    setIsTrackingTicket(event.target.checked)
+                  }
+                  className="accent-lavender-700 h-4 w-4"
+                />
+                Tracking ticket
+              </span>
             </label>
             <label className="text-ink block text-sm font-bold">
               Ticket type

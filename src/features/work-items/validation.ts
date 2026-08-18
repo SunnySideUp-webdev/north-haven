@@ -12,23 +12,34 @@ const operationalStatus = z.enum([
 const systemPriority = z.enum(["urgent", "high", "medium", "low"]);
 const isoDateTime = z.string().datetime({ offset: true });
 
-export const ticketInputSchema = z.object({
-  description,
-  externalUrl: z.union([
-    z.literal(""),
-    z.string().trim().url().startsWith("https://"),
-  ]),
-  formBackupComplete: z.boolean(),
-  note: z.string().trim().max(10_000).optional(),
-  operationalStatus,
-  receivedAt: z.string().date(),
-  systemPriority,
-  ticketNumber: z.string().trim().min(1).max(80),
-  ticketTypeId: z.string().uuid(),
-  title,
-  trackingState: trackingState.optional(),
-  workItemId: z.string().uuid().optional(),
-});
+export const ticketInputSchema = z
+  .object({
+    description,
+    externalUrl: z.union([
+      z.literal(""),
+      z.string().trim().url().startsWith("https://"),
+    ]),
+    formBackupComplete: z.boolean(),
+    isTrackingTicket: z.boolean().default(false),
+    note: z.string().trim().max(10_000).optional(),
+    operationalStatus,
+    receivedAt: z.string().date(),
+    systemPriority,
+    ticketNumber: z.string().trim().max(80),
+    ticketTypeId: z.string().uuid(),
+    title,
+    trackingState: trackingState.optional(),
+    workItemId: z.string().uuid().optional(),
+  })
+  .superRefine((ticket, context) => {
+    if (!ticket.isTrackingTicket && ticket.ticketNumber.length === 0) {
+      context.addIssue({
+        code: "custom",
+        message: "Ticket number is required.",
+        path: ["ticketNumber"],
+      });
+    }
+  });
 
 export const ticketWorkflowInputSchema = z.object({
   operationalStatus,

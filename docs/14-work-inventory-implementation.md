@@ -46,6 +46,9 @@ Create and edit flows use authenticated Server Actions and Zod validation.
 Customer-entered descriptions and notes are not emitted to URLs or intentional
 application logs. Reminder and Task date-times are converted to UTC instants in
 the browser before persistence.
+Ticket creation also supports local Tracking Tickets: checking Tracking ticket
+under Ticket number removes the source-number requirement while keeping the rest
+of the Ticket fields and workflow behavior unchanged.
 
 The detail route provides overview data, the secure source-system link, activity
 notes, an editable open follow-up, and automatic status history. Tracking can be

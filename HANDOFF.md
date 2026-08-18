@@ -234,6 +234,9 @@ calendar.
 - Today supports explicit date navigation through `/today?date=YYYY-MM-DD`, so
   unfinished prior workdays can be reopened to mark progress, save notes, run
   End of Day, or review the dated plan
+- Ticket creation supports local Tracking Tickets via a checkbox under Ticket
+  number. Tracking tickets do not require a source-system ticket number and
+  display as `Tracking Ticket` while retaining normal Ticket fields.
 
 ### Pending or not started
 
@@ -320,6 +323,7 @@ visually reviewed. They contain no customer information and can be removed with
 - Today shows only deliberately planned work.
 - Today can reopen previous work dates; it is not limited to the current local
   date when a specific date is requested.
+- Tracking Tickets are valid Tickets without an external ticket number.
 - The full inventory remains available through Work and a secondary action.
 - End of Day has four steps:
   1. Update Tickets

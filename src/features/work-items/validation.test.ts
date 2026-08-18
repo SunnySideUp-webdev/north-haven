@@ -29,6 +29,27 @@ describe("work item validation", () => {
     ).toBe(false);
   });
 
+  it("accepts tracking tickets without a ticket number", () => {
+    const ticket = {
+      description: "Track follow-through that has no source ticket.",
+      externalUrl: "",
+      formBackupComplete: false,
+      isTrackingTicket: true,
+      operationalStatus: "pending",
+      receivedAt: "2026-08-18",
+      systemPriority: "medium",
+      ticketNumber: "",
+      ticketTypeId: "44ac6dfa-5676-4c66-8b05-404b6f6bc6bd",
+      title: "Follow up with the vendor",
+    };
+
+    expect(ticketInputSchema.safeParse(ticket).success).toBe(true);
+    expect(
+      ticketInputSchema.safeParse({ ...ticket, isTrackingTicket: false })
+        .success,
+    ).toBe(false);
+  });
+
   it("requires a timezone-aware instant for reminders", () => {
     expect(
       reminderInputSchema.safeParse({

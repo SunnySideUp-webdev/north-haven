@@ -58,6 +58,7 @@ workspace boundary avoids a future authorization migration.
 
 - `work_item_id`
 - `ticket_number`
+- `is_tracking_ticket`
 - `ticket_type_id`
 - `system_priority`: urgent, high, medium, low
 - `operational_status`: pending, in_progress, waiting_response, resolved
@@ -67,7 +68,10 @@ workspace boundary avoids a future authorization migration.
 - `form_backup_completed_at`
 - `external_url`
 
-Unique constraint: workspace plus normalized ticket number.
+Unique constraint: workspace plus normalized ticket number. Tracking tickets set
+`is_tracking_ticket` and do not store a source-system ticket number, allowing
+multiple local-only tracking tickets to display as `Tracking Ticket` without
+creating duplicate-number conflicts.
 
 ### ticket_types
 
