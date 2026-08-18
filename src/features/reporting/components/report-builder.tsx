@@ -784,7 +784,7 @@ export function ReportBuilder({
             <div className="border-border border-t pt-4">
               <CheckOption
                 checked={config.includeTicketDetails}
-                label="Ticket numbers and titles"
+                label="Tickets"
                 description="Off by default to protect customer information"
                 onChange={(value) =>
                   setSimple("includeTicketDetails", value, value)
@@ -793,7 +793,7 @@ export function ReportBuilder({
             </div>
             <CheckOption
               checked={config.includeTaskDetails}
-              label="Task titles"
+              label="Tasks"
               description="Off by default to protect work details"
               onChange={(value) =>
                 setSimple("includeTaskDetails", value, value)

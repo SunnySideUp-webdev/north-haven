@@ -38,7 +38,7 @@ describe("Report Builder", () => {
 
   it("warns before details and offers the accessible CSV preview", async () => {
     render(<ReportBuilder initialReport={reportFixture()} />);
-    fireEvent.click(screen.getByLabelText(/Ticket numbers and titles/));
+    fireEvent.click(screen.getByLabelText(/Tickets/));
     expect(
       screen.getByText("This report may contain customer information."),
     ).toBeInTheDocument();
@@ -56,8 +56,8 @@ describe("Report Builder", () => {
   it("shows selected detail sections even when the period has no matching rows", () => {
     render(<ReportBuilder initialReport={reportFixture()} />);
 
-    fireEvent.click(screen.getByLabelText(/Ticket numbers and titles/));
-    fireEvent.click(screen.getByLabelText(/Task titles/));
+    fireEvent.click(screen.getByLabelText(/Tickets/));
+    fireEvent.click(screen.getByLabelText(/Tasks/));
     fireEvent.click(screen.getByLabelText(/Day notes/));
     fireEvent.click(screen.getByLabelText(/Follow-up reasons/));
 

@@ -76,10 +76,10 @@ interval, so the PDF does not rely on color alone or a dense paragraph legend.
 `Not resolved` means planned tickets that did not reach Resolved during that
 day.
 
-Optional detail sections are explicit when selected. Ticket numbers and titles,
-Task titles, Day notes, and Follow-up reasons render matching rows when
-available, and render a short empty-state sentence when no rows match the report
-period or upcoming review window.
+Optional detail sections are explicit when selected. Tickets, Tasks, Day notes,
+and Follow-up reasons render matching rows when available, and render a short
+empty-state sentence when no rows match the report period or upcoming review
+window.
 
 ## Data CSV
 
