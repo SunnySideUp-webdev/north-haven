@@ -66,7 +66,8 @@ Enabled by default:
 
 Disabled by default:
 
-- Ticket numbers, ticket titles, and task titles
+- Ticket numbers and titles
+- Task titles
 - Day notes
 - Follow-up reasons
 

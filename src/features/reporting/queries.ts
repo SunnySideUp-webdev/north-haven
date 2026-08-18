@@ -15,6 +15,7 @@ import {
   reportConfigSchema,
   type ReportConfig,
   type ReportFollowUp,
+  type ReportTaskDetail,
   type ReportTicketDetail,
   type ReportView,
 } from "@/features/reporting/reports";
@@ -399,8 +400,9 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
     0,
   );
 
+  let taskDetails: ReportTaskDetail[] = [];
   let ticketDetails: ReportTicketDetail[] = [];
-  if (config.includeTicketDetails) {
+  if (config.includeTaskDetails || config.includeTicketDetails) {
     const { data: logRows, error: logError } = await supabase
       .from("work_logs")
       .select("work_item_id, worked_on")
@@ -416,25 +418,41 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
       datesByItem.set(row.work_item_id, dates);
     }
     const ids = [...datesByItem.keys()];
-    if (ids.length) {
-      const { data: items, error: itemError } = await supabase
+    if (ids.length && config.includeTicketDetails) {
+      const { data: ticketItems, error: ticketError } = await supabase
         .from("work_inventory_rows")
-        .select("id, kind, title, ticket_number")
-        .in("kind", ["ticket", "task"])
+        .select("id, title, ticket_number")
+        .eq("kind", "ticket")
         .in("id", ids)
-        .order("kind")
         .order("ticket_number")
         .order("title");
-      if (itemError) throw new Error("We couldn't load work details.");
-      ticketDetails = (items ?? []).flatMap((item) => {
-        if (!item.id || !item.title) return [];
-        if (item.kind !== "task" && item.kind !== "ticket") return [];
-        if (item.kind === "ticket" && !item.ticket_number) return [];
+      if (ticketError) throw new Error("We couldn't load ticket details.");
+      ticketDetails = (ticketItems ?? []).flatMap((item) => {
+        if (!item.id || !item.ticket_number || !item.title) return [];
 
         return [
           {
-            kind: item.kind,
             ticketNumber: item.ticket_number,
+            title: item.title,
+            workDates: [...(datesByItem.get(item.id) ?? [])],
+            workItemId: item.id,
+          },
+        ];
+      });
+    }
+    if (ids.length && config.includeTaskDetails) {
+      const { data: taskItems, error: taskError } = await supabase
+        .from("work_inventory_rows")
+        .select("id, title")
+        .eq("kind", "task")
+        .in("id", ids)
+        .order("title");
+      if (taskError) throw new Error("We couldn't load task details.");
+      taskDetails = (taskItems ?? []).flatMap((item) => {
+        if (!item.id || !item.title) return [];
+
+        return [
+          {
             title: item.title,
             workDates: [...(datesByItem.get(item.id) ?? [])],
             workItemId: item.id,
@@ -522,6 +540,7 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
       workingWeekdays,
     },
     start: range.start,
+    taskDetails,
     ticketDetails,
     timeZone,
     today,

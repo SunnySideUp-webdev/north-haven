@@ -18,8 +18,9 @@ const headers = [
   "in_progress_tickets",
   "waiting_for_response",
   "resolved_status_tickets",
-  "work_identifiers",
-  "work_titles",
+  "ticket_numbers",
+  "ticket_titles",
+  "task_titles",
   "day_note",
   "follow_up_reasons",
 ] as const;
@@ -44,21 +45,22 @@ export function reportToCsv(report: ReportView) {
   );
   const detailsByDate = new Map<
     string,
-    { identifiers: string[]; titles: string[] }
+    { numbers: string[]; titles: string[] }
   >();
   for (const detail of report.ticketDetails) {
     for (const date of detail.workDates) {
-      const values = detailsByDate.get(date) ?? {
-        identifiers: [],
-        titles: [],
-      };
-      values.identifiers.push(
-        detail.kind === "ticket" && detail.ticketNumber
-          ? detail.ticketNumber
-          : "Task",
-      );
+      const values = detailsByDate.get(date) ?? { numbers: [], titles: [] };
+      values.numbers.push(detail.ticketNumber);
       values.titles.push(detail.title);
       detailsByDate.set(date, values);
+    }
+  }
+  const taskTitlesByDate = new Map<string, string[]>();
+  for (const detail of report.taskDetails) {
+    for (const date of detail.workDates) {
+      const values = taskTitlesByDate.get(date) ?? [];
+      values.push(detail.title);
+      taskTitlesByDate.set(date, values);
     }
   }
 
@@ -87,10 +89,11 @@ export function reportToCsv(report: ReportView) {
       null,
       report.config.includeStatus ? inventory?.waitingTickets : null,
       null,
-      report.config.includeTicketDetails
-        ? details?.identifiers.join(" | ")
-        : null,
+      report.config.includeTicketDetails ? details?.numbers.join(" | ") : null,
       report.config.includeTicketDetails ? details?.titles.join(" | ") : null,
+      report.config.includeTaskDetails
+        ? taskTitlesByDate.get(day.workDate)?.join(" | ")
+        : null,
       report.config.includeDayNotes ? notesByDate.get(day.workDate) : null,
       null,
     ];
@@ -124,6 +127,7 @@ export function reportToCsv(report: ReportView) {
     report.config.includeStatus ? report.workStatus.inProgress : null,
     report.config.includeStatus ? report.workStatus.waiting : null,
     report.config.includeStatus ? report.workStatus.resolved : null,
+    null,
     null,
     null,
     null,

@@ -23,6 +23,7 @@ export const reportConfigSchema = z.object({
   includeNarrative: z.boolean(),
   includeStatus: z.boolean(),
   includeSummaryMetrics: z.boolean(),
+  includeTaskDetails: z.boolean().default(false),
   includeTicketDetails: z.boolean(),
   includeTrend: z.boolean(),
   period: reportPeriodSchema,
@@ -40,8 +41,13 @@ export type ReportRange = {
 };
 
 export type ReportTicketDetail = {
-  kind: "task" | "ticket";
-  ticketNumber: string | null;
+  ticketNumber: string;
+  title: string;
+  workItemId: string;
+  workDates: string[];
+};
+
+export type ReportTaskDetail = {
   title: string;
   workItemId: string;
   workDates: string[];
@@ -83,6 +89,7 @@ export type ReportView = {
     workingWeekdays: number[];
   };
   start: string;
+  taskDetails: ReportTaskDetail[];
   ticketDetails: ReportTicketDetail[];
   timeZone: string;
   today: string;
@@ -99,6 +106,7 @@ export function defaultReportConfig(today: string): ReportConfig {
     includeNarrative: true,
     includeStatus: true,
     includeSummaryMetrics: true,
+    includeTaskDetails: false,
     includeTicketDetails: false,
     includeTrend: true,
     period: "weekly",

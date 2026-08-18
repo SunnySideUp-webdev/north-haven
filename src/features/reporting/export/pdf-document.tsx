@@ -273,12 +273,6 @@ function generatedLabel(report: ReportView) {
   }).format(new Date(report.generatedAt));
 }
 
-function workDetailLabel(detail: ReportView["ticketDetails"][number]) {
-  return detail.kind === "ticket" && detail.ticketNumber
-    ? formatTicketNumber(detail.ticketNumber)
-    : "Task";
-}
-
 function Metric({
   blush = false,
   detail,
@@ -456,6 +450,7 @@ function EmptyDetail({ children }: { children: string }) {
 export function ReportPdfDocument({ report }: { report: ReportView }) {
   const completion = planCompletion(report.totals);
   const detailsIncluded =
+    report.config.includeTaskDetails ||
     report.config.includeTicketDetails ||
     report.config.includeDayNotes ||
     report.config.includeFollowUpReasons;
@@ -602,7 +597,7 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
 
         {report.config.includeTicketDetails ? (
           <View style={styles.detailSection}>
-            <Text style={styles.sectionTitle}>Tickets and tasks worked</Text>
+            <Text style={styles.sectionTitle}>Tickets worked</Text>
             {report.ticketDetails.length ? (
               report.ticketDetails.map((ticket) => (
                 <View
@@ -611,7 +606,7 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
                   wrap={false}
                 >
                   <Text style={styles.detailTitle}>
-                    {workDetailLabel(ticket)} · {ticket.title}
+                    {formatTicketNumber(ticket.ticketNumber)} · {ticket.title}
                   </Text>
                   {report.config.period === "daily" ? null : (
                     <Text style={styles.detailMeta}>
@@ -622,7 +617,33 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
               ))
             ) : (
               <EmptyDetail>
-                No tickets or tasks matched this report period.
+                No ticket numbers or titles matched this report period.
+              </EmptyDetail>
+            )}
+          </View>
+        ) : null}
+
+        {report.config.includeTaskDetails ? (
+          <View style={styles.detailSection}>
+            <Text style={styles.sectionTitle}>Tasks worked</Text>
+            {report.taskDetails.length ? (
+              report.taskDetails.map((task) => (
+                <View
+                  key={task.workItemId}
+                  style={styles.detailRow}
+                  wrap={false}
+                >
+                  <Text style={styles.detailTitle}>Task · {task.title}</Text>
+                  {report.config.period === "daily" ? null : (
+                    <Text style={styles.detailMeta}>
+                      Worked {task.workDates.map(shortDate).join(", ")}
+                    </Text>
+                  )}
+                </View>
+              ))
+            ) : (
+              <EmptyDetail>
+                No task titles matched this report period.
               </EmptyDetail>
             )}
           </View>

@@ -366,8 +366,8 @@ visually reviewed. They contain no customer information and can be removed with
 - Reports are entered through Insights and do not add primary navigation.
 - Daily, Weekly, and Monthly are supported.
 - Designed PDF is primary; data-only CSV is secondary.
-- Optional detailed work content includes worked Tickets and Tasks when selected
-  for report exports; it remains off by default for privacy.
+- Optional detailed work content has separate opt-ins for worked Tickets and
+  Tasks in report exports; both remain off by default for privacy.
 - Reports use the same metric definitions as Insights and Calendar.
 - Ticket numbers, work titles, notes, and follow-up content are excluded by default.
 - Detailed content requires explicit opt-in and a privacy notice.

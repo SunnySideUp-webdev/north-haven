@@ -7,7 +7,7 @@ describe("report CSV", () => {
   it("exports date rows and a total row without details by default", () => {
     const csv = reportToCsv(reportFixture());
     expect(csv).toContain("record_type,date,tickets_worked");
-    expect(csv).toContain("work_identifiers,work_titles");
+    expect(csv).toContain("ticket_numbers,ticket_titles,task_titles");
     expect(csv).toContain(
       "pending_tickets,in_progress_tickets,waiting_for_response,resolved_status_tickets",
     );
@@ -25,6 +25,7 @@ describe("report CSV", () => {
       config: {
         ...base.config,
         includeDayNotes: true,
+        includeTaskDetails: true,
         includeTicketDetails: true,
       },
       dayNotes: [
@@ -36,15 +37,14 @@ describe("report CSV", () => {
       ],
       ticketDetails: [
         {
-          kind: "ticket",
           ticketNumber: "DEMO-1",
           title: 'Update "main" form',
           workItemId: "ticket-1",
           workDates: ["2026-07-27"],
         },
+      ],
+      taskDetails: [
         {
-          kind: "task",
-          ticketNumber: null,
           title: "Prepare export notes",
           workItemId: "task-1",
           workDates: ["2026-07-27"],
@@ -52,9 +52,29 @@ describe("report CSV", () => {
       ],
     });
     expect(csv).toContain("DEMO-1");
-    expect(csv).toContain("Task");
     expect(csv).toContain('Update ""main"" form');
     expect(csv).toContain("Prepare export notes");
     expect(csv).toContain('"Customer address, confirmed"');
+  });
+
+  it("can export task titles without ticket details", () => {
+    const base = reportFixture();
+    const csv = reportToCsv({
+      ...base,
+      config: {
+        ...base.config,
+        includeTaskDetails: true,
+        includeTicketDetails: false,
+      },
+      taskDetails: [
+        {
+          title: "Prepare export notes",
+          workItemId: "task-1",
+          workDates: ["2026-07-27"],
+        },
+      ],
+    });
+
+    expect(csv).toContain(",,,Prepare export notes,");
   });
 });

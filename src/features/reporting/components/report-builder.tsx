@@ -23,12 +23,6 @@ function shortDate(value: string) {
   }).format(new Date(`${value}T12:00:00Z`));
 }
 
-function workDetailLabel(detail: ReportView["ticketDetails"][number]) {
-  return detail.kind === "ticket" && detail.ticketNumber
-    ? formatTicketNumber(detail.ticketNumber)
-    : "Task";
-}
-
 function weekday(value: string) {
   return new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC",
@@ -260,6 +254,7 @@ function PdfPreview({ report }: { report: ReportView }) {
         ? "End-of-week status"
         : "End-of-month status";
   const detailsIncluded =
+    report.config.includeTaskDetails ||
     report.config.includeTicketDetails ||
     report.config.includeDayNotes ||
     report.config.includeFollowUpReasons;
@@ -404,14 +399,13 @@ function PdfPreview({ report }: { report: ReportView }) {
 
       {report.config.includeTicketDetails ? (
         <section className="mt-7">
-          <h3 className="text-ink text-sm font-bold">
-            Tickets and tasks worked
-          </h3>
+          <h3 className="text-ink text-sm font-bold">Tickets worked</h3>
           {report.ticketDetails.length ? (
             <ul className="mt-3 divide-y">
               {report.ticketDetails.map((ticket) => (
                 <li key={ticket.workItemId} className="py-3 text-xs">
-                  <strong>{workDetailLabel(ticket)}</strong> · {ticket.title}
+                  <strong>{formatTicketNumber(ticket.ticketNumber)}</strong> ·{" "}
+                  {ticket.title}
                   {report.config.period === "daily" ? null : (
                     <span className="text-muted mt-1 block">
                       Worked {ticket.workDates.map(shortDate).join(", ")}
@@ -422,7 +416,31 @@ function PdfPreview({ report }: { report: ReportView }) {
             </ul>
           ) : (
             <EmptyDetail>
-              No tickets or tasks matched this report period.
+              No ticket numbers or titles matched this report period.
+            </EmptyDetail>
+          )}
+        </section>
+      ) : null}
+
+      {report.config.includeTaskDetails ? (
+        <section className="mt-7">
+          <h3 className="text-ink text-sm font-bold">Tasks worked</h3>
+          {report.taskDetails.length ? (
+            <ul className="mt-3 divide-y">
+              {report.taskDetails.map((task) => (
+                <li key={task.workItemId} className="py-3 text-xs">
+                  <strong>Task</strong> · {task.title}
+                  {report.config.period === "daily" ? null : (
+                    <span className="text-muted mt-1 block">
+                      Worked {task.workDates.map(shortDate).join(", ")}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyDetail>
+              No task titles matched this report period.
             </EmptyDetail>
           )}
         </section>
@@ -600,6 +618,7 @@ export function ReportBuilder({
   const requestId = useRef(0);
   const displayReport = { ...report, config };
   const containsDetails =
+    config.includeTaskDetails ||
     config.includeTicketDetails ||
     config.includeDayNotes ||
     config.includeFollowUpReasons;
@@ -765,13 +784,21 @@ export function ReportBuilder({
             <div className="border-border border-t pt-4">
               <CheckOption
                 checked={config.includeTicketDetails}
-                label="Ticket and task titles"
+                label="Ticket numbers and titles"
                 description="Off by default to protect customer information"
                 onChange={(value) =>
                   setSimple("includeTicketDetails", value, value)
                 }
               />
             </div>
+            <CheckOption
+              checked={config.includeTaskDetails}
+              label="Task titles"
+              description="Off by default to protect work details"
+              onChange={(value) =>
+                setSimple("includeTaskDetails", value, value)
+              }
+            />
             <CheckOption
               checked={config.includeDayNotes}
               label="Day notes"
