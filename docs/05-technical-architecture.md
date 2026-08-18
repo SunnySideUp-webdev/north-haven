@@ -175,7 +175,7 @@ Calendar failure must never block manual planning.
 - Validate period, local dates, format, and every inclusion flag with Zod.
 - Authorize workspace access again at the export boundary and rate-limit report
   generation.
-- Keep ticket titles, notes, and follow-up text out of exports unless the
+- Keep work titles, notes, and follow-up text out of exports unless the
   request explicitly opts in.
 
 The implemented PDF renderer is `@react-pdf/renderer` 4.5.1 on the Node runtime.
@@ -206,7 +206,7 @@ Handler. CSV remains a dependency-free server renderer.
 
 ## Observability
 
-Capture technical event names and identifiers only. Never capture ticket titles,
+Capture technical event names and identifiers only. Never capture work titles,
 notes, customer names, addresses, phone numbers, calendar titles, or access
 tokens.
 

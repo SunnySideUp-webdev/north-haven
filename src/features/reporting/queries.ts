@@ -407,7 +407,7 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
       .gte("worked_on", range.start)
       .lte("worked_on", range.end)
       .order("worked_on");
-    if (logError) throw new Error("We couldn't load ticket details.");
+    if (logError) throw new Error("We couldn't load work details.");
 
     const datesByItem = new Map<string, Set<string>>();
     for (const row of logRows ?? []) {
@@ -419,26 +419,28 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
     if (ids.length) {
       const { data: items, error: itemError } = await supabase
         .from("work_inventory_rows")
-        .select("id, title, ticket_number")
-        .eq("kind", "ticket")
+        .select("id, kind, title, ticket_number")
+        .in("kind", ["ticket", "task"])
         .in("id", ids)
-        .order("ticket_number");
-      if (itemError) throw new Error("We couldn't load ticket details.");
-      ticketDetails = (items ?? [])
-        .filter(
-          (
-            item,
-          ): item is typeof item & {
-            id: string;
-            ticket_number: string;
-            title: string;
-          } => Boolean(item.id && item.ticket_number && item.title),
-        )
-        .map((item) => ({
-          ticketNumber: item.ticket_number,
-          title: item.title,
-          workDates: [...(datesByItem.get(item.id) ?? [])],
-        }));
+        .order("kind")
+        .order("ticket_number")
+        .order("title");
+      if (itemError) throw new Error("We couldn't load work details.");
+      ticketDetails = (items ?? []).flatMap((item) => {
+        if (!item.id || !item.title) return [];
+        if (item.kind !== "task" && item.kind !== "ticket") return [];
+        if (item.kind === "ticket" && !item.ticket_number) return [];
+
+        return [
+          {
+            kind: item.kind,
+            ticketNumber: item.ticket_number,
+            title: item.title,
+            workDates: [...(datesByItem.get(item.id) ?? [])],
+            workItemId: item.id,
+          },
+        ];
+      });
     }
   }
 

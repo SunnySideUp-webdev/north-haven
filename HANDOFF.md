@@ -154,7 +154,7 @@ calendar.
 - Live designed-PDF and accessible CSV previews with exact local date ranges
 - Server-rendered, selectable-text PDF using embedded DM Sans plus date-row and
   period-total UTF-8 CSV
-- Privacy-safe detail controls that exclude ticket titles, day notes, and
+- Privacy-safe detail controls that exclude work titles, day notes, and
   follow-up reasons until explicit opt-in
 - Authenticated, same-origin, private/no-store export endpoint with a durable
   six-per-minute PostgreSQL limit and no retained report files
@@ -366,8 +366,10 @@ visually reviewed. They contain no customer information and can be removed with
 - Reports are entered through Insights and do not add primary navigation.
 - Daily, Weekly, and Monthly are supported.
 - Designed PDF is primary; data-only CSV is secondary.
+- Optional detailed work content includes worked Tickets and Tasks when selected
+  for report exports; it remains off by default for privacy.
 - Reports use the same metric definitions as Insights and Calendar.
-- Ticket numbers, titles, notes, and follow-up content are excluded by default.
+- Ticket numbers, work titles, notes, and follow-up content are excluded by default.
 - Detailed content requires explicit opt-in and a privacy notice.
 - Generated files are streamed on demand and are not retained by North Haven.
 - The complete reporting extension is implemented and ready for personal

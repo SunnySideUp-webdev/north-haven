@@ -66,7 +66,7 @@ Enabled by default:
 
 Disabled by default:
 
-- Ticket numbers and titles
+- Ticket numbers, ticket titles, and task titles
 - Day notes
 - Follow-up reasons
 
@@ -133,7 +133,7 @@ Insights and Calendar. No report-specific recomputation is allowed.
 
 - Generate exports only after authenticated, workspace-scoped authorization.
 - Do not put report content or configuration in URLs.
-- Do not log report titles, ticket titles, notes, customer content, or CSV rows.
+- Do not log report titles, work titles, notes, customer content, or CSV rows.
 - Generate on demand and stream directly to the browser.
 - Do not persist report files in application storage during the MVP.
 - Set private/no-store cache headers.

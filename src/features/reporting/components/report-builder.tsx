@@ -23,6 +23,12 @@ function shortDate(value: string) {
   }).format(new Date(`${value}T12:00:00Z`));
 }
 
+function workDetailLabel(detail: ReportView["ticketDetails"][number]) {
+  return detail.kind === "ticket" && detail.ticketNumber
+    ? formatTicketNumber(detail.ticketNumber)
+    : "Task";
+}
+
 function weekday(value: string) {
   return new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC",
@@ -387,7 +393,7 @@ function PdfPreview({ report }: { report: ReportView }) {
             </p>
           ))}
           <p className="text-muted mt-2 text-xs leading-5">
-            Customer details and ticket titles are{" "}
+            Customer details and work titles are{" "}
             {detailsIncluded
               ? "included where selected"
               : "excluded from this report"}
@@ -398,13 +404,14 @@ function PdfPreview({ report }: { report: ReportView }) {
 
       {report.config.includeTicketDetails ? (
         <section className="mt-7">
-          <h3 className="text-ink text-sm font-bold">Tickets worked</h3>
+          <h3 className="text-ink text-sm font-bold">
+            Tickets and tasks worked
+          </h3>
           {report.ticketDetails.length ? (
             <ul className="mt-3 divide-y">
               {report.ticketDetails.map((ticket) => (
-                <li key={ticket.ticketNumber} className="py-3 text-xs">
-                  <strong>{formatTicketNumber(ticket.ticketNumber)}</strong> ·{" "}
-                  {ticket.title}
+                <li key={ticket.workItemId} className="py-3 text-xs">
+                  <strong>{workDetailLabel(ticket)}</strong> · {ticket.title}
                   {report.config.period === "daily" ? null : (
                     <span className="text-muted mt-1 block">
                       Worked {ticket.workDates.map(shortDate).join(", ")}
@@ -415,7 +422,7 @@ function PdfPreview({ report }: { report: ReportView }) {
             </ul>
           ) : (
             <EmptyDetail>
-              No ticket numbers or titles matched this report period.
+              No tickets or tasks matched this report period.
             </EmptyDetail>
           )}
         </section>
@@ -758,7 +765,7 @@ export function ReportBuilder({
             <div className="border-border border-t pt-4">
               <CheckOption
                 checked={config.includeTicketDetails}
-                label="Ticket numbers and titles"
+                label="Ticket and task titles"
                 description="Off by default to protect customer information"
                 onChange={(value) =>
                   setSimple("includeTicketDetails", value, value)

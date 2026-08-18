@@ -40,8 +40,10 @@ export type ReportRange = {
 };
 
 export type ReportTicketDetail = {
-  ticketNumber: string;
+  kind: "task" | "ticket";
+  ticketNumber: string | null;
   title: string;
+  workItemId: string;
   workDates: string[];
 };
 

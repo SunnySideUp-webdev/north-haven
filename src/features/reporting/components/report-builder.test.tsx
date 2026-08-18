@@ -38,7 +38,7 @@ describe("Report Builder", () => {
 
   it("warns before details and offers the accessible CSV preview", async () => {
     render(<ReportBuilder initialReport={reportFixture()} />);
-    fireEvent.click(screen.getByLabelText(/Ticket numbers and titles/));
+    fireEvent.click(screen.getByLabelText(/Ticket and task titles/));
     expect(
       screen.getByText("This report may contain customer information."),
     ).toBeInTheDocument();
@@ -56,15 +56,13 @@ describe("Report Builder", () => {
   it("shows selected detail sections even when the period has no matching rows", () => {
     render(<ReportBuilder initialReport={reportFixture()} />);
 
-    fireEvent.click(screen.getByLabelText(/Ticket numbers and titles/));
+    fireEvent.click(screen.getByLabelText(/Ticket and task titles/));
     fireEvent.click(screen.getByLabelText(/Day notes/));
     fireEvent.click(screen.getByLabelText(/Follow-up reasons/));
 
-    expect(screen.getByRole("heading", { name: "Tickets worked" }));
+    expect(screen.getByRole("heading", { name: "Tickets and tasks worked" }));
     expect(
-      screen.getByText(
-        "No ticket numbers or titles matched this report period.",
-      ),
+      screen.getByText("No tickets or tasks matched this report period."),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Day notes" }));
     expect(
@@ -101,7 +99,16 @@ describe("Report Builder", () => {
             {
               ticketNumber: "1909",
               title: "Update customer address",
+              kind: "ticket",
+              workItemId: "ticket-1",
               workDates: ["2026-07-27"],
+            },
+            {
+              kind: "task",
+              ticketNumber: null,
+              title: "Prepare customer-safe report summary",
+              workDates: ["2026-07-27"],
+              workItemId: "task-1",
             },
           ],
         }}
@@ -113,5 +120,8 @@ describe("Report Builder", () => {
       screen.getByText("Confirmed Call Vision payloads."),
     ).toBeInTheDocument();
     expect(screen.getByText("Prepared the PDF export.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Task").closest("li"),
+    ).toHaveTextContent("Prepare customer-safe report summary");
   });
 });

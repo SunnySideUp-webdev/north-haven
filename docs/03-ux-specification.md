@@ -425,7 +425,7 @@ plain-text summary.
 - Designed PDF or Data CSV format
 - Live preview for PDF
 - Summary metrics, trend chart, and status snapshot enabled by default
-- Ticket numbers and titles, day notes, and follow-up reasons disabled by
+- Ticket numbers, ticket titles, task titles, day notes, and follow-up reasons disabled by
   default
 - `Generate PDF` or `Download CSV` primary action
 

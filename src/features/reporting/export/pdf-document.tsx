@@ -273,6 +273,12 @@ function generatedLabel(report: ReportView) {
   }).format(new Date(report.generatedAt));
 }
 
+function workDetailLabel(detail: ReportView["ticketDetails"][number]) {
+  return detail.kind === "ticket" && detail.ticketNumber
+    ? formatTicketNumber(detail.ticketNumber)
+    : "Task";
+}
+
 function Metric({
   blush = false,
   detail,
@@ -585,7 +591,7 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
               </Text>
             ))}
             <Text style={styles.narrativeLine}>
-              Customer details and ticket titles are{" "}
+              Customer details and work titles are{" "}
               {detailsIncluded
                 ? "included where selected"
                 : "excluded from this report"}
@@ -596,16 +602,16 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
 
         {report.config.includeTicketDetails ? (
           <View style={styles.detailSection}>
-            <Text style={styles.sectionTitle}>Tickets worked</Text>
+            <Text style={styles.sectionTitle}>Tickets and tasks worked</Text>
             {report.ticketDetails.length ? (
               report.ticketDetails.map((ticket) => (
                 <View
-                  key={ticket.ticketNumber}
+                  key={ticket.workItemId}
                   style={styles.detailRow}
                   wrap={false}
                 >
                   <Text style={styles.detailTitle}>
-                    {formatTicketNumber(ticket.ticketNumber)} · {ticket.title}
+                    {workDetailLabel(ticket)} · {ticket.title}
                   </Text>
                   {report.config.period === "daily" ? null : (
                     <Text style={styles.detailMeta}>
@@ -616,7 +622,7 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
               ))
             ) : (
               <EmptyDetail>
-                No ticket numbers or titles matched this report period.
+                No tickets or tasks matched this report period.
               </EmptyDetail>
             )}
           </View>

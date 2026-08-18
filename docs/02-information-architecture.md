@@ -116,7 +116,7 @@ The ritual is autosaved and can be resumed.
 2. Choose Daily, Weekly, or Monthly.
 3. Choose the period and review the calculated preview.
 4. Keep summary metrics, trends, and status enabled by default.
-5. Explicitly opt in if ticket titles, notes, or other detailed content is
+5. Explicitly opt in if work titles, notes, or other detailed content is
    needed.
 6. Generate a designed PDF or a data-only CSV.
 7. Download the report without persisting a server-side copy.
