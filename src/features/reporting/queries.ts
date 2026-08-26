@@ -9,10 +9,12 @@ import {
   shiftDateKey,
 } from "@/features/reporting/date";
 import {
+  applyPlannedTicketResolutionMetrics,
   buildReportNarrative,
   defaultReportConfig,
   getReportRange,
   reportConfigSchema,
+  type PlannedTicketResolutionRow,
   type ReportConfig,
   type ReportFollowUp,
   type ReportTaskDetail,
@@ -28,6 +30,15 @@ import type {
   SavedCalendarDayColor,
 } from "@/features/reporting/types";
 import { requireAuthenticatedContext } from "@/server/auth/session";
+
+type SupabaseClient = Awaited<
+  ReturnType<typeof requireAuthenticatedContext>
+>["supabase"];
+
+type PlannedWorkItemRow = {
+  daily_plans: { work_date: string } | { work_date: string }[] | null;
+  work_item_id: string;
+};
 
 function number(value: number | null) {
   return value ?? 0;
@@ -110,6 +121,62 @@ function mapPeriodTotals(
     ticketsResolved: number(row?.tickets_resolved ?? 0),
     ticketsWorked: number(row?.tickets_worked ?? 0),
   };
+}
+
+function plannedWorkDate(row: PlannedWorkItemRow) {
+  const plan = Array.isArray(row.daily_plans)
+    ? row.daily_plans[0]
+    : row.daily_plans;
+  return plan?.work_date ?? null;
+}
+
+async function getPlannedTicketResolutionRows({
+  end,
+  start,
+  supabase,
+}: {
+  end: string;
+  start: string;
+  supabase: SupabaseClient;
+}): Promise<PlannedTicketResolutionRow[]> {
+  const { data: plannedRows, error: plannedError } = await supabase
+    .from("daily_plan_items")
+    .select(
+      "work_item_id, daily_plans!daily_plan_items_daily_plan_id_workspace_id_fkey!inner(work_date)",
+    )
+    .gte("daily_plans.work_date", start)
+    .lte("daily_plans.work_date", end);
+
+  if (plannedError) throw new Error("We couldn't prepare this report.");
+
+  const planned = (plannedRows ?? []) as unknown as PlannedWorkItemRow[];
+  const workItemIds = [...new Set(planned.map((row) => row.work_item_id))];
+  if (!workItemIds.length) return [];
+
+  const { data: resolvedTickets, error: resolvedError } = await supabase
+    .from("work_inventory_rows")
+    .select("id")
+    .eq("kind", "ticket")
+    .eq("operational_status", "resolved")
+    .in("id", workItemIds);
+
+  if (resolvedError) throw new Error("We couldn't prepare this report.");
+
+  const resolvedIds = new Set(
+    (resolvedTickets ?? []).flatMap((item) => (item.id ? [item.id] : [])),
+  );
+
+  return planned.flatMap((row) => {
+    const workDate = plannedWorkDate(row);
+    if (!workDate) return [];
+    return [
+      {
+        isResolved: resolvedIds.has(row.work_item_id),
+        workDate,
+        workItemId: row.work_item_id,
+      },
+    ];
+  });
 }
 
 export async function getMonthlyCalendar(
@@ -346,7 +413,19 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
       workDate: row.work_date,
     }),
   );
-  const totals = mapPeriodTotals(totalsResult.data?.[0]);
+  const baseTotals = mapPeriodTotals(totalsResult.data?.[0]);
+  const plannedTicketResolutionRows = await getPlannedTicketResolutionRows({
+    end: range.end,
+    start: range.start,
+    supabase,
+  });
+  const reportMetrics = applyPlannedTicketResolutionMetrics({
+    daily,
+    rows: plannedTicketResolutionRows,
+    totals: baseTotals,
+  });
+  const reportDaily = reportMetrics.daily;
+  const totals = reportMetrics.totals;
   const workStatus = {
     active: number(statusResult.data?.[0]?.active_work ?? 0),
     inProgress: number(statusResult.data?.[0]?.in_progress ?? 0),
@@ -496,7 +575,7 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
     totals.meetingsAttended ||
     totals.plannedItems ||
     inventory.some((row) => row.activeTickets || row.ticketsReceived) ||
-    daily.some((row) => row.dayNote || row.isOutOfOffice),
+    reportDaily.some((row) => row.dayNote || row.isOutOfOffice),
   );
 
   return {
@@ -504,9 +583,9 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
       ...config,
       anchor: config.anchor <= today ? config.anchor : today,
     },
-    daily,
+    daily: reportDaily,
     dayNotes: config.includeDayNotes
-      ? daily
+      ? reportDaily
           .filter((row): row is DailyMetric & { dayNote: string } =>
             Boolean(row.dayNote),
           )
@@ -526,7 +605,7 @@ export async function getReport(input: ReportConfig): Promise<ReportView> {
     inventory,
     isPartial: range.isPartial,
     narrative: buildReportNarrative({
-      daily,
+      daily: reportDaily,
       inventory,
       period: config.period,
       totals,

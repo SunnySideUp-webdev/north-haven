@@ -97,6 +97,12 @@ export type ReportView = {
   workStatus: WorkStatusSnapshot;
 };
 
+export type PlannedTicketResolutionRow = {
+  isResolved: boolean;
+  workDate: string;
+  workItemId: string;
+};
+
 export function defaultReportConfig(today: string): ReportConfig {
   return {
     anchor: today,
@@ -179,6 +185,38 @@ export function planCompletion(totals: PeriodTotals) {
   return totals.plannedItems
     ? Math.round((totals.completedItems / totals.plannedItems) * 100)
     : null;
+}
+
+export function applyPlannedTicketResolutionMetrics({
+  daily,
+  rows,
+  totals,
+}: {
+  daily: DailyMetric[];
+  rows: PlannedTicketResolutionRow[];
+  totals: PeriodTotals;
+}) {
+  const resolvedByDate = new Map<string, Set<string>>();
+  const uniqueResolved = new Set<string>();
+
+  for (const row of rows) {
+    if (!row.isResolved) continue;
+    uniqueResolved.add(row.workItemId);
+    const dateSet = resolvedByDate.get(row.workDate) ?? new Set<string>();
+    dateSet.add(row.workItemId);
+    resolvedByDate.set(row.workDate, dateSet);
+  }
+
+  return {
+    daily: daily.map((day) => ({
+      ...day,
+      ticketsResolved: resolvedByDate.get(day.workDate)?.size ?? 0,
+    })),
+    totals: {
+      ...totals,
+      ticketsResolved: uniqueResolved.size,
+    },
+  };
 }
 
 export function buildReportNarrative({

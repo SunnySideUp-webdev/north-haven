@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  applyPlannedTicketResolutionMetrics,
   buildReportNarrative,
   defaultReportConfig,
   getReportRange,
@@ -84,5 +85,57 @@ describe("reports", () => {
       "88% of eligible planned items were completed.",
       "3 tickets remain waiting for a response at period end.",
     ]);
+  });
+
+  it("counts resolved report tickets from planned work instead of status events", () => {
+    const base = reportFixture();
+    const report = reportFixture({
+      daily: [
+        {
+          ...base.daily[0],
+          ticketsResolved: 0,
+          workDate: "2026-08-17",
+        },
+        {
+          ...base.daily[1],
+          ticketsResolved: 0,
+          workDate: "2026-08-18",
+        },
+      ],
+      totals: {
+        ...base.totals,
+        ticketsResolved: 0,
+      },
+    });
+
+    const result = applyPlannedTicketResolutionMetrics({
+      daily: report.daily,
+      rows: [
+        {
+          isResolved: true,
+          workDate: "2026-08-17",
+          workItemId: "ticket-1",
+        },
+        {
+          isResolved: true,
+          workDate: "2026-08-17",
+          workItemId: "ticket-2",
+        },
+        {
+          isResolved: false,
+          workDate: "2026-08-17",
+          workItemId: "ticket-3",
+        },
+        {
+          isResolved: true,
+          workDate: "2026-08-18",
+          workItemId: "ticket-1",
+        },
+      ],
+      totals: report.totals,
+    });
+
+    expect(result.daily.map((day) => day.ticketsResolved)).toEqual([2, 1]);
+    expect(result.totals.ticketsResolved).toBe(2);
   });
 });
