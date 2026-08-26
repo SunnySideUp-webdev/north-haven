@@ -62,7 +62,8 @@ export function BulkTicketImportDialog({
   const importable = drafts.filter(
     (ticket) => !ticket.duplicate && ticket.ticketTypeId,
   );
-  const duplicates = drafts.length - importable.length;
+  const duplicateDrafts = drafts.filter((ticket) => ticket.duplicate);
+  const duplicates = duplicateDrafts.length;
 
   function openDialog() {
     setMessage(undefined);
@@ -124,145 +125,177 @@ export function BulkTicketImportDialog({
           event.preventDefault();
           closeDialog();
         }}
-        className="backdrop:bg-ink/25 bg-paper border-border shadow-surface m-auto w-full max-w-[980px] rounded-2xl border p-0 backdrop:backdrop-blur-[2px]"
+        className="backdrop:bg-ink/25 bg-paper border-border shadow-surface m-auto w-full max-w-[980px] overflow-hidden rounded-2xl border p-0 backdrop:backdrop-blur-[2px]"
       >
-        <div className="border-blush-200 bg-lavender-100 flex items-start justify-between gap-6 border-b-2 px-7 py-6">
-          <div>
-            <p className="text-quiet text-xs font-bold tracking-[0.12em] uppercase">
-              Bulk import
-            </p>
-            <h2
-              id="bulk-ticket-import-title"
-              className="text-ink mt-2 text-2xl font-bold tracking-[-0.03em]"
-            >
-              Paste tickets from the ticket system
-            </h2>
-            <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
-              Copy the visible ticket list, paste it here, review the preview,
-              then import everything into Work Inventory.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={closeDialog}
-            className="text-muted hover:text-ink rounded-md px-2 py-1 text-sm font-bold"
-          >
-            Close
-          </button>
-        </div>
-
-        <div className="grid max-h-[72vh] grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] overflow-hidden">
-          <div className="border-border border-r p-6">
-            <label
-              htmlFor="ticket-import-paste"
-              className="text-quiet text-xs font-bold tracking-[0.12em] uppercase"
-            >
-              Copied text
-            </label>
-            <textarea
-              id="ticket-import-paste"
-              value={text}
-              onChange={(event) => {
-                setMessage(undefined);
-                setText(event.target.value);
-              }}
-              placeholder="Paste the copied ticket list here..."
-              className="border-border bg-canvas text-ink placeholder:text-quiet focus:border-lavender-500 mt-3 h-[420px] w-full resize-none rounded-xl border p-4 text-sm leading-6 outline-none"
-            />
-            <p className="text-muted mt-3 text-xs leading-5">
-              Dates like “Created 7 days ago” are converted into approximate
-              received dates so old-to-new ordering still works.
-            </p>
-          </div>
-
-          <div className="flex min-h-0 flex-col">
-            <div className="border-border flex items-center justify-between gap-4 border-b px-6 py-4">
-              <div>
-                <p className="text-ink text-sm font-bold">
-                  {drafts.length
-                    ? `${plural(importable.length, "ticket")} ready`
-                    : "No tickets detected yet"}
-                </p>
-                {duplicates ? (
-                  <p className="text-waiting-ink mt-1 text-xs font-bold">
-                    {plural(duplicates, "duplicate")} will be skipped.
-                  </p>
-                ) : null}
-              </div>
-              <button
-                type="button"
-                disabled={!importable.length || pending}
-                onClick={importTickets}
-                className="bg-lavender-700 hover:bg-lavender-500 rounded-lg px-5 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+        <div className="flex h-[88vh] max-h-[900px] flex-col">
+          <div className="border-blush-200 bg-lavender-100 flex shrink-0 items-start justify-between gap-6 border-b-2 px-7 py-6">
+            <div>
+              <p className="text-quiet text-xs font-bold tracking-[0.12em] uppercase">
+                Bulk import
+              </p>
+              <h2
+                id="bulk-ticket-import-title"
+                className="text-ink mt-2 text-2xl font-bold tracking-[-0.03em]"
               >
-                {pending ? "Importing…" : "Import tickets"}
-              </button>
+                Paste tickets from the ticket system
+              </h2>
+              <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
+                Copy the visible ticket list, paste it here, review the preview,
+                then import everything into Work Inventory.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={closeDialog}
+              className="text-muted hover:text-ink rounded-md px-2 py-1 text-sm font-bold"
+            >
+              Close
+            </button>
+          </div>
+
+          <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] overflow-hidden">
+            <div className="border-border flex min-h-0 flex-col border-r p-6">
+              <label
+                htmlFor="ticket-import-paste"
+                className="text-quiet shrink-0 text-xs font-bold tracking-[0.12em] uppercase"
+              >
+                Copied text
+              </label>
+              <textarea
+                id="ticket-import-paste"
+                value={text}
+                onChange={(event) => {
+                  setMessage(undefined);
+                  setText(event.target.value);
+                }}
+                placeholder="Paste the copied ticket list here..."
+                className="border-border bg-canvas text-ink placeholder:text-quiet focus:border-lavender-500 mt-3 min-h-[320px] flex-1 resize-none overflow-y-auto rounded-xl border p-4 text-sm leading-6 outline-none"
+              />
+              <p className="text-muted mt-3 shrink-0 text-xs leading-5">
+                Dates like “Created 7 days ago” are converted into approximate
+                received dates so old-to-new ordering still works.
+              </p>
             </div>
 
-            {message ? (
-              <p
-                role={message.tone === "error" ? "alert" : "status"}
-                className={`mx-6 mt-4 rounded-lg px-4 py-3 text-sm ${
-                  message.tone === "success"
-                    ? "bg-success-surface text-success-ink"
-                    : "bg-urgent-surface text-urgent-ink"
-                }`}
-              >
-                {message.text}
-              </p>
-            ) : null}
-
-            <div className="min-h-0 flex-1 overflow-y-auto p-6">
-              {!ticketTypes.length ? (
-                <div className="bg-urgent-surface text-urgent-ink rounded-xl px-4 py-3 text-sm font-bold">
-                  Add at least one ticket type before importing tickets.
+            <div className="flex min-h-0 flex-col">
+              <div className="border-border flex shrink-0 items-center justify-between gap-4 border-b px-6 py-4">
+                <div>
+                  <p className="text-ink text-sm font-bold">
+                    {drafts.length
+                      ? `${plural(importable.length, "ticket")} ready`
+                      : "No tickets detected yet"}
+                  </p>
+                  {duplicates ? (
+                    <p className="text-waiting-ink mt-1 text-xs font-bold">
+                      {plural(duplicates, "duplicate")} will be skipped.
+                    </p>
+                  ) : null}
                 </div>
-              ) : drafts.length ? (
-                <div className="space-y-3">
-                  {drafts.slice(0, 100).map((ticket) => (
-                    <article
-                      key={ticket.ticketNumber}
-                      className={`border-border rounded-xl border p-4 ${
-                        ticket.duplicate ? "bg-canvas opacity-70" : "bg-paper"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-ink text-sm font-bold">
-                            {formatTicketNumber(ticket.ticketNumber)} ·{" "}
-                            {ticket.title}
-                          </p>
-                          <p className="text-muted mt-1 text-xs">
-                            {ticket.ticketTypeName} · {ticket.systemPriority} ·{" "}
-                            {ticket.receivedAt}
-                          </p>
-                        </div>
-                        {ticket.duplicate ? (
-                          <span className="bg-blush-100 text-urgent-ink rounded-full px-3 py-1 text-xs font-bold">
-                            Duplicate
-                          </span>
-                        ) : (
+                <button
+                  type="button"
+                  disabled={!importable.length || pending}
+                  onClick={importTickets}
+                  className="bg-lavender-700 hover:bg-lavender-500 rounded-lg px-5 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {pending ? "Importing…" : "Import tickets"}
+                </button>
+              </div>
+
+              {message ? (
+                <p
+                  role={message.tone === "error" ? "alert" : "status"}
+                  className={`mx-6 mt-4 shrink-0 rounded-lg px-4 py-3 text-sm ${
+                    message.tone === "success"
+                      ? "bg-success-surface text-success-ink"
+                      : "bg-urgent-surface text-urgent-ink"
+                  }`}
+                >
+                  {message.text}
+                </p>
+              ) : null}
+
+              <div className="min-h-0 flex-1 overflow-y-auto p-6">
+                {!ticketTypes.length ? (
+                  <div className="bg-urgent-surface text-urgent-ink rounded-xl px-4 py-3 text-sm font-bold">
+                    Add at least one ticket type before importing tickets.
+                  </div>
+                ) : drafts.length ? (
+                  <div className="space-y-3">
+                    {importable.slice(0, 100).map((ticket) => (
+                      <article
+                        key={ticket.ticketNumber}
+                        className="border-border bg-paper rounded-xl border p-4"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-ink text-sm font-bold">
+                              {formatTicketNumber(ticket.ticketNumber)} ·{" "}
+                              {ticket.title}
+                            </p>
+                            <p className="text-muted mt-1 text-xs">
+                              {ticket.ticketTypeName} ·{" "}
+                              {ticket.systemPriority} · {ticket.receivedAt}
+                            </p>
+                          </div>
                           <span className="bg-success-surface text-success-ink rounded-full px-3 py-1 text-xs font-bold">
                             Ready
                           </span>
-                        )}
-                      </div>
-                      {ticket.requesterName || ticket.requesterEmail ? (
-                        <p className="text-quiet mt-3 text-xs">
-                          {ticket.requesterName}
-                          {ticket.requesterEmail
-                            ? ` · ${ticket.requesterEmail}`
-                            : ""}
-                        </p>
-                      ) : null}
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <div className="border-border bg-canvas text-muted rounded-xl border border-dashed px-6 py-12 text-center text-sm">
-                  Paste copied tickets to see a calm little preview here.
-                </div>
-              )}
+                        </div>
+                        {ticket.requesterName || ticket.requesterEmail ? (
+                          <p className="text-quiet mt-3 text-xs">
+                            {ticket.requesterName}
+                            {ticket.requesterEmail
+                              ? ` · ${ticket.requesterEmail}`
+                              : ""}
+                          </p>
+                        ) : null}
+                      </article>
+                    ))}
+                    {duplicateDrafts.length ? (
+                      <section className="border-border mt-5 border-t pt-5">
+                        <div className="mb-3">
+                          <h3 className="text-ink text-sm font-bold">
+                            Duplicates skipped
+                          </h3>
+                          <p className="text-muted mt-1 text-xs leading-5">
+                            These tickets are already in Work Inventory. Search
+                            by ticket number to check when they were added.
+                          </p>
+                        </div>
+                        <div className="space-y-3">
+                          {duplicateDrafts.map((ticket) => (
+                            <article
+                              key={ticket.ticketNumber}
+                              className="border-border bg-canvas rounded-xl border p-4 opacity-80"
+                            >
+                              <div className="flex items-start justify-between gap-4">
+                                <div>
+                                  <p className="text-ink text-sm font-bold">
+                                    {formatTicketNumber(ticket.ticketNumber)} ·{" "}
+                                    {ticket.title}
+                                  </p>
+                                  <p className="text-muted mt-1 text-xs">
+                                    {ticket.ticketTypeName} ·{" "}
+                                    {ticket.systemPriority} ·{" "}
+                                    {ticket.receivedAt}
+                                  </p>
+                                </div>
+                                <span className="bg-blush-100 text-urgent-ink rounded-full px-3 py-1 text-xs font-bold">
+                                  Duplicate
+                                </span>
+                              </div>
+                            </article>
+                          ))}
+                        </div>
+                      </section>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="border-border bg-canvas text-muted rounded-xl border border-dashed px-6 py-12 text-center text-sm">
+                    Paste copied tickets to see a calm little preview here.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
