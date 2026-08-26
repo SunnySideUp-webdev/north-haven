@@ -46,6 +46,9 @@ export function buildPlanningItems({
         item.id &&
         (selectedByWorkId.has(item.id) || !plannedElsewhereIds.has(item.id)) &&
         (selectedByWorkId.has(item.id) ||
+          item.kind !== "ticket" ||
+          item.operational_status !== "resolved") &&
+        (selectedByWorkId.has(item.id) ||
           item.tracking_state === "active" ||
           item.tracking_state === "watching"),
     )

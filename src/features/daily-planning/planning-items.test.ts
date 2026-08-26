@@ -7,11 +7,18 @@ import {
 } from "@/features/daily-planning/planning-items";
 import type { WorkInventoryRow } from "@/features/work-items/types";
 
-function item(id: string, title = id): WorkInventoryRow {
+function item(
+  id: string,
+  title = id,
+  overrides: Partial<WorkInventoryRow> = {},
+): WorkInventoryRow {
   return {
     id,
     title,
+    kind: "ticket",
+    operational_status: "pending",
     tracking_state: "active",
+    ...overrides,
   } as WorkInventoryRow;
 }
 
@@ -62,5 +69,42 @@ describe("buildPlanningItems", () => {
     });
 
     expect(result.map((row) => row.id)).toEqual(["closed-plan"]);
+  });
+
+  it("hides resolved tickets from new planning options", () => {
+    const result = buildPlanningItems({
+      inventory: [
+        item("pending-ticket"),
+        item("resolved-ticket", "resolved-ticket", {
+          operational_status: "resolved",
+        }),
+        item("normal-task", "normal-task", {
+          kind: "task",
+          operational_status: null,
+        }),
+      ],
+      otherPlanAssignments: [],
+      planItems: [],
+    });
+
+    expect(result.map((row) => row.id)).toEqual([
+      "pending-ticket",
+      "normal-task",
+    ]);
+  });
+
+  it("keeps resolved tickets visible when they are already in the current plan", () => {
+    const result = buildPlanningItems({
+      inventory: [
+        item("resolved-current", "resolved-current", {
+          operational_status: "resolved",
+        }),
+      ],
+      otherPlanAssignments: [],
+      planItems: [planItem("resolved-current")],
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.planItem?.work_item_id).toBe("resolved-current");
   });
 });
