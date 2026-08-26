@@ -493,14 +493,10 @@ export function ReportPdfDocument({ report }: { report: ReportView }) {
         {report.config.includeSummaryMetrics ? (
           <View style={styles.metrics} wrap={false}>
             <Metric
-              label="Tickets worked"
-              value={report.totals.ticketsWorked}
-            />
-            <Metric
-              blush
-              label="Resolved"
+              label="Tickets resolved"
               value={report.totals.ticketsResolved}
             />
+            <Metric blush label="Pending" value={report.workStatus.pending} />
             <Metric label="Closed" value={report.totals.ticketsClosed} />
             <Metric
               blush

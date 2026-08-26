@@ -296,12 +296,11 @@ function PdfPreview({ report }: { report: ReportView }) {
 
       {report.config.includeSummaryMetrics ? (
         <dl className="mt-7 grid grid-cols-4 gap-3">
-          <Metric label="Tickets worked" value={report.totals.ticketsWorked} />
           <Metric
-            blush
-            label="Resolved"
+            label="Tickets resolved"
             value={report.totals.ticketsResolved}
           />
+          <Metric blush label="Pending" value={report.workStatus.pending} />
           <Metric label="Closed" value={report.totals.ticketsClosed} />
           <Metric
             blush
