@@ -3,6 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import {
+  isBlockingPlanAssignment,
+  isCompletedPlanningCandidate,
+  type OtherPlanAssignment,
+} from "@/features/daily-planning/planning-items";
+import type { WorkInventoryRow } from "@/features/work-items/types";
 import { requireAuthenticatedContext } from "@/server/auth/session";
 
 const date = z.string().date();
@@ -27,22 +33,47 @@ export async function setPlanSelectionAction(input: {
       await supabase
         .from("daily_plan_items")
         .select(
-          "id, daily_plans!daily_plan_items_daily_plan_id_workspace_id_fkey!inner(work_date, status)",
+          "work_item_id, execution_status, daily_plans!daily_plan_items_daily_plan_id_workspace_id_fkey!inner(work_date, status)",
         )
         .eq("work_item_id", result.data.workItemId)
         .neq("daily_plans.work_date", result.data.workDate)
-        .neq("daily_plans.status", "closed")
         .in("execution_status", ["planned", "in_progress", "done"])
-        .limit(1);
+        .limit(5);
 
     if (existingPlanItemsError) {
       return { ok: false, message: "We couldn't update this plan." };
     }
 
-    if (existingPlanItems.length > 0) {
+    if (
+      (
+        existingPlanItems as unknown as OtherPlanAssignment[]
+      ).some((assignment) => isBlockingPlanAssignment(assignment))
+    ) {
       return {
         ok: false,
-        message: "This item is already planned for another day.",
+        message: "This item is already planned or completed on another day.",
+      };
+    }
+
+    const { data: workItem, error: workItemError } = await supabase
+      .from("work_inventory_rows")
+      .select(
+        "kind, operational_status, resolved_at, task_completed_at, reminder_acknowledged_at",
+      )
+      .eq("id", result.data.workItemId)
+      .maybeSingle();
+
+    if (workItemError) {
+      return { ok: false, message: "We couldn't update this plan." };
+    }
+
+    if (
+      workItem &&
+      isCompletedPlanningCandidate(workItem as unknown as WorkInventoryRow)
+    ) {
+      return {
+        ok: false,
+        message: "This item is already completed.",
       };
     }
   }

@@ -71,6 +71,21 @@ describe("buildPlanningItems", () => {
     expect(result.map((row) => row.id)).toEqual(["closed-plan"]);
   });
 
+  it("hides work already completed in another day even if that plan is closed", () => {
+    const result = buildPlanningItems({
+      inventory: [item("done-before")],
+      otherPlanAssignments: [
+        {
+          ...assignment("done-before", "closed"),
+          execution_status: "done",
+        },
+      ],
+      planItems: [],
+    });
+
+    expect(result).toHaveLength(0);
+  });
+
   it("hides resolved tickets from new planning options", () => {
     const result = buildPlanningItems({
       inventory: [
@@ -93,6 +108,40 @@ describe("buildPlanningItems", () => {
     ]);
   });
 
+  it("hides completed tasks and acknowledged reminders from new planning options", () => {
+    const result = buildPlanningItems({
+      inventory: [
+        item("open-task", "open-task", {
+          kind: "task",
+          operational_status: null,
+          task_completed_at: null,
+        }),
+        item("done-task", "done-task", {
+          kind: "task",
+          operational_status: null,
+          task_completed_at: "2026-08-03T17:00:00.000Z",
+        }),
+        item("open-reminder", "open-reminder", {
+          kind: "reminder",
+          operational_status: null,
+          reminder_acknowledged_at: null,
+        }),
+        item("acknowledged-reminder", "acknowledged-reminder", {
+          kind: "reminder",
+          operational_status: null,
+          reminder_acknowledged_at: "2026-08-03T17:00:00.000Z",
+        }),
+      ],
+      otherPlanAssignments: [],
+      planItems: [],
+    });
+
+    expect(result.map((row) => row.id)).toEqual([
+      "open-task",
+      "open-reminder",
+    ]);
+  });
+
   it("keeps resolved tickets visible when they are already in the current plan", () => {
     const result = buildPlanningItems({
       inventory: [
@@ -106,5 +155,22 @@ describe("buildPlanningItems", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0]?.planItem?.work_item_id).toBe("resolved-current");
+  });
+
+  it("keeps completed tasks visible when they are already in the current plan", () => {
+    const result = buildPlanningItems({
+      inventory: [
+        item("completed-current-task", "completed-current-task", {
+          kind: "task",
+          operational_status: null,
+          task_completed_at: "2026-08-03T17:00:00.000Z",
+        }),
+      ],
+      otherPlanAssignments: [],
+      planItems: [planItem("completed-current-task")],
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.planItem?.work_item_id).toBe("completed-current-task");
   });
 });

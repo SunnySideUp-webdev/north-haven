@@ -18,6 +18,33 @@ export type PlanningInventoryItem = WorkInventoryRow & {
   plannedElsewhere: boolean;
 };
 
+const BLOCKING_OPEN_PLAN_STATUSES = new Set(["planned", "in_progress"]);
+
+export function isCompletedPlanningCandidate(item: WorkInventoryRow): boolean {
+  if (item.kind === "ticket") {
+    return item.operational_status === "resolved" || Boolean(item.resolved_at);
+  }
+
+  if (item.kind === "task") return Boolean(item.task_completed_at);
+
+  if (item.kind === "reminder") return Boolean(item.reminder_acknowledged_at);
+
+  return false;
+}
+
+export function isBlockingPlanAssignment(
+  assignment: OtherPlanAssignment,
+): boolean {
+  if (!assignment.daily_plans?.work_date) return false;
+
+  if (assignment.execution_status === "done") return true;
+
+  return (
+    assignment.daily_plans.status !== "closed" &&
+    BLOCKING_OPEN_PLAN_STATUSES.has(assignment.execution_status)
+  );
+}
+
 export function buildPlanningItems({
   inventory,
   otherPlanAssignments,
@@ -32,11 +59,7 @@ export function buildPlanningItems({
   );
   const plannedElsewhereIds = new Set(
     otherPlanAssignments
-      .filter(
-        (assignment) =>
-          assignment.daily_plans?.status !== "closed" &&
-          assignment.daily_plans?.work_date,
-      )
+      .filter((assignment) => isBlockingPlanAssignment(assignment))
       .map((assignment) => assignment.work_item_id),
   );
 
@@ -46,8 +69,7 @@ export function buildPlanningItems({
         item.id &&
         (selectedByWorkId.has(item.id) || !plannedElsewhereIds.has(item.id)) &&
         (selectedByWorkId.has(item.id) ||
-          item.kind !== "ticket" ||
-          item.operational_status !== "resolved") &&
+          !isCompletedPlanningCandidate(item)) &&
         (selectedByWorkId.has(item.id) ||
           item.tracking_state === "active" ||
           item.tracking_state === "watching"),

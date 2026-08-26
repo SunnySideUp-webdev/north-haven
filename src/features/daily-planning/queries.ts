@@ -55,7 +55,6 @@ export async function getDailyPlanningData(workDate: string) {
         "work_item_id, execution_status, daily_plans!daily_plan_items_daily_plan_id_workspace_id_fkey!inner(work_date, status)",
       )
       .neq("daily_plans.work_date", workDate)
-      .neq("daily_plans.status", "closed")
       .in("execution_status", ["planned", "in_progress", "done"]);
 
   if (otherPlanAssignmentsError) {
