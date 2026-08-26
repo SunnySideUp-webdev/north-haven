@@ -102,6 +102,10 @@ date and creates the new selection transactionally. Nothing rolls over by
 default. Choosing Done for a Ticket also changes its operational status to
 Resolved in the same database transaction.
 
+The production migration also backfilled the existing Friday, August 21, 2026
+plan: Tickets already recorded as Done on that day were synchronized to
+Resolved while retaining their existing completion timestamp when available.
+
 Due follow-ups can remain waiting with a future review date, return a work item
 to Active, close it after an external change, or become no longer relevant.
 Day notes and their important marker can be edited from Today or End of Day and

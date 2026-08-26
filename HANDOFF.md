@@ -104,6 +104,8 @@ calendar.
 - Ticket completion is synchronized across daily planning and Work Inventory:
   the Today check and End of Day Done set Tickets to Resolved, while reopening
   the Today check sets the plan item and Ticket to In Progress
+- Existing Done Tickets from the August 21, 2026 plan were backfilled to
+  Resolved so historical daily and weekly reports use the synchronized state
 - Work logs and next-workday calculation that skips weekends/non-working dates
 - Separate Plan navigation that includes OOO weekdays while continuing to skip
   holidays and manually blocked dates
