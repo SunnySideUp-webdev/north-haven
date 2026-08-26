@@ -283,6 +283,15 @@ permanent delete. Archive and delete use North Haven's in-app confirmation
 dialog instead of the browser confirmation UI; delete clearly states that
 related notes, plans, and history are permanently removed.
 
+### Bulk ticket import
+
+Work Inventory includes `Import tickets` for source systems that do not provide
+an API or export. The user can paste copied ticket-list text, preview detected
+tickets, skip duplicates by ticket number, and import the remaining Tickets in
+one action. Imported Tickets default to Active tracking, map source `Open` to
+North Haven `Pending`, keep the detected system priority, and save requester /
+category metadata as a small note for later reference.
+
 ### Acceptance criteria
 
 - Filters persist during the session.
@@ -291,6 +300,8 @@ related notes, plans, and history are permanently removed.
 - Archive is recoverable from the Archived filter.
 - Delete is available for tickets, tasks, and reminders when the user needs to
   permanently clean up Work Inventory.
+- Copied ticket-system text can be imported in bulk with a preview before
+  database writes occur.
 
 ## Ticket detail
 

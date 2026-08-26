@@ -1,7 +1,7 @@
 # Work Inventory implementation
 
-Status: Complete through Phase 7.5C plus permanent delete
-Last updated: August 3, 2026
+Status: Complete through Phase 7.5C plus permanent delete and bulk ticket import
+Last updated: August 26, 2026
 
 ## Outcome
 
@@ -73,11 +73,18 @@ Phase 7.5C completes the approved operational surface with:
 - the complete operational table context: received date, age, priority,
   operational status, tracking state, next review, backup, and last worked date
 - multi-selection with Add to Plan, Set Review Date, and recoverable Archive
-- per-row permanent Delete from Work Inventory, exposed as an icon-only trash
-  action with browser confirmation for records entered by mistake or work that
-  no longer exists
+- per-row and bulk permanent Delete from Work Inventory, guarded by an in-app
+  confirmation dialog for records entered by mistake or work that no longer
+  exists
 - database guards that prevent archiving work still present in an open plan
 - direct Add to Plan and Days Worked sections on Work Detail
+
+Bulk ticket import adds a practical bridge for source systems without an API or
+CSV export. The `Import tickets` dialog accepts copied ticket-list text,
+detects repeated ticket blocks, converts relative creation labels into
+approximate received dates, maps priorities/statuses into North Haven fields,
+flags duplicates already present in the inventory, and saves requester/category
+metadata as an import note.
 - confirmations for downstream closure, archival, future received dates, and
   clearing an existing backup completion
 - duplicate capture recovery with a direct Open Existing action

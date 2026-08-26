@@ -11,8 +11,12 @@ import {
   bulkSetReviewDateAction,
   deleteWorkItemAction,
 } from "@/features/work-items/actions";
+import { BulkTicketImportDialog } from "@/features/work-items/components/bulk-ticket-import-dialog";
 import { formatDate, formatDateTime } from "@/features/work-items/date";
-import type { WorkInventoryRow } from "@/features/work-items/types";
+import type {
+  TicketTypeOption,
+  WorkInventoryRow,
+} from "@/features/work-items/types";
 import { formatTicketNumber } from "@/shared/ticket-number";
 import { PageHeader } from "@/shared/ui/page-header";
 
@@ -77,7 +81,13 @@ function ageInDays(value: string | null) {
   return `${days}d`;
 }
 
-export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
+export function WorkIndex({
+  items,
+  ticketTypes,
+}: {
+  items: WorkInventoryRow[];
+  ticketTypes: TicketTypeOption[];
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [savedView, setSavedView] = useState<SavedView>("active");
@@ -236,6 +246,12 @@ export function WorkIndex({ items }: { items: WorkInventoryRow[] }) {
         description="Everything stays here. Today only shows what you deliberately plan."
         action={
           <div className="flex items-center gap-3">
+            <BulkTicketImportDialog
+              existingTicketNumbers={items
+                .map((item) => item.ticket_number)
+                .filter((value): value is string => Boolean(value))}
+              ticketTypes={ticketTypes}
+            />
             <Link
               href="/work/new/task"
               className="border-border bg-paper text-muted hover:text-ink rounded-lg border px-4 py-3 text-sm font-bold"

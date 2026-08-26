@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import type { WorkFormState } from "@/features/work-items/types";
 import {
+  bulkTicketImportInputSchema,
   createTicketTypeInputSchema,
   followUpInputSchema,
   manageTicketTypeInputSchema,
@@ -28,6 +29,26 @@ function databaseMessage(message: string | undefined, noun: string) {
   }
 
   return `We couldn't save this ${noun}. Review the details and try again.`;
+}
+
+function importNote(input: {
+  category?: string;
+  createdLabel?: string;
+  requesterEmail?: string;
+  requesterName?: string;
+  sourceStatus: string;
+}) {
+  const lines = [
+    "Imported from copied ticket-system text.",
+    input.requesterName || input.requesterEmail
+      ? `Requester: ${[input.requesterName, input.requesterEmail ? `<${input.requesterEmail}>` : ""].filter(Boolean).join(" ")}`
+      : undefined,
+    input.createdLabel,
+    `Source status: ${input.sourceStatus}`,
+    input.category ? `Category: ${input.category}` : undefined,
+  ].filter((line): line is string => Boolean(line));
+
+  return lines.join("\n");
 }
 
 export async function createTicketAction(
@@ -124,6 +145,87 @@ export async function createTicketAction(
     }
   }
   redirect(`/work/${data}`);
+}
+
+export async function bulkImportTicketsAction(input: unknown): Promise<{
+  created: number;
+  failed: number;
+  message: string;
+  ok: boolean;
+  skipped: number;
+}> {
+  const result = bulkTicketImportInputSchema.safeParse(input);
+  if (!result.success) {
+    return {
+      created: 0,
+      failed: 0,
+      message: "Review the imported tickets and try again.",
+      ok: false,
+      skipped: 0,
+    };
+  }
+
+  const { supabase } = await requireAuthenticatedContext();
+  let created = 0;
+  let skipped = 0;
+  let failed = 0;
+
+  for (const ticket of result.data.tickets) {
+    const { data: existingWorkItemId } = await supabase.rpc(
+      "find_ticket_by_number",
+      { chosen_ticket_number: ticket.ticketNumber },
+    );
+
+    if (existingWorkItemId) {
+      skipped += 1;
+      continue;
+    }
+
+    const { error } = await supabase.rpc("create_ticket", {
+      chosen_description: "",
+      chosen_external_url: "",
+      chosen_form_backup_complete: false,
+      chosen_is_tracking_ticket: false,
+      chosen_note: importNote(ticket),
+      chosen_operational_status: ticket.operationalStatus,
+      chosen_received_at: ticket.receivedAt,
+      chosen_system_priority: ticket.systemPriority,
+      chosen_ticket_number: ticket.ticketNumber,
+      chosen_ticket_type_id: ticket.ticketTypeId,
+      chosen_title: ticket.title,
+    });
+
+    if (error) {
+      if (error.message.includes("normalized_ticket_number")) {
+        skipped += 1;
+      } else {
+        failed += 1;
+      }
+      continue;
+    }
+
+    created += 1;
+  }
+
+  revalidatePath("/work");
+  revalidatePath("/plan");
+  revalidatePath("/today");
+  revalidatePath("/calendar");
+  revalidatePath("/insights");
+
+  const parts = [
+    `${created} ${created === 1 ? "ticket" : "tickets"} imported`,
+    skipped ? `${skipped} duplicate ${skipped === 1 ? "was" : "were"} skipped` : "",
+    failed ? `${failed} ${failed === 1 ? "ticket" : "tickets"} failed` : "",
+  ].filter(Boolean);
+
+  return {
+    created,
+    failed,
+    message: `${parts.join(" · ")}.`,
+    ok: created > 0 || (skipped > 0 && failed === 0),
+    skipped,
+  };
 }
 
 export async function createTaskAction(

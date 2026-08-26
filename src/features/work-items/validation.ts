@@ -48,6 +48,27 @@ export const ticketWorkflowInputSchema = z.object({
   workItemId: z.string().uuid(),
 });
 
+export const bulkTicketImportInputSchema = z.object({
+  tickets: z
+    .array(
+      z.object({
+        category: z.string().trim().max(500).optional(),
+        createdLabel: z.string().trim().max(120).optional(),
+        operationalStatus,
+        receivedAt: z.string().date(),
+        requesterEmail: z.string().trim().email().optional(),
+        requesterName: z.string().trim().max(200).optional(),
+        sourceStatus: z.string().trim().min(1).max(80),
+        systemPriority,
+        ticketNumber: z.string().trim().min(1).max(80),
+        ticketTypeId: z.string().uuid(),
+        title,
+      }),
+    )
+    .min(1)
+    .max(100),
+});
+
 export const taskInputSchema = z.object({
   description,
   dueAt: z.union([z.literal(""), isoDateTime]),

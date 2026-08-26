@@ -179,6 +179,8 @@ calendar.
 - Operational Work Inventory columns plus multi-select Add to Plan, Set Review,
   guarded recoverable Archive actions, and permanent Delete for tickets, tasks,
   and reminders using an in-app confirmation dialog
+- Bulk Ticket Import from copied ticket-system text with preview, duplicate
+  skipping, approximate received-date parsing, and import metadata notes
 - Direct Work Detail planning, Days Worked history, duplicate recovery, and
   confirmations for sensitive lifecycle changes
 - End of Day multi-ticket capture actions and embedded next-workday planning
