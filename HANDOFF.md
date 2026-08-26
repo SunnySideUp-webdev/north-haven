@@ -1,6 +1,6 @@
 # North Haven project handoff
 
-Last updated: August 2, 2026
+Last updated: August 26, 2026
 
 This file is the safest starting point when continuing North Haven in a new
 chat or development session. It summarizes the approved product direction and
@@ -101,6 +101,9 @@ calendar.
 - Persisted Daily Plans with manual, duplicate-safe Work selection and ordering
 - Draft and Ready states, intention, and calm capacity guidance above eight items
 - Authenticated Today data that hides unplanned inventory and records progress
+- Ticket completion is synchronized across daily planning and Work Inventory:
+  the Today check and End of Day Done set Tickets to Resolved, while reopening
+  the Today check sets the plan item and Ticket to In Progress
 - Work logs and next-workday calculation that skips weekends/non-working dates
 - Separate Plan navigation that includes OOO weekdays while continuing to skip
   holidays and manually blocked dates
@@ -197,7 +200,7 @@ calendar.
 - Auth-user teardown that removes a sole-owner personal workspace atomically
   without changing North Haven's recoverable in-app archival behavior
 - Hosted `North Haven Development` Supabase project in the Tokki organization,
-  East US (North Virginia), linked to the repository with all 20 reviewed
+  East US (North Virginia), linked to the repository with all reviewed
   migrations applied and no demo or customer data
 - Production Vercel project deployed in the Tokki team at
   `https://north-haven-steel.vercel.app`, with the stable domain aliased and

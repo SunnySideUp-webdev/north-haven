@@ -1,14 +1,14 @@
 # Daily Planning implementation
 
 Status: Complete through Phase 7.5C plus cross-day planning de-duplication
-Last updated: August 2, 2026
+Last updated: August 26, 2026
 
 ## Outcome
 
 North Haven now persists a deliberate plan for a specific work date. The owner
 can select work manually, order it without drag-and-drop, mark the plan Ready,
-open Today, and record completion without changing a Ticket's operational or
-tracking status.
+open Today, and record completion. Completing a Ticket from Today or End of Day
+also keeps its operational workflow status synchronized.
 
 ## Database implementation
 
@@ -58,8 +58,10 @@ than silently creating a confusing second commitment.
 
 Today now reads only the selected plan for the user's local date. It provides a
 real empty state, hides unplanned inventory, separates Tickets from normal work,
-shows progress, and records reversible Done decisions without changing Ticket
-workflow status. Planned work rows in Today now match the Work Inventory's
+shows progress, and records reversible Done decisions. Marking a Ticket Done
+sets its operational status to Resolved; reopening it from the Today check sets
+both the plan item and Ticket to In Progress. Tasks and Reminders retain their
+own completion semantics. Planned work rows in Today now match the Work Inventory's
 hover-open rhythm: the item content opens Work Detail without a separate
 Details action, and Work Detail returns to Today when it was opened from Today.
 Today can also open a specific work date with `/today?date=YYYY-MM-DD`, making
@@ -97,7 +99,8 @@ The four-step End of Day flow is now implemented:
 Each planned item requires an explicit outcome: Done, Return to Inventory, Plan
 for Another Date, Keep Watching, or No Longer Needed. Deferral requires a future
 date and creates the new selection transactionally. Nothing rolls over by
-default.
+default. Choosing Done for a Ticket also changes its operational status to
+Resolved in the same database transaction.
 
 Due follow-ups can remain waiting with a future review date, return a work item
 to Active, close it after an external change, or become no longer relevant.

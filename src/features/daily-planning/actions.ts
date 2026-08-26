@@ -160,6 +160,9 @@ export async function setPlanItemDoneAction(input: {
     return { ok: false, message: "We couldn't update today's progress." };
   revalidatePath("/today");
   revalidatePath("/plan");
+  revalidatePath("/work");
+  revalidatePath("/calendar");
+  revalidatePath("/insights");
   return { ok: true };
 }
 
@@ -241,6 +244,9 @@ export async function applyEndOfDayOutcomeAction(input: {
   revalidatePath("/end-of-day");
   revalidatePath("/today");
   revalidatePath("/plan");
+  revalidatePath("/work");
+  revalidatePath("/calendar");
+  revalidatePath("/insights");
   return { ok: true };
 }
 
