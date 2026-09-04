@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { GoogleCalendarError } from "@/features/calendar-sync/google";
 import { requireCalendarServerContext } from "@/features/calendar-sync/server-context";
 import {
   disconnectGoogleCalendar,
@@ -26,11 +27,13 @@ export async function syncCalendarAction(): Promise<CalendarActionResult> {
     await syncGoogleCalendar(workspaceId);
     refreshCalendarViews();
     return { ok: true, message: "Google Calendar is up to date." };
-  } catch {
+  } catch (error) {
     return {
       ok: false,
       message:
-        "North Haven could not sync Google Calendar. Your work plan is still available.",
+        error instanceof GoogleCalendarError && error.code === "timeout"
+          ? "Google Calendar took too long to respond. Please try again in a moment."
+          : "North Haven could not sync Google Calendar. Your work plan is still available.",
     };
   }
 }

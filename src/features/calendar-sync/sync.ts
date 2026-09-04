@@ -1,5 +1,6 @@
 import "server-only";
 
+import { batchItems, mapWithConcurrency } from "@/features/calendar-sync/batch";
 import {
   fullDayOooDates,
   normalizeGoogleEventWindow,
@@ -19,8 +20,16 @@ import {
 } from "@/features/calendar-sync/google";
 import { requireCalendarServerContext } from "@/features/calendar-sync/server-context";
 import { createAdminClient } from "@/server/database/supabase/admin";
+import type { Database } from "@/server/database/supabase/database.types";
 
 type AdminClient = ReturnType<typeof createAdminClient>;
+type ExternalEventInsert =
+  Database["public"]["Tables"]["external_calendar_events"]["Insert"];
+type NonWorkingDayInsert =
+  Database["public"]["Tables"]["non_working_days"]["Insert"];
+
+const calendarWriteBatchSize = 100;
+const calendarSyncConcurrency = 3;
 
 function safeProviderCode(error: unknown) {
   if (error instanceof GoogleCalendarError) return error.code.slice(0, 80);
@@ -80,36 +89,26 @@ async function removeGoogleDaysForCalendar(
   if (error) throw new Error("Calendar OOO dates could not be refreshed.");
 }
 
-async function saveEventChange({
-  admin,
+function prepareEventChange({
   calendarId,
   event,
   workspaceId,
   workspaceTimeZone,
 }: {
-  admin: AdminClient;
   calendarId: string;
   event: GoogleCalendarEvent;
   workspaceId: string;
   workspaceTimeZone: string;
 }) {
   const sourceEventId = `${calendarId}:${event.id}`;
-  await admin
-    .from("non_working_days")
-    .delete()
-    .eq("workspace_id", workspaceId)
-    .eq("source", "google")
-    .eq("source_event_id", sourceEventId);
 
   if (event.status === "cancelled" || !event.start || !event.end) {
-    const { error } = await admin
-      .from("external_calendar_events")
-      .delete()
-      .eq("workspace_id", workspaceId)
-      .eq("external_calendar_id", calendarId)
-      .eq("provider_event_id", event.id);
-    if (error) throw new Error("A removed calendar event could not be synced.");
-    return;
+    return {
+      eventRow: null,
+      oooRows: [] as NonWorkingDayInsert[],
+      providerEventId: event.id,
+      sourceEventId,
+    };
   }
 
   const window = normalizeGoogleEventWindow(
@@ -117,51 +116,117 @@ async function saveEventChange({
     event.end,
     workspaceTimeZone,
   );
-  if (!window || new Date(window.endsAt) <= new Date(window.startsAt)) return;
+  if (!window || new Date(window.endsAt) <= new Date(window.startsAt)) {
+    return {
+      eventRow: null,
+      oooRows: [] as NonWorkingDayInsert[],
+      providerEventId: event.id,
+      sourceEventId,
+    };
+  }
 
   const normalizedType = eventType(event.eventType);
   const oooDates =
     normalizedType === "out_of_office"
       ? fullDayOooDates(event.start, event.end, workspaceTimeZone)
       : [];
-  const { error } = await admin.from("external_calendar_events").upsert(
-    {
-      end_local_date: window.endLocalDate,
-      ends_at: window.endsAt,
-      event_type: normalizedType,
-      external_calendar_id: calendarId,
-      ical_uid: event.iCalUID ?? null,
-      is_all_day: window.isAllDay || oooDates.length > 0,
-      meeting_url: event.hangoutLink ?? null,
-      provider_event_id: event.id,
-      provider_url: event.htmlLink ?? null,
-      provider_updated_at: event.updated ?? null,
-      start_local_date: window.startLocalDate,
-      starts_at: window.startsAt,
-      status: event.status ?? "confirmed",
-      synced_at: new Date().toISOString(),
-      title: event.summary?.trim() || "Untitled event",
-      workspace_id: workspaceId,
-    },
-    { onConflict: "external_calendar_id,provider_event_id" },
-  );
-  if (error) throw new Error("A calendar event could not be synced.");
+  const eventRow: ExternalEventInsert = {
+    end_local_date: window.endLocalDate,
+    ends_at: window.endsAt,
+    event_type: normalizedType,
+    external_calendar_id: calendarId,
+    ical_uid: event.iCalUID ?? null,
+    is_all_day: window.isAllDay || oooDates.length > 0,
+    meeting_url: event.hangoutLink ?? null,
+    provider_event_id: event.id,
+    provider_url: event.htmlLink ?? null,
+    provider_updated_at: event.updated ?? null,
+    start_local_date: window.startLocalDate,
+    starts_at: window.startsAt,
+    status: event.status ?? "confirmed",
+    synced_at: new Date().toISOString(),
+    title: event.summary?.trim() || "Untitled event",
+    workspace_id: workspaceId,
+  };
+  const oooRows: NonWorkingDayInsert[] = oooDates.map((workDate) => ({
+    allows_urgent_work: true,
+    kind: "out_of_office" as const,
+    source: "google" as const,
+    source_event_id: sourceEventId,
+    work_date: workDate,
+    workspace_id: workspaceId,
+  }));
 
-  if (oooDates.length) {
-    const rows = oooDates.map((workDate) => ({
-      allows_urgent_work: true,
-      kind: "out_of_office" as const,
-      source: "google" as const,
-      source_event_id: sourceEventId,
-      work_date: workDate,
-      workspace_id: workspaceId,
-    }));
-    if (rows.length) {
-      const { error: dayError } = await admin
-        .from("non_working_days")
-        .insert(rows);
-      if (dayError) throw new Error("Calendar OOO dates could not be synced.");
-    }
+  return { eventRow, oooRows, providerEventId: event.id, sourceEventId };
+}
+
+async function saveEventChanges({
+  admin,
+  calendarId,
+  events,
+  workspaceId,
+  workspaceTimeZone,
+}: {
+  admin: AdminClient;
+  calendarId: string;
+  events: GoogleCalendarEvent[];
+  workspaceId: string;
+  workspaceTimeZone: string;
+}) {
+  const changes = events.map((event) =>
+    prepareEventChange({
+      calendarId,
+      event,
+      workspaceId,
+      workspaceTimeZone,
+    }),
+  );
+
+  for (const sourceEventIds of batchItems(
+    changes.map((change) => change.sourceEventId),
+    calendarWriteBatchSize,
+  )) {
+    const { error } = await admin
+      .from("non_working_days")
+      .delete()
+      .eq("workspace_id", workspaceId)
+      .eq("source", "google")
+      .in("source_event_id", sourceEventIds);
+    if (error) throw new Error("Calendar OOO dates could not be refreshed.");
+  }
+
+  const removedEventIds = changes
+    .filter((change) => !change.eventRow)
+    .map((change) => change.providerEventId);
+  for (const providerEventIds of batchItems(
+    removedEventIds,
+    calendarWriteBatchSize,
+  )) {
+    const { error } = await admin
+      .from("external_calendar_events")
+      .delete()
+      .eq("workspace_id", workspaceId)
+      .eq("external_calendar_id", calendarId)
+      .in("provider_event_id", providerEventIds);
+    if (error) throw new Error("Removed calendar events could not be synced.");
+  }
+
+  const eventRows = changes.flatMap((change) =>
+    change.eventRow ? [change.eventRow] : [],
+  );
+  for (const rows of batchItems(eventRows, calendarWriteBatchSize)) {
+    const { error } = await admin
+      .from("external_calendar_events")
+      .upsert(rows, {
+        onConflict: "external_calendar_id,provider_event_id",
+      });
+    if (error) throw new Error("Calendar events could not be synced.");
+  }
+
+  const oooRows = changes.flatMap((change) => change.oooRows);
+  for (const rows of batchItems(oooRows, calendarWriteBatchSize)) {
+    const { error } = await admin.from("non_working_days").insert(rows);
+    if (error) throw new Error("Calendar OOO dates could not be synced.");
   }
 }
 
@@ -208,15 +273,13 @@ async function syncOneCalendar({
     });
   }
 
-  for (const event of changes.events) {
-    await saveEventChange({
-      admin,
-      calendarId: calendar.id,
-      event,
-      workspaceId,
-      workspaceTimeZone,
-    });
-  }
+  await saveEventChanges({
+    admin,
+    calendarId: calendar.id,
+    events: changes.events,
+    workspaceId,
+    workspaceTimeZone,
+  });
 
   const { error } = await admin
     .from("external_calendars")
@@ -227,9 +290,11 @@ async function syncOneCalendar({
     .eq("id", calendar.id)
     .eq("workspace_id", workspaceId);
   if (error) throw new Error("Calendar sync state could not be saved.");
+  return changes.events.length;
 }
 
 export async function syncGoogleCalendar(workspaceId: string) {
+  const startedAt = Date.now();
   const admin = createAdminClient();
   const { data: connection, error: connectionError } = await admin
     .from("calendar_connections")
@@ -261,15 +326,18 @@ export async function syncGoogleCalendar(workspaceId: string) {
     if (calendarsError)
       throw new Error("Selected calendars could not be loaded.");
 
-    for (const calendar of calendars ?? []) {
-      await syncOneCalendar({
-        accessToken,
-        admin,
-        calendar,
-        workspaceId,
-        workspaceTimeZone: schedule?.time_zone ?? "America/Guatemala",
-      });
-    }
+    const eventCounts = await mapWithConcurrency(
+      calendars ?? [],
+      calendarSyncConcurrency,
+      (calendar) =>
+        syncOneCalendar({
+          accessToken,
+          admin,
+          calendar,
+          workspaceId,
+          workspaceTimeZone: schedule?.time_zone ?? "America/Guatemala",
+        }),
+    );
 
     const { error: recoveryError } = await admin.rpc(
       "apply_calendar_outcome_recovery",
@@ -290,6 +358,11 @@ export async function syncGoogleCalendar(workspaceId: string) {
       .eq("id", connection.id)
       .eq("workspace_id", workspaceId);
     if (error) throw new Error("Calendar connection state could not be saved.");
+    console.info("Google Calendar sync completed.", {
+      calendarCount: calendars?.length ?? 0,
+      durationMs: Date.now() - startedAt,
+      eventChangeCount: eventCounts.reduce((total, count) => total + count, 0),
+    });
     return syncedAt;
   } catch (error) {
     const disconnected =
@@ -307,6 +380,11 @@ export async function syncGoogleCalendar(workspaceId: string) {
       })
       .eq("id", connection.id)
       .eq("workspace_id", workspaceId);
+    console.error("Google Calendar sync failed.", {
+      code: safeProviderCode(error),
+      durationMs: Date.now() - startedAt,
+      status: error instanceof GoogleCalendarError ? error.status : undefined,
+    });
     throw error;
   }
 }

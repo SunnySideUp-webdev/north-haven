@@ -1,7 +1,7 @@
 # Google Calendar implementation
 
-Status: Complete; live corporate OAuth and refresh verified
-Last updated: August 1, 2026
+Status: Complete; live corporate OAuth, refresh, and high-volume sync verified
+Last updated: September 4, 2026
 
 ## Outcome
 
@@ -61,6 +61,13 @@ attendees, attachments, and conference metadata are not retained.
 - Google network calls are explicitly time-bounded so a slow provider request
   returns the existing non-blocking sync error instead of leaving Settings in an
   indefinite pending state.
+- Provider changes are normalized in memory and persisted in bounded batches of
+  100 instead of issuing multiple database requests for every event.
+- Up to three selected calendars synchronize concurrently. This keeps a large
+  incremental catch-up within the hosted request window without creating an
+  unbounded burst against Google or Supabase.
+- Production logs record only duration, selected-calendar count, provider error
+  code, and change count. Event titles, calendar names, and tokens remain absent.
 - Google outOfOffice is recognized by provider event type, never title matching.
 - Only full-local-day OOO events create non-working dates. Google all-day
   records use an exclusive end date, while timed records qualify only when they

@@ -1,6 +1,6 @@
 # North Haven project handoff
 
-Last updated: August 26, 2026
+Last updated: September 4, 2026
 
 This file is the safest starting point when continuing North Haven in a new
 chat or development session. It summarizes the approved product direction and
@@ -121,6 +121,8 @@ calendar.
 - Server-only AES-256-GCM token protection and browser-inaccessible Calendar
   tables
 - Read-only calendar selection plus initial and incremental event sync
+- Calendar catch-up writes are batched and selected calendars use bounded
+  concurrency, preventing large incremental syncs from timing out in Settings
 - Real meetings in Plan, Today, Calendar, and End of Day attendance review
 - Official full-local-day Google OOO records integrated with next-workday
   calculation, including midnight-to-midnight events returned as timed records

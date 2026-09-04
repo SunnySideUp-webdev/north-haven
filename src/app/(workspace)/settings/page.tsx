@@ -7,6 +7,7 @@ import { getManagedTicketTypes } from "@/features/work-items/queries";
 import { PageHeader } from "@/shared/ui/page-header";
 
 export const metadata: Metadata = { title: "Settings" };
+export const maxDuration = 60;
 
 export default async function SettingsPage({
   searchParams,
